@@ -16,18 +16,14 @@ type TrieNode struct {
   Parent *TrieNode
   Pos *Set
   IsStar bool
-  Count int
 }
 
-const ROOT_CHAR = 0
-
 func NewTrieNode(char Char, parent TrieNode) *TrieNode{
-  return &TrieNode{char, parent, NewHashSet(), false, 0}
+  return &TrieNode{char, parent, NewHashSet(), false}
 }
 
 func NewRootNode(parent TrieNode, ref Reference) *TrieNode {
-	n := &TrieNode{ROOT_CHAR, nil, NewFullSet(ref), false}
-	n.Count = n.(FullSet).Count
+	n := &TrieNode{0, nil, NewFullSet(ref), false}
 	return n
 }
 
@@ -46,7 +42,7 @@ func (n * TrieNode) ToString() string {
 
 func TrieCountFilter( limit int ) PatternFilter {
   return func(p Pattern) bool {
-    return p.(TrieNode).Count > limit
+    return p.(TrieNode).Pos.Length() > limit
   }
 }
 
@@ -60,7 +56,6 @@ func trieSimpleExtend(n TrieNode, ref Reference, patterns map[Char]Pattern) {
       patterns[c] = pat
     }
     pat.Pos.Add( next )
-    pat.Count += 1
   })
 }
 
@@ -82,7 +77,6 @@ func trieGroupCombine(n TrieNode, ref Reference, patterns map[Char] Pattern) {
     pat := NewTrieNode(g.Id, n)
     patterns[g.Id] = pat
     for char := range g.Chars {
-      pats[g.Id].Count += pats[c].Count
       pats[g.Id].Pos.AddSet( pats[c].Pos )
     }
   }

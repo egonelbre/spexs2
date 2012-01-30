@@ -5,7 +5,7 @@ type Pos uint64
 const (
 	PATTERN_LENGTH_BITS = 4
 	PATTERN_LENGTH_MASK = (2 << PATTERN_LENGTH_BITS) - 1
-	Emptypos = 0
+	EmptyPos = 0
 )
 // meaning pattern length can be at most = 2^4
 // and can there can be at most 2^(64 - 4) patterns
@@ -34,16 +34,16 @@ type HashSet struct {
 }
 
 func NewHashSet() *HashSet {
-  return &HashSet{make(map[Pos] bool)}
+  return &HashSet{make(map[Pos] bool), 0}
 }
 
 func ( hs *HashSet ) Add(val Pos) {
-  hs.data[val] = bool
+	hs.data[val] = bool
 }
 
-func ( hs *HashSet ) Contains(val Pos) (exists bool) {
+func ( hs *HashSet ) Contains(val Pos) bool {
   _, exists := hs.data[val]
-  return
+  return exists
 }
 
 func ( hs *HashSet) Length() uint {
@@ -96,7 +96,7 @@ type FullSet struct {
 func NewFullSet(ref *UnicodeReference) *FullSet{
 	f := &FullSet{ ref }
 	for p, _ := range ref.Pats {
-		f.Count += p.Length
+		f.Count += p.Count
 	}
 	return f
 }
@@ -105,7 +105,7 @@ func ( f * FullSet ) Add( val Pos ){ }
 
 func ( f * FullSet ) Contains( val Pos ){
 	idx, pos := PosDecode(val)
-	return idx < len(f.Pats) && pos < f.Pats[idx].Length
+	return idx < len(f.Pats) && pos < len( f.Pats[idx].Pat )
 }
 
 func ( f *FullSet) Length() uint {

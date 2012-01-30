@@ -4,7 +4,7 @@ import utf8
 
 type ReferencePattern {
 	Pat []byte
-	Length int
+	Count int // this refers to rune count in Pat
 }
 
 type UnicodeReference struct {
@@ -17,7 +17,7 @@ type UnicodeReference struct {
 func (ref *UnicodeReferences) Next(p Pos) (Char, Pos, bool) {
   idx, pos := PosDecode(p)
 
-  if pos >= ref.Pats[idx].Length {
+  if pos >= len(ref.Pats[idx].Pat) {
   	return 0, EmptyPos, false
   }
 
