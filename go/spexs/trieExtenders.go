@@ -98,7 +98,7 @@ func GroupStarExtender(p Pattern, ref Reference) Patterns {
   trieSimpleExtend(p.(TrieNode), ref, patterns)
   trieGroupCombine(p.(TrieNode), ref, patterns)
   trieStarExtend(p.(TrieNode), ref, stars)
-  trieGroupExtend(p.(TrieNode), ref, stars)
+  trieGroupCombine(p.(TrieNode), ref, stars)
 
   for _, pat := patterns {
     result <- patterns
