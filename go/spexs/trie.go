@@ -1,4 +1,4 @@
-package trie
+package spexs
 
 type Char int
 
@@ -14,27 +14,27 @@ func NewGroup( id Char, chars []Char ) *Group {
 type TrieNode struct {
   Char Char
   Parent *TrieNode
-  Pos *Set
+  Pos Set
   IsStar bool
 }
 
-func NewTrieNode(char Char, parent TrieNode) *TrieNode{
+func NewTrieNode(char Char, parent *TrieNode) *TrieNode{
   return &TrieNode{char, parent, NewHashSet(), false}
 }
 
-func NewRootNode(parent TrieNode, ref Reference) *TrieNode {
+func NewRootNode(parent TrieNode, ref *Reference) *TrieNode {
 	n := &TrieNode{0, nil, NewFullSet(ref), false}
 	return n
 }
 
-func (n * TrieNode) ToString() string {
+func (n TrieNode) ToString() string {
 	if n.Parent == nil {
 		return ""
 	} else {
     if n.IsStar {
-      return n.Parent.ToString() + '*' +  string( n.Char )
+      return n.Parent.ToString() + string('*') +  string( n.Char )
     } else {
-      return n.Parent.ToString() + string( n.Char )
+      return n.Parent.ToString() + string(n.Char)
     }
 		
 	}

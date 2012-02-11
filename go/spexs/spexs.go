@@ -1,14 +1,15 @@
 package spexs
 
-type Pattern interface{
+type Pattern interface {
   ToString() string
 }
 
-type Patterns chan Pattern
+type Patterns chan *Pattern
+
 type EmptyPattern nil
 
-type Reference interface{
-  Next(pos Pos) (Char, Pos, bool) {
+type Reference interface {
+  Next(pos Pos) (Char, Pos, bool)
 }
 
 type Pooler interface {
@@ -22,7 +23,7 @@ type ExtenderFunc func( p Pattern, ref Reference) Patterns
 func Run( ref Reference, patterns Pooler, results Pooler, 
           extender ExtenderFunc, acceptable PatternFilter) {
   patterns.Put(EmptyPattern)
-  for p, valid := patterns.Take(); valid {
+  for ;p, valid := patterns.Take(); valid {
     pats := extender(p, ref)
     for ep := range pats {
       if acceptable( ep ) {
@@ -38,7 +39,7 @@ func RunParallel( ref Reference, input Pooler, results Pooler,
   input.Put(EmptyPattern)
   start := make(chan int) // alternatively make(chan int, threadLimit)
   stop := make(chan int)
-  func run {
+  run := func(){
     start <- 1
     defer func(){ stop <- 1 }()
     

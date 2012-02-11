@@ -12,20 +12,22 @@ const (
 
 // pos must be < 16
 func PosEncode(idx int, pos byte) Pos {
-	return idx << PATTERN_LENGTH_BITS | (pos & PATTERN_LENGTH_MASK)
+	idxe := uint64(idx << PATTERN_LENGTH_BITS)
+	pose := uint64(pos & PATTERN_LENGTH_MASK)
+	return Pos(idxe | pose)
 }
 
 func PosDecode( p Pos ) (idx int, pos byte ) {
-	pos = p & PATTERN_LENGTH_MASK
-	idx = p >> PATTERN_LENGTH_BITS
+	pos = byte(p & PATTERN_LENGTH_MASK)
+	idx = int(p >> PATTERN_LENGTH_BITS)
 }
 
 type ItemFunc func(item Pos)
 
 type Set interface {
-  Add(item Pos)
-  Contains(item Pos) bool
-  Length() uint
+  Add(val Pos)
+  Contains(val Pos) bool
+  Length() int
   Iterate( ItemFunc )
 }
 
@@ -34,30 +36,30 @@ type HashSet struct {
 }
 
 func NewHashSet() *HashSet {
-  return &HashSet{make(map[Pos] bool), 0}
+  return &HashSet{make(map[Pos]bool)}
 }
 
-func ( hs *HashSet ) Add(val Pos) {
-	hs.data[val] = bool
+func (hs *HashSet ) Add(val Pos) {
+	hs.data[val] = true
 }
 
-func ( hs *HashSet ) Contains(val Pos) bool {
+func (hs *HashSet ) Contains(val Pos) bool {
   _, exists := hs.data[val]
   return exists
 }
 
-func ( hs *HashSet) Length() uint {
+func (hs *HashSet) Length() int {
   return len(hs.data)
 }
 
-func ( hs *HashSet) Iterate( f ItemFunc ){
+func (hs *HashSet) Iterate( f ItemFunc ){
 	for v, _ := range hs.data {
 		f(v)
 	}
 }
 
 // result can't be hs nor gs
-func ( h * Set) And( g *Set, result *Set ){
+func SetAnd( h Set, g Set, result Set ){
 	var first, second Set
 
 	if h.Length() < g.Length() {
@@ -75,7 +77,7 @@ func ( h * Set) And( g *Set, result *Set ){
 	})
 }
 
-func ( h * Set) Or( g *Set, result *Set ){
+func SetOr( h Set, g Set, result Set ){
 	if h != result {
 		h.Iterate( func(item Pos){ result.Add(item) } )
 	}
@@ -84,7 +86,7 @@ func ( h * Set) Or( g *Set, result *Set ){
 	}
 }
 
-func ( h * Set) AddSet( g *Set ){
+func SetAddSet( h Set, g Set ){
 	g.Iterate( func(item Pos){ h.Add(item) } )
 }
 
@@ -93,31 +95,31 @@ type FullSet struct {
 	Count int
 }
 
-func NewFullSet(ref *UnicodeReference) *FullSet{
-	f := &FullSet{ ref }
-	for p, _ := range ref.Pats {
+func NewFullSet(r Reference) *FullSet {
+	ref, _ := r.(UnicodeReference) // hack
+	f := &FullSet{ ref, 0 }
+	for _, p := range ref.Pats {
 		f.Count += p.Count
 	}
 	return f
 }
 
-func ( f * FullSet ) Add( val Pos ){ }
+func (f * FullSet ) Add( val Pos ){ }
 
-func ( f * FullSet ) Contains( val Pos ){
+func (f * FullSet ) Contains( val Pos ) bool {
 	idx, pos := PosDecode(val)
-	return idx < len(f.Pats) && pos < len( f.Pats[idx].Pat )
+	return idx < len(f.Ref.Pats) && int(pos) < len( f.Ref.Pats[idx].Pat )
 }
 
-func ( f *FullSet) Length() uint {
+func (f *FullSet) Length() int {
   return f.Count
 }
 
-func ( f *FullSet) Iterate( f ItemFunc ){
-	for idx := range len(f.Ref.Pats) {
-		pat := f.Ref.Pats[idx]
+func (f *FullSet) Iterate( fun ItemFunc ){
+	for idx, pat := range f.Ref.Pats {
 		/* TODO: iterate properly utf8 style */
-		for pos := range pat.Length {
-			f( PosEncode(idx, pos) )
+		for pos, _ := range pat.Pat {
+			fun( PosEncode(idx, uint8(pos)) )
 		}
 	}
 }

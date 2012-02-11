@@ -1,8 +1,8 @@
 package spexs
 
-import utf8
+import "utf8"
 
-type ReferencePattern {
+type ReferencePattern struct {
 	Pat []byte
 	Count int // this refers to rune count in Pat
 }
@@ -14,7 +14,7 @@ type UnicodeReference struct {
   Groups []Group
 }
 
-func (ref *UnicodeReferences) Next(p Pos) (Char, Pos, bool) {
+func (ref UnicodeReference) Next(p Pos) (Char, Pos, bool) {
   idx, pos := PosDecode(p)
 
   if pos >= len(ref.Pats[idx].Pat) {
