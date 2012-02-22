@@ -47,6 +47,9 @@ func NewPriorityPool(fitness FitnessFunction) *PriorityPool {
 			p.actualPut(c)
 		}
 	}()
+
+	heap.Init(p)
+
 	return p
 }
 
