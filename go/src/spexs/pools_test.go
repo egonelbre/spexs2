@@ -18,7 +18,7 @@ func (p *string_pattern) String() string {
 func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
 	val, ok := p.Take()
 	if ok != expectedOk {
-		t.Errorf("didn't get correct ok value, got='%s', expected='%s'", ok, expectedOk)
+		t.Errorf("didn't get correct ok value, got='%v', expected='%v', str='%s'", ok, expectedOk, expected)
 	}
 	if ok && val.String() != expected {
 		t.Errorf("didn't get correct value, got='%s', expected='%s'", val, expected)
@@ -48,9 +48,22 @@ func TestPriorityPool(t *testing.T) {
 		return float32(len(p.String()))
 	}
 	p := NewPriorityPool(lenFitness)
-		
-	p.Put(newString("alpha"))
-	p.Put(newString("beta"))
-	testTake(t, p, "alpha", true)
-	testTake(t, p, "beta", true)
+	
+	p.Put(newString("bc"))	
+	p.Put(newString("defg"))
+	p.Put(newString("a"))
+	p.Put(newString("def"))
+	
+	testTake(t, p, "a", true)
+	testTake(t, p, "bc", true)
+
+	p.Put(newString("x"))
+	p.Put(newString("defgh"))
+
+	testTake(t, p, "x", true)
+	testTake(t, p, "def", true)
+	testTake(t, p, "defg", true)
+	testTake(t, p, "defgh", true)
+	
+	testTake(t, p, "", false)
 }

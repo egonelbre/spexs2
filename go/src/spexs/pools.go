@@ -27,7 +27,6 @@ type FitnessFunction func(a Pattern) float32
 
 type PriorityPool struct {
 	token   chan int
-	input   Patterns
 	items   []Pattern
 	Fitness FitnessFunction
 }
@@ -35,40 +34,34 @@ type PriorityPool struct {
 func NewPriorityPool(fitness FitnessFunction) *PriorityPool {
 	p := &PriorityPool{}
 	p.token = make(chan int, 1)
-	p.input = MakePatterns()
 	p.items = make([]Pattern, 0)
 	p.Fitness = fitness
 	p.token <- 1
 
-	// put synchronizer
-	go func() {
-		for {
-			c := <-p.input
-			p.actualPut(c)
-		}
-	}()
-
 	heap.Init(p)
-
 	return p
+}
+
+func (p *PriorityPool) IsEmpty() bool {
+    return len(p.items) == 0
 }
 
 func (p *PriorityPool) Take() (Pattern, bool) {
 	<-p.token
 	defer func() { p.token <- 1 }()
+
+	if p.IsEmpty() {
+		return nil, false
+	}
 	v := heap.Pop(p)
 	return v.(Pattern), true
 }
 
-func (p *PriorityPool) actualPut(pat Pattern) {
+func (p *PriorityPool) Put(pat Pattern) {
 	<-p.token
 	defer func() { p.token <- 1 }()
 
 	heap.Push(p, pat)
-}
-
-func (p *PriorityPool) Put(pat Pattern) {
-	p.input <- pat
 }
 
 // sort.Interface
