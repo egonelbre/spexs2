@@ -1,15 +1,14 @@
 package spexs
 
 func output(out Patterns, patterns map[Char]*TrieNode) {
-	for _, node := range(patterns) {
-		p := Pattern(*node)
-		out <- &p
+	for _, node := range patterns {
+		out <- node
 	}
 }
 
-func trieSimpleExtend(n *TrieNode, ref *Reference, patterns map[Char]*TrieNode) {
+func trieSimpleExtend(n *TrieNode, ref Reference, patterns map[Char]*TrieNode) {
 	for pos := range n.Pos.Iter() {
-		char, next, valid := (*ref).Next(pos)
+		char, next, valid := ref.Next(pos)
 		if !valid {
 			continue
 		}
@@ -22,19 +21,19 @@ func trieSimpleExtend(n *TrieNode, ref *Reference, patterns map[Char]*TrieNode) 
 	}
 }
 
-func SimpleExtender(p *Pattern, ref *Reference) Patterns {
-	result := make(Patterns)
+func SimpleExtender(p Pattern, ref Reference) Patterns {
+	result := MakePatterns()
 	patterns := make(map[Char]*TrieNode)
 
-	node := (*p).(TrieNode)
+	node := p.(TrieNode)
 	trieSimpleExtend(&node, ref, patterns)
 
 	output(result, patterns)
 	return result
 }
 
-func trieGroupCombine(n *TrieNode, ref *Reference, patterns map[Char]*TrieNode) {
-	for _, g := range (*ref).(UnicodeReference).Groups {
+func trieGroupCombine(n *TrieNode, ref Reference, patterns map[Char]*TrieNode) {
+	for _, g := range ref.(UnicodeReference).Groups {
 		pat := NewTrieNode(g.Id, n)
 		patterns[g.Id] = pat
 		for _, char := range g.Chars {
@@ -43,11 +42,11 @@ func trieGroupCombine(n *TrieNode, ref *Reference, patterns map[Char]*TrieNode) 
 	}
 }
 
-func GroupExtender(p *Pattern, ref *Reference) Patterns {
-	result := make(Patterns)
+func GroupExtender(p Pattern, ref Reference) Patterns {
+	result := MakePatterns()
 	patterns := make(map[Char]*TrieNode)
 
-	node := (*p).(TrieNode)
+	node := p.(TrieNode)
 	trieSimpleExtend(&node, ref, patterns)
 	trieGroupCombine(&node, ref, patterns)
 
@@ -55,7 +54,7 @@ func GroupExtender(p *Pattern, ref *Reference) Patterns {
 	return result
 }
 
-func trieStarExtend(node *TrieNode, ref *Reference, stars map[Char]*TrieNode) {
+func trieStarExtend(node *TrieNode, ref Reference, stars map[Char]*TrieNode) {
 	lowest := make(map[int]Pos)
 
 	for p := range node.Pos.Iter() {
@@ -67,7 +66,7 @@ func trieStarExtend(node *TrieNode, ref *Reference, stars map[Char]*TrieNode) {
 	}
 
 	for _, p := range lowest {
-		char, next, valid := (*ref).Next(p);
+		char, next, valid := ref.Next(p);
 		for valid {
 			pat, exists := stars[char]
 			if !exists {
@@ -76,17 +75,17 @@ func trieStarExtend(node *TrieNode, ref *Reference, stars map[Char]*TrieNode) {
 				stars[char] = pat
 			}
 			pat.Pos.Add(next)
-			char, next, valid = (*ref).Next(next)
+			char, next, valid = ref.Next(next)
 		}
 	}
 }
 
-func StarExtender(p *Pattern, ref *Reference) Patterns {
-	result := make(Patterns)
+func StarExtender(p Pattern, ref Reference) Patterns {
+	result := MakePatterns()
 	patterns := make(map[Char]*TrieNode)
 	stars := make(map[Char]*TrieNode)
 
-	node := (*p).(TrieNode)
+	node := p.(TrieNode)
 	trieSimpleExtend(&node, ref, patterns)
 	trieStarExtend(&node, ref, stars)
 
@@ -95,12 +94,12 @@ func StarExtender(p *Pattern, ref *Reference) Patterns {
 	return result
 }
 
-func GroupStarExtender(p *Pattern, ref *Reference) Patterns {
-	result := make(Patterns)
+func GroupStarExtender(p Pattern, ref Reference) Patterns {
+	result := MakePatterns()
 	patterns := make(map[Char]*TrieNode)
 	stars := make(map[Char]*TrieNode)
 
-	node := (*p).(TrieNode)
+	node := p.(TrieNode)
 	trieSimpleExtend(&node, ref, patterns)
 	trieGroupCombine(&node, ref, patterns)
 	trieStarExtend(&node, ref, stars)

@@ -22,25 +22,24 @@ func NewTrieNode(char Char, parent *TrieNode) *TrieNode {
 	return &TrieNode{char, parent, NewHashSet(), false}
 }
 
-func NewRootNode(parent TrieNode, ref *Reference) *TrieNode {
+func NewRootNode(ref Reference) *TrieNode {
 	n := &TrieNode{0, nil, NewFullSet(ref), false}
 	return n
 }
 
-func (n TrieNode) ToString() string {
+func (n TrieNode) String() string {
 	if n.Parent != nil {
 		if n.IsStar {
-			return n.Parent.ToString() + string('*') + string(n.Char)
+			return n.Parent.String() + string('*') + string(n.Char)
 		} else {
-			return n.Parent.ToString() + string(n.Char)
+			return n.Parent.String() + string(n.Char)
 		}
-
 	}
 	return "";
 }
 
 func TrieCountFilter(limit int) PatternFilter {
-	return func(p *Pattern) bool {
-		return (*p).(TrieNode).Pos.Length() > limit
+	return func(p Pattern) bool {
+		return p.(TrieNode).Pos.Length() > limit
 	}
 }
