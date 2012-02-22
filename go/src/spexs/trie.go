@@ -11,7 +11,7 @@ func NewTrieNode(char Char, parent *TrieNode) *TrieNode {
 	return &TrieNode{char, parent, NewHashSet(), false}
 }
 
-func NewRootNode(ref Reference) *TrieNode {
+func NewFullNodeFromRef(ref Reference) *TrieNode {
 	n := &TrieNode{0, nil, NewFullSet(ref), false}
 	return n
 }

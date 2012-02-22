@@ -22,7 +22,7 @@ func pattern(data string) ReferencePattern {
 	return p
 }
 
-func createUnicodeReference() *UnicodeReference {
+func createTestUnicodeReference() *UnicodeReference {
 	u := &UnicodeReference{}
 	u.Alphabet = chars("ACGT")
 
@@ -44,7 +44,7 @@ func createUnicodeReference() *UnicodeReference {
 }
 
 func TestUnicodeReferenceNext(t *testing.T){
-	u := createUnicodeReference()
+	u := createTestUnicodeReference()
 
 	testStr := func (idx int, str string) {
 		p := PosEncode(idx, 0)
