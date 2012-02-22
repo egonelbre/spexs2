@@ -1,16 +1,5 @@
 package spexs
 
-type Char rune
-
-type Group struct {
-	Id    Char
-	Chars []Char
-}
-
-func NewGroup(id Char, chars []Char) *Group {
-	return &Group{id, chars}
-}
-
 type TrieNode struct {
 	Char   Char
 	Parent *TrieNode

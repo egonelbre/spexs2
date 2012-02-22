@@ -4,7 +4,7 @@ type Pos uint64
 
 const (
 	PATTERN_LENGTH_BITS = 4
-	PATTERN_LENGTH_MASK = (2 << PATTERN_LENGTH_BITS) - 1
+	PATTERN_LENGTH_MASK = (1 << PATTERN_LENGTH_BITS) - 1
 	EmptyPos            = 0
 )
 

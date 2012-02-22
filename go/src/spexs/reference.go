@@ -2,6 +2,17 @@ package spexs
 
 import "unicode/utf8"
 
+type Char rune
+
+type Group struct {
+	Id    Char
+	Chars []Char
+}
+
+func NewGroup(id Char, chars []Char) *Group {
+	return &Group{id, chars}
+}
+
 type ReferencePattern struct {
 	Pat   []byte
 	Count int // this refers to rune count in Pat
@@ -9,7 +20,6 @@ type ReferencePattern struct {
 
 type UnicodeReference struct {
 	Pats     []ReferencePattern
-	Star     Char
 	Alphabet []Char
 	Groups   []Group
 }
