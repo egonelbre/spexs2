@@ -1,14 +1,16 @@
 package spexs
 
+import "fmt"
+
 type Pos uint64
 
 const (
-	PATTERN_LENGTH_BITS = 4
+	PATTERN_LENGTH_BITS = 5
 	PATTERN_LENGTH_MASK = (1 << PATTERN_LENGTH_BITS) - 1
 	EmptyPos            = 0
 )
 
-// meaning pattern length can be at most = 2^4
+// meaning pattern length can be at most = 2^4-1
 // and can there can be at most 2^(64 - 4) patterns
 
 // pos must be < 16
@@ -53,11 +55,14 @@ func (hs *HashSet) Length() int {
 }
 
 func (hs *HashSet) Iter() chan Pos {
-	ch := make(chan Pos)
+	ch := make(chan Pos, 100)
 	go func(){
 		for v, _ := range hs.data {
+			pos, idx := PosDecode(v)
+			fmt.Printf("sending %v %v \n", pos, idx)
 			ch <- v
 		}
+		close(ch)
 	}()
 	return ch
 }
@@ -127,12 +132,15 @@ func (f *FullSet) Length() int {
 }
 
 func (f *FullSet) Iter() chan Pos {
-	ch := make(chan Pos)
-	for idx, pat := range f.Ref.Pats {
-		/* TODO: iterate properly utf8 style */
-		for pos, _ := range pat.Pat {
-			ch <- PosEncode(idx, uint8(pos))
+	ch := make(chan Pos, 100)
+	go func(){
+		for idx, pat := range f.Ref.Pats {
+			/* TODO: iterate properly utf8 style */
+			for pos, _ := range pat.Pat {
+				ch <- PosEncode(idx, uint8(pos))
+			}
 		}
-	}
+		close(ch)
+	}()
 	return ch
 }
