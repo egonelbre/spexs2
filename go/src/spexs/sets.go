@@ -1,7 +1,5 @@
 package spexs
 
-import "fmt"
-
 type Pos uint64
 
 const (
@@ -58,8 +56,6 @@ func (hs *HashSet) Iter() chan Pos {
 	ch := make(chan Pos, 100)
 	go func(){
 		for v, _ := range hs.data {
-			pos, idx := PosDecode(v)
-			fmt.Printf("sending %v %v \n", pos, idx)
 			ch <- v
 		}
 		close(ch)

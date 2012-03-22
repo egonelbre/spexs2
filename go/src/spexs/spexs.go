@@ -3,7 +3,7 @@ package spexs
 import "fmt"
 
 const (
-	patternsBufferSize = 1000
+	patternsBufferSize = 10000
 )
 
 type Pattern interface {
@@ -46,10 +46,10 @@ func Run(ref Reference, patterns Pooler, results Pooler,
 func RunParallel(ref Reference, input Pooler, results Pooler,
 	extender ExtenderFunc, acceptable PatternFilter) {
 
-	start := make(chan int) // alternatively make(chan int, threadLimit)
-	stop := make(chan int)
+	start := make(chan int, 1000)
+	stop := make(chan int, 1000)
 	
-	num_threads := 10;
+	num_threads := 36;
 	for i := 0; i < num_threads; i++ {
 		go func(){
 			start <- 1
@@ -72,7 +72,7 @@ func RunParallel(ref Reference, input Pooler, results Pooler,
 		}()
 	}
 
-	for _ = range(start) {
+	for i := 0; i < num_threads; i++ {
 		<-stop
 	}
 }

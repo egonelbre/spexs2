@@ -81,3 +81,23 @@ func TestHashSet(t *testing.T) {
 		}
 	}
 }
+
+func InsertAndIterate(s Set, patterns int, positions int){
+	for idx := 0; idx < patterns; idx += 1 {
+		for pos := 0; pos < positions; pos += 1 {
+			p := PosEncode(idx, byte(pos))
+			hs.Add(p)
+		}
+	}
+
+	sum := 0;
+	for x := range s.Iter() {
+		_, pos := PosDecode(x)
+		sum += int(pos);
+	}
+}
+
+func BenchmarkHashSet(b *testing.B) {
+	hs := NewHashSet()
+	InsertAndIterate(hs, 1000000, 10)
+}

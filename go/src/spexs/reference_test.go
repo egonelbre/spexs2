@@ -8,7 +8,7 @@ import (
 
 func chars(s string) []Char {
 	a := make([]Char, 0, 100)
-	for c := range s {
+	for _, c := range s {
 		a = append(a, Char(c))
 	}
 	return a
