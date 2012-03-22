@@ -7,14 +7,15 @@ type TrieNode struct {
 	IsGroup bool
 	IsStar bool
 	length int
+	complexity int
 }
 
 func NewTrieNode(char Char, parent *TrieNode) *TrieNode {
-	return &TrieNode{char, parent, NewHashSet(), false, false, -1}
+	return &TrieNode{char, parent, NewHashSet(), false, false, -1, -1}
 }
 
 func NewFullNodeFromRef(ref Reference) *TrieNode {
-	n := &TrieNode{0, nil, NewFullSet(ref), false, false, -1}
+	n := &TrieNode{0, nil, NewFullSet(ref), false, false, -1, -1}
 	return n
 }
 
@@ -41,13 +42,16 @@ func (n TrieNode) Length() int {
 
 func (n TrieNode) Complexity() int {
 	if n.Parent != nil {
-		if n.IsStar {
-			return n.Parent.Complexity() + 4
-		} else if n.IsGroup {
-			return n.Parent.Complexity() + 2
-		} else {
-			return n.Parent.Complexity() + 1
+		if n.complexity < 0 {
+			if n.IsStar {
+				n.complexity = n.Parent.Complexity() + 4
+			} else if n.IsGroup {
+				n.complexity = n.Parent.Complexity() + 2
+			} else {
+				n.complexity = n.Parent.Complexity() + 1
+			}
 		}
+		return n.complexity
 	}
 	return 0
 }

@@ -29,12 +29,14 @@ type PriorityPool struct {
 	token   chan int
 	items   []Pattern
 	Fitness FitnessFunction
+	limit   int
 }
 
-func NewPriorityPool(fitness FitnessFunction) *PriorityPool {
+func NewPriorityPool(fitness FitnessFunction, limit int) *PriorityPool {
 	p := &PriorityPool{}
 	p.token = make(chan int, 1)
 	p.items = make([]Pattern, 0)
+	p.limit = limit
 	p.Fitness = fitness
 	p.token <- 1
 
@@ -62,6 +64,9 @@ func (p *PriorityPool) Put(pat Pattern) {
 	defer func() { p.token <- 1 }()
 
 	heap.Push(p, pat)
+	if p.Len() > p.limit {
+		heap.Pop(p)
+	}
 }
 
 // sort.Interface

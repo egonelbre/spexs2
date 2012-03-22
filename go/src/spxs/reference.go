@@ -21,10 +21,6 @@ func chars(s string) []Char {
 }
 
 func pattern(data string) *ReferencePattern {
-	data = strings.Trim(data, " \n\r\t")
-	if len(data) == 0 {
-		return nil
-	}
 	p := ReferencePattern{}
 	b := bytes.NewBufferString(data)
 	p.Pat = b.Bytes()
@@ -44,12 +40,18 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 	}
 	
 	ref = &UnicodeReference{}
-	ref.Pats = make([]ReferencePattern, 0, 1000000)
+	ref.Pats = make([]ReferencePattern, 0, 1024)
 
 	reader = bufio.NewReader(file)
-	for err != nil {
+	for err == nil {
 		if line, err = reader.ReadString('\n'); err != nil && err != io.EOF {
 			return nil, fmt.Errorf("Unable to read reference file '%v'", refName)
+		}
+		
+		line = strings.TrimSpace(line)
+		
+		if len(line) == 0 {
+			continue
 		}
 
 		p := pattern(line)
@@ -63,13 +65,13 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 
 	ref.Groups = make([]Group, 0, 255)
 	
-	if file, err = os.Open(refName); err != nil {
+	if file, err = os.Open(charName); err != nil {
 		return nil, fmt.Errorf("Unable to read charset file '%v'", charName)
 	}
 
 	regComment, err1 := regexp.Compile("^\\s*(#.*)?$")
 	regAlphabet, err2 := regexp.Compile("^\\s*(\\S+)\\s*(#.*)?$")
-	regGroup, err3 := regexp.Compile("^\\s*(\\S+)\\s*,?\\s*(\\S)\\s*,?\\s*(\\S+)\\s*(#.*)?$")
+	regGroup, err3 := regexp.Compile("^\\s*(\\S+)\\s*,\\s*(\\S)\\s*,\\s*(\\S+)\\s*(#.*)?$")
 	
 	if err1 != nil || err2 != nil || err3 != nil {
 		fmt.Printf("Invalid regex %v\n", err1)
@@ -80,13 +82,13 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 
 	first := true
 	lineNo := 0
-	groupIdx := 0
 	reader = bufio.NewReader(file)
 
-	for err != nil {
+	for err == nil {
 		if line, err = reader.ReadString('\n'); err != nil && err != io.EOF {
 			return nil, err
 		}
+		line = strings.TrimSpace(line)
 		lineNo += 1;
 
 		if regComment.MatchString(line) {
@@ -101,15 +103,15 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 		}
 		
 		if !first && regGroup.MatchString(line) {
-			tokens := regAlphabet.FindStringSubmatch(line)
+			tokens := regGroup.FindStringSubmatch(line)
 			g := *NewGroup(tokens[3], chars(tokens[2])[0], chars(tokens[1]))
-			ref.Groups[groupIdx] = g
-			groupIdx += 1
+			ref.Groups = append(ref.Groups, g)
 			continue
 		}
 
 		fmt.Printf("Invalid charset entry on line %v : %v\n", lineNo, line)
 	}
+	err = nil
 
 	return
 }

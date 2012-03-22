@@ -10,10 +10,12 @@ import (
 var (
 	//alphabet *string = flag.String("alphabet", "ACGT", "alphabet used for the input file")
     characterFile *string = flag.String("chars", "", "character set file")
-    referenceFile *string = flag.String("ref", "", "reference file")
+    referenceFile *string = flag.String("ref", "", "reference file")   
     extenderName *string = flag.String("extender", "regex", "method used for extending nodes (simple, group, star, regex)")
     limiterName *string = flag.String("limiter", "count", "method used to determine whether node is accptable for extending (count, length, complexity)")
     limitValue *int = flag.Int("limit", 5, "value for limiter")
+    topCount *int = flag.Int("top", 10, "only print top amount")
+    procs *int = flag.Int("procs", 2, "processors to use")
 )
 
 var extenders = map[string] ExtenderFunc {
@@ -41,7 +43,6 @@ var limiters = map[string] PatternFilterCreator {
 }
 
 func main() {
-	runtime.GOMAXPROCS(16)
 	flag.Parse()
 
 	ok := true
@@ -64,6 +65,10 @@ func main() {
 	if !ok {
 		return
 	}
+	
+	if *procs > 0 {
+		runtime.GOMAXPROCS(*procs)
+	}
 
 	var (
 		ref *UnicodeReference
@@ -83,13 +88,21 @@ func main() {
 	acceptable = limiters[*limiterName](*limitValue)
 
 	in = NewFifoPool()
- 	in.Put(*NewFullNodeFromRef(ref))
-	out = NewFifoPool()
+ 	in.Put(*NewFullNodeFromRef(*ref))
+	//out = NewFifoPool()
 
-	RunParallel(ref,in,out,extender,acceptable)
-	
-	for p, ok := out.Take(); ok; {
-		n := p.(TrieNode)
-		fmt.Printf("%s : %v\n", n.String(), n.Pos.Length())
+	f := func(a Pattern) float32{
+		return float32(a.(TrieNode).Length()*a.(TrieNode).Pos.Length())
 	}
+	out = NewPriorityPool(f, *topCount)
+
+	RunParallel(*ref,in,out,extender,acceptable,(*procs)*4)
+	 
+	p, ok := out.Take()
+	for ok {
+		n := p.(TrieNode)
+		fmt.Printf("%s\t%v\t%v\n", n.String(), n.Pos.Length(), f(p))
+		p, ok = out.Take()
+	}
+	fmt.Printf("\n\n")
 }
