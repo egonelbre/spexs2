@@ -96,7 +96,7 @@ func main() {
 	fitness = fitnesses[*fitnessName]
 
 	in = NewFifoPool()
- 	in.Put(NewFullNodeFromRef(*ref))
+ 	in.Put(NewFullNodeFromRef(ref))
 	out = NewPriorityPool(fitness, *topCount)
 
 	RunParallel(ref,in,out,extender,acceptable,(*procs)*4)

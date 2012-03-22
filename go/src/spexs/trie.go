@@ -14,7 +14,7 @@ func NewTrieNode(char Char, parent *TrieNode) *TrieNode {
 	return &TrieNode{char, parent, NewHashSet(), false, false, -1, -1}
 }
 
-func NewFullNodeFromRef(ref Reference) *TrieNode {
+func NewFullNodeFromRef(ref *UnicodeReference) *TrieNode {
 	n := &TrieNode{0, nil, NewFullSet(ref), false, false, -1, -1}
 	return n
 }

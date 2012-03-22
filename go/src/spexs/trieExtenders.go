@@ -34,7 +34,7 @@ func SimpleExtender(p Pattern, ref Reference) Patterns {
 }
 
 func trieGroupCombine(n *TrieNode, ref Reference, patterns map[Char]*TrieNode) {
-	for _, g := range ref.(UnicodeReference).Groups {
+	for _, g := range ref.(*UnicodeReference).Groups {
 		pat := NewTrieNode(g.Id, n)
 		patterns[g.Id] = pat
 		for _, char := range g.Chars {

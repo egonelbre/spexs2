@@ -25,7 +25,7 @@ type UnicodeReference struct {
 	Groups   []Group
 }
 
-func (ref UnicodeReference) Next(p Pos) (Char, Pos, bool) {
+func (ref *UnicodeReference) Next(p Pos) (Char, Pos, bool) {
 	idx, pos := PosDecode(p)
 
 	if int(pos) >= len(ref.Pats[idx].Pat) {

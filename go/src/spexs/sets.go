@@ -106,10 +106,8 @@ type FullSet struct {
 	Count int
 }
 
-func NewFullSet(r Reference) *FullSet {
-	// hack, implement proper typeswitch
-	ref, _ := r.(UnicodeReference) 
-	f := &FullSet{&ref, 0}
+func NewFullSet(ref *UnicodeReference) *FullSet {
+	f := &FullSet{ref, 0}
 	for _, p := range ref.Pats {
 		f.Count += p.Count
 	}
