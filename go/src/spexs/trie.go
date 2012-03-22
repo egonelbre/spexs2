@@ -19,7 +19,7 @@ func NewFullNodeFromRef(ref Reference) *TrieNode {
 	return n
 }
 
-func (n TrieNode) String() string {
+func (n *TrieNode) String() string {
 	if n.Parent != nil {
 		if n.IsStar {
 			return n.Parent.String() + string('*') + string(n.Char)
@@ -30,7 +30,7 @@ func (n TrieNode) String() string {
 	return "";
 }
 
-func (n TrieNode) Length() int {
+func (n *TrieNode) Length() int {
 	if n.Parent != nil {
 		if n.length < 0 {
 			n.length = n.Parent.Length() + 1
@@ -40,7 +40,7 @@ func (n TrieNode) Length() int {
 	return 0
 }
 
-func (n TrieNode) Complexity() int {
+func (n *TrieNode) Complexity() int {
 	if n.Parent != nil {
 		if n.complexity < 0 {
 			if n.IsStar {

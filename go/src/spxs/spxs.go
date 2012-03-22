@@ -30,21 +30,21 @@ type PatternFilterCreator func(limit int) FilterFunc
 var limiters = map[string] PatternFilterCreator {
 	"count"  : func(limit int) FilterFunc {
 		return func(p Pattern) bool {
-			return p.(TrieNode).Pos.Length() > limit
+			return p.(*TrieNode).Pos.Length() > limit
 		}},
 	"length" : func(limit int) FilterFunc {
 		return func(p Pattern) bool { 
-			return p.(TrieNode).Length() < limit
+			return p.(*TrieNode).Length() < limit
 		}},
 	"complexity" : func(limit int) FilterFunc {
 		return func(p Pattern) bool { 
-			return p.(TrieNode).Complexity() < limit
+			return p.(*TrieNode).Complexity() < limit
 		}},
 }
 
 var fitnesses = map[string] FitnessFunc {
 	"def" : func(a Pattern) float32 {
-		return float32(a.(TrieNode).Length()*a.(TrieNode).Pos.Length())
+		return float32(a.(*TrieNode).Length()*a.(*TrieNode).Pos.Length())
 		},
 }
 
@@ -96,14 +96,14 @@ func main() {
 	fitness = fitnesses[*fitnessName]
 
 	in = NewFifoPool()
- 	in.Put(*NewFullNodeFromRef(*ref))
+ 	in.Put(NewFullNodeFromRef(*ref))
 	out = NewPriorityPool(fitness, *topCount)
 
-	RunParallel(*ref,in,out,extender,acceptable,(*procs)*4)
+	RunParallel(ref,in,out,extender,acceptable,(*procs)*4)
 	 
 	p, ok := out.Take()
 	for ok {
-		n := p.(TrieNode)
+		n := p.(*TrieNode)
 		fmt.Printf("%s\t%v\t%v\n", n.String(), n.Pos.Length(), fitness(p))
 		p, ok = out.Take()
 	}

@@ -2,7 +2,7 @@ package spexs
 
 func output(out Patterns, patterns map[Char]*TrieNode) {
 	for _, node := range patterns {
-		out <- *node
+		out <- node
 	}
 }
 
@@ -25,8 +25,8 @@ func SimpleExtender(p Pattern, ref Reference) Patterns {
 	result := MakePatterns()
 	patterns := make(map[Char]*TrieNode)
 	
-	node := p.(TrieNode)
-	trieSimpleExtend(&node, ref, patterns)
+	node := p.(*TrieNode)
+	trieSimpleExtend(node, ref, patterns)
 
 	output(result, patterns)
 	close(result)
@@ -49,9 +49,9 @@ func GroupExtender(p Pattern, ref Reference) Patterns {
 	result := MakePatterns()
 	patterns := make(map[Char]*TrieNode)
 
-	node := p.(TrieNode)
-	trieSimpleExtend(&node, ref, patterns)
-	trieGroupCombine(&node, ref, patterns)
+	node := p.(*TrieNode)
+	trieSimpleExtend(node, ref, patterns)
+	trieGroupCombine(node, ref, patterns)
 
 	output(result, patterns)
 	close(result)
@@ -89,9 +89,9 @@ func StarExtender(p Pattern, ref Reference) Patterns {
 	patterns := make(map[Char]*TrieNode)
 	stars := make(map[Char]*TrieNode)
 
-	node := p.(TrieNode)
-	trieSimpleExtend(&node, ref, patterns)
-	trieStarExtend(&node, ref, stars)
+	node := p.(*TrieNode)
+	trieSimpleExtend(node, ref, patterns)
+	trieStarExtend(node, ref, stars)
 
 	output(result, patterns)
 	output(result, stars)
@@ -104,11 +104,11 @@ func GroupStarExtender(p Pattern, ref Reference) Patterns {
 	patterns := make(map[Char]*TrieNode)
 	stars := make(map[Char]*TrieNode)
 
-	node := p.(TrieNode)
-	trieSimpleExtend(&node, ref, patterns)
-	trieGroupCombine(&node, ref, patterns)
-	trieStarExtend(&node, ref, stars)
-	trieGroupCombine(&node, ref, stars)
+	node := p.(*TrieNode)
+	trieSimpleExtend(node, ref, patterns)
+	trieGroupCombine(node, ref, patterns)
+	trieStarExtend(node, ref, stars)
+	trieGroupCombine(node, ref, stars)
 
 	output(result, patterns)
 	output(result, stars)
