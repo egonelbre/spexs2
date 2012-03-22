@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	//alphabet *string = flag.String("alphabet", "ACGT", "alphabet used for the input file")
     characterFile *string = flag.String("chars", "", "character set file")
     referenceFile *string = flag.String("ref", "", "reference file")   
     extenderName *string = flag.String("extender", "regex", "method used for extending nodes (simple, group, star, regex)")
