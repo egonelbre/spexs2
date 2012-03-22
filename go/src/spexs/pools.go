@@ -23,16 +23,16 @@ func (p *FifoPool) Put(pat Pattern) {
 	p.patterns <- pat
 }
 
-type FitnessFunction func(a Pattern) float32
+type FitnessFunc func(a Pattern) float32
 
 type PriorityPool struct {
 	token   chan int
 	items   []Pattern
-	Fitness FitnessFunction
+	Fitness FitnessFunc
 	limit   int
 }
 
-func NewPriorityPool(fitness FitnessFunction, limit int) *PriorityPool {
+func NewPriorityPool(fitness FitnessFunc, limit int) *PriorityPool {
 	p := &PriorityPool{}
 	p.token = make(chan int, 1)
 	p.items = make([]Pattern, 0)

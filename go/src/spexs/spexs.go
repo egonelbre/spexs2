@@ -25,11 +25,11 @@ type Pooler interface {
 	Put(Pattern)
 }
 
-type PatternFilter func(p Pattern) bool
+type FilterFunc func(p Pattern) bool
 type ExtenderFunc func(p Pattern, ref Reference) Patterns
 
 func Run(ref Reference, patterns Pooler, results Pooler,
-	extender ExtenderFunc, acceptable PatternFilter) {
+	extender ExtenderFunc, acceptable FilterFunc) {
 	p, valid := patterns.Take()
 	for valid {
 		pats := extender(p, ref)
@@ -44,7 +44,7 @@ func Run(ref Reference, patterns Pooler, results Pooler,
 }
 
 func RunParallel(ref Reference, input Pooler, results Pooler,
-	extender ExtenderFunc, acceptable PatternFilter, num_threads int) {
+	extender ExtenderFunc, acceptable FilterFunc, num_threads int) {
 
 	start := make(chan int, 1000)
 	stop := make(chan int, 1000)
