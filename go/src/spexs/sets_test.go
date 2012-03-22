@@ -86,7 +86,7 @@ func InsertAndIterate(s Set, patterns int, positions int){
 	for idx := 0; idx < patterns; idx += 1 {
 		for pos := 0; pos < positions; pos += 1 {
 			p := PosEncode(idx, byte(pos))
-			hs.Add(p)
+			s.Add(p)
 		}
 	}
 

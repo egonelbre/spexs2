@@ -27,12 +27,12 @@ func createTestUnicodeReference() *UnicodeReference {
 	u.Alphabet = chars("ACGT")
 
 	u.Groups = make([]Group, 6)
-	u.Groups[0] = *NewGroup('1', chars("AC"))
-	u.Groups[1] = *NewGroup('2', chars("AG"))
-	u.Groups[2] = *NewGroup('3', chars("AT"))
-	u.Groups[3] = *NewGroup('4', chars("CG"))
-	u.Groups[4] = *NewGroup('5', chars("CT"))
-	u.Groups[5] = *NewGroup('6', chars("GT"))
+	u.Groups[0] = *NewGroup("[AC]", '1', chars("AC"))
+	u.Groups[1] = *NewGroup("[AG]", '2', chars("AG"))
+	u.Groups[2] = *NewGroup("[AT]", '3', chars("AT"))
+	u.Groups[3] = *NewGroup("[CG]", '4', chars("CG"))
+	u.Groups[4] = *NewGroup("[CT]", '5', chars("CT"))
+	u.Groups[5] = *NewGroup("[GT]", '6', chars("GT"))
 
 	u.Pats = make([]ReferencePattern, 4)
 	u.Pats[0] = pattern("ACGTACGG")
