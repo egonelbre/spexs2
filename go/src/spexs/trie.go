@@ -4,15 +4,17 @@ type TrieNode struct {
 	Char   Char
 	Parent *TrieNode
 	Pos    Set
+	IsGroup bool
 	IsStar bool
+	length int
 }
 
 func NewTrieNode(char Char, parent *TrieNode) *TrieNode {
-	return &TrieNode{char, parent, NewHashSet(), false}
+	return &TrieNode{char, parent, NewHashSet(), false, false, -1}
 }
 
 func NewFullNodeFromRef(ref Reference) *TrieNode {
-	n := &TrieNode{0, nil, NewFullSet(ref), false}
+	n := &TrieNode{0, nil, NewFullSet(ref), false, false, -1}
 	return n
 }
 
@@ -27,8 +29,25 @@ func (n TrieNode) String() string {
 	return "";
 }
 
-func TrieCountFilter(limit int) PatternFilter {
-	return func(p Pattern) bool {
-		return p.(TrieNode).Pos.Length() > limit
+func (n TrieNode) Length() int {
+	if n.Parent != nil {
+		if n.length < 0 {
+			n.length = n.Parent.Length() + 1
+		}
+		return n.length
 	}
+	return 0
+}
+
+func (n TrieNode) Complexity() int {
+	if n.Parent != nil {
+		if n.IsStar {
+			return n.Parent.Complexity() + 4
+		} else if n.IsGroup {
+			return n.Parent.Complexity() + 2
+		} else {
+			return n.Parent.Complexity() + 1
+		}
+	}
+	return 0
 }

@@ -6,11 +6,12 @@ type Char rune
 
 type Group struct {
 	Id    Char
+	Name  string
 	Chars []Char
 }
 
-func NewGroup(id Char, chars []Char) *Group {
-	return &Group{id, chars}
+func NewGroup(name string, id Char, chars []Char) *Group {
+	return &Group{id, name, chars}
 }
 
 type ReferencePattern struct {

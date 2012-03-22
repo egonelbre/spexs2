@@ -1,0 +1,16 @@
+# first line is all the characters
+ACGT
+
+# id-s must be unique letters
+# grouping id name
+
+AC, M, [AC]
+AG, R, [AG]
+AT, W, [AT]
+CG, S, [CG]
+CT, Y, [CT]
+GT, K, [GT]
+CGT, B, [CGT]
+AGT, D, [AGT]
+ACT, H, [ACT]
+ACG, V, [ACG]

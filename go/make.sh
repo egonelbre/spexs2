@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GOPATH=`pwd`
+export GOPATH=`pwd`
 
 go install spexs
-go install spexs/spxs
+go install spxs

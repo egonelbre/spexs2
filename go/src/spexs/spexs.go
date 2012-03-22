@@ -3,7 +3,7 @@ package spexs
 import "fmt"
 
 const (
-	patternsBufferSize = 10000
+	patternsBufferSize = 1024*1024*204
 )
 
 type Pattern interface {
