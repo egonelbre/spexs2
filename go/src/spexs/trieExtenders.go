@@ -39,7 +39,7 @@ func SimpleExtender(p Pattern, ref Reference) Patterns {
 	return result
 }
 
-/*
+
 func trieGroupCombine(n *TrieNode, ref Reference, patterns map[Char]*TrieNode) {
 	for _, g := range ref.(*UnicodeReference).Groups {
 		pat := NewTrieNode(g.Id, n)
@@ -65,6 +65,7 @@ func GroupExtender(p Pattern, ref Reference) Patterns {
 	return result
 }
 
+/*
 func trieStarExtend(node *TrieNode, ref Reference, stars map[Char]*TrieNode) {
 	lowest := make(map[int]Pos)
 

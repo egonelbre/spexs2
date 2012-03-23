@@ -10,7 +10,7 @@ import (
 var (
     characterFile *string = flag.String("chars", "", "character set file")
     referenceFile *string = flag.String("ref", "", "reference file")   
-    extenderName *string = flag.String("extender", "simple", "method used for extending nodes (simple, group, star, regex)")
+    extenderName *string = flag.String("extender", "regexp", "method used for extending nodes (simple, group, star, regex)")
     limiterName *string = flag.String("limiter", "count", "method used to determine whether node is accptable for extending (count, length, complexity)")
     fitnessName *string = flag.String("fitness", "def", "fitness function used for sorting (def)")
     limitValue *int = flag.Int("limit", 5, "value for limiter")
@@ -20,9 +20,9 @@ var (
 
 var extenders = map[string] ExtenderFunc {
 	"simple" : SimpleExtender,
-	//"group"  : GroupExtender,
+	"group"  : GroupExtender,
 	//"star"   : StarExtender,
-	//"regex"  : GroupStarExtender,
+	//"regexp"  : GroupStarExtender,
 }
 
 type PatternFilterCreator func(limit int) FilterFunc
