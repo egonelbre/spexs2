@@ -95,10 +95,11 @@ func main() {
 	acceptable = limiters[*limiterName](*limitValue)
 	fitness = fitnesses[*fitnessName]
 
+	//in = NewPriorityPool(fitness, *topCount)
 	in = NewFifoPool()
  	in.Put(NewFullNodeFromRef(ref))
+ 	out = NewFifoPool()
 	//out = NewPriorityPool(fitness, *topCount)
-	out = NewFifoPool()
 
 	RunParallel(ref,in,out,extender,acceptable,(*procs)*4)
 	 

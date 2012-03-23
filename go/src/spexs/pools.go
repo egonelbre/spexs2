@@ -1,26 +1,49 @@
 package spexs
 
-import "container/heap"
+import (
+	"container/list"
+	"container/heap"
+)
 
 type FifoPool struct {
-	patterns Patterns
+	input Patterns
+	token chan int
+	list *list.List
 }
 
 func NewFifoPool() *FifoPool {
-	return &FifoPool{MakePatterns()}
+	p := &FifoPool{}
+	p.token = make(chan int, 1)
+	p.input = MakePatterns()
+	p.list = list.New()
+	p.token <- 1
+	
+	go func(){
+		for {
+			pat := <-p.input
+			<-p.token
+			p.list.PushBack(pat)
+			p.token <- 1
+		}
+	}()
+
+	return p
 }
 
 func (p *FifoPool) Take() (Pattern, bool) {
-	select {
-		case pat := <-p.patterns:
-			return pat, true
-		default: break
+	<-p.token
+	if p.list.Len() == 0 {
+		p.token <- 1
+		return nil, false
 	}
-	return nil, false
+	tmp := p.list.Front()
+	p.list.Remove(tmp)
+	p.token <- 1
+	return tmp.Value.(Pattern), true
 }
 
 func (p *FifoPool) Put(pat Pattern) {
-	p.patterns <- pat
+	p.input <- pat
 }
 
 type FitnessFunc func(a Pattern) float32
@@ -50,23 +73,21 @@ func (p *PriorityPool) IsEmpty() bool {
 
 func (p *PriorityPool) Take() (Pattern, bool) {
 	<-p.token
-	defer func() { p.token <- 1 }()
-
 	if p.IsEmpty() {
 		return nil, false
 	}
 	v := heap.Pop(p)
+	p.token <- 1
 	return v.(Pattern), true
 }
 
 func (p *PriorityPool) Put(pat Pattern) {
 	<-p.token
-	defer func() { p.token <- 1 }()
-
 	heap.Push(p, pat)
 	if p.Len() > p.limit {
 		heap.Pop(p)
 	}
+	p.token <- 1
 }
 
 // sort.Interface
