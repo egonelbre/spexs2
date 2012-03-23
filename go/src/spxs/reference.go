@@ -39,8 +39,7 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 		return nil, err
 	}
 	
-	ref = &UnicodeReference{}
-	ref.Pats = make([]ReferencePattern, 0, 1024)
+	ref = NewUnicodeReference(1024)
 
 	reader = bufio.NewReader(file)
 	for err == nil {
@@ -63,8 +62,6 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 	file.Close()
 	err = nil
 
-	ref.Groups = make([]Group, 0, 255)
-	
 	if file, err = os.Open(charName); err != nil {
 		return nil, fmt.Errorf("Unable to read charset file '%v'", charName)
 	}
@@ -104,8 +101,9 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 		
 		if !first && regGroup.MatchString(line) {
 			tokens := regGroup.FindStringSubmatch(line)
-			g := *NewGroup(tokens[3], chars(tokens[2])[0], chars(tokens[1]))
-			ref.Groups = append(ref.Groups, g)
+			id := chars(tokens[2])[0]
+			g := *NewGroup(tokens[3], id, chars(tokens[1]))
+			ref.Groups[id] = g
 			continue
 		}
 

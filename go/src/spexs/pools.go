@@ -6,7 +6,6 @@ import (
 )
 
 type FifoPool struct {
-	input Patterns
 	token chan int
 	list *list.List
 }
@@ -14,19 +13,8 @@ type FifoPool struct {
 func NewFifoPool() *FifoPool {
 	p := &FifoPool{}
 	p.token = make(chan int, 1)
-	p.input = MakePatterns()
 	p.list = list.New()
 	p.token <- 1
-	
-	go func(){
-		for {
-			pat := <-p.input
-			<-p.token
-			p.list.PushBack(pat)
-			p.token <- 1
-		}
-	}()
-
 	return p
 }
 
@@ -43,7 +31,13 @@ func (p *FifoPool) Take() (Pattern, bool) {
 }
 
 func (p *FifoPool) Put(pat Pattern) {
-	p.input <- pat
+	<-p.token
+	p.list.PushBack(pat)
+	p.token <- 1
+}
+
+func (p *FifoPool) Len() int {
+	return p.list.Len()
 }
 
 type FitnessFunc func(a Pattern) float32
@@ -74,6 +68,7 @@ func (p *PriorityPool) IsEmpty() bool {
 func (p *PriorityPool) Take() (Pattern, bool) {
 	<-p.token
 	if p.IsEmpty() {
+		p.token <- 1
 		return nil, false
 	}
 	v := heap.Pop(p)

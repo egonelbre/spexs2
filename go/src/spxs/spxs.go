@@ -4,6 +4,7 @@ import (
 	"fmt"
 	. "spexs" 
 	"runtime"
+	"time"
 	"flag"
 )
 
@@ -30,22 +31,29 @@ type PatternFilterCreator func(limit int) FilterFunc
 var limiters = map[string] PatternFilterCreator {
 	"count"  : func(limit int) FilterFunc {
 		return func(p Pattern) bool {
-			return p.(*TrieNode).Pos.Length() > limit
+			return p.(*TrieNode).Pos.Len() >= limit
 		}},
 	"length" : func(limit int) FilterFunc {
 		return func(p Pattern) bool { 
-			return p.(*TrieNode).Length() < limit
+			return p.(*TrieNode).Len() <= limit
 		}},
 	"complexity" : func(limit int) FilterFunc {
 		return func(p Pattern) bool { 
-			return p.(*TrieNode).Complexity() < limit
+			return p.(*TrieNode).Complexity() <= limit
 		}},
 }
 
 var fitnesses = map[string] FitnessFunc {
 	"def" : func(a Pattern) float32 {
-		return float32(a.(*TrieNode).Length()*a.(*TrieNode).Pos.Length())
+		return float32(a.(*TrieNode).Len()*a.(*TrieNode).Pos.Len())
 		},
+	"len" : func(a Pattern) float32 {
+		return float32(a.(*TrieNode).Len())
+		},
+}
+
+func inputOrdering(a Pattern) float32 {
+	return 1/float32(a.(*TrieNode).Len())
 }
 
 func main() {
@@ -95,19 +103,33 @@ func main() {
 	acceptable = limiters[*limiterName](*limitValue)
 	fitness = fitnesses[*fitnessName]
 
-	//in = NewPriorityPool(fitness, *topCount)
-	in = NewFifoPool()
+	in = NewPriorityPool(inputOrdering, 1000000000)
  	in.Put(NewFullNodeFromRef(ref))
  	out = NewFifoPool()
 	//out = NewPriorityPool(fitness, *topCount)
+
+
+	maxInQueue := 0
+	go func(){
+		for {
+			print(in.Len(), "\n")
+			if in.Len() > maxInQueue {
+				maxInQueue = in.Len()
+			}
+			time.Sleep(1000*1000*100)
+		}
+	}()
 
 	RunParallel(ref,in,out,extender,acceptable,(*procs)*4)
 	 
 	p, ok := out.Take()
 	for ok {
 		n := p.(*TrieNode)
-		fmt.Printf("%s\t%v\t%v\n", n.String(), n.Pos.Length(), fitness(p))
+		name := ref.ReplaceGroups(n.String())
+		fmt.Printf("%s\t%v\t%v\n", name, n.Pos.Len(), fitness(p))
 		p, ok = out.Take()
 	}
+
+	print("maximum items in queue: ", maxInQueue, "\n")
 	fmt.Printf("\n\n")
 }

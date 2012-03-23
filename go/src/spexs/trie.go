@@ -30,10 +30,10 @@ func (n *TrieNode) String() string {
 	return "";
 }
 
-func (n *TrieNode) Length() int {
+func (n *TrieNode) Len() int {
 	if n.Parent != nil {
 		if n.length < 0 {
-			n.length = n.Parent.Length() + 1
+			n.length = n.Parent.Len() + 1
 		}
 		return n.length
 	}

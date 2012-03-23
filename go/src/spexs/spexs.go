@@ -23,23 +23,24 @@ type Reference interface {
 type Pooler interface {
 	Take() (Pattern, bool)
 	Put(Pattern)
+	Len() int
 }
 
 type FilterFunc func(p Pattern) bool
 type ExtenderFunc func(p Pattern, ref Reference) Patterns
 
-func Run(ref Reference, patterns Pooler, results Pooler,
+func Run(ref Reference, input Pooler, results Pooler,
 	extender ExtenderFunc, acceptable FilterFunc) {
-	p, valid := patterns.Take()
+	p, valid := input.Take()
 	for valid {
 		pats := extender(p, ref)
 		for ep := range pats {
 			if acceptable(ep) {
-				patterns.Put(ep)
+				input.Put(ep)
 				results.Put(ep)
 			}
 		}
-		p, valid = patterns.Take()
+		p, valid = input.Take()
 	}
 }
 

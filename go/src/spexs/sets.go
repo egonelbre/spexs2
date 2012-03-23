@@ -3,7 +3,7 @@ package spexs
 type Set interface {
 	Add(idx int, pos byte)
 	Contains(idx int, pos byte) bool
-	Length() int
+	Len() int
 	Iter() (chan int, chan int)
 }
 
@@ -28,7 +28,7 @@ func (hs *HashSet) Contains(idx int, pos byte) bool {
 	return exists && (val & (1 << pos) != 0)
 }
 
-func (hs *HashSet) Length() int {
+func (hs *HashSet) Len() int {
 	return len(hs.data)
 }
 
@@ -69,9 +69,7 @@ type FullSet struct {
 
 func NewFullSet(ref *UnicodeReference) *FullSet {
 	f := &FullSet{ref, 0}
-	for _, p := range ref.Pats {
-		f.Count += p.Count
-	}
+	f.Count = len(ref.Pats)
 	return f
 }
 
@@ -81,7 +79,7 @@ func (f *FullSet) Contains(idx int, pos byte) bool {
 	return idx < len(f.Ref.Pats) && int(pos) < len(f.Ref.Pats[idx].Pat)
 }
 
-func (f *FullSet) Length() int {
+func (f *FullSet) Len() int {
 	return f.Count
 }
 
