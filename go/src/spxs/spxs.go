@@ -15,7 +15,7 @@ var (
     fitnessName *string = flag.String("fitness", "def", "fitness function used for sorting (def)")
     limitValue *int = flag.Int("limit", 5, "value for limiter")
     topCount *int = flag.Int("top", 10, "only print top amount")
-    procs *int = flag.Int("procs", 2, "processors to use")
+    procs *int = flag.Int("procs", 4, "processors to use")
 )
 
 var extenders = map[string] ExtenderFunc {
@@ -97,7 +97,8 @@ func main() {
 
 	in = NewFifoPool()
  	in.Put(NewFullNodeFromRef(ref))
-	out = NewPriorityPool(fitness, *topCount)
+	//out = NewPriorityPool(fitness, *topCount)
+	out = NewFifoPool()
 
 	RunParallel(ref,in,out,extender,acceptable,(*procs)*4)
 	 

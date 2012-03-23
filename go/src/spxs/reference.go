@@ -74,9 +74,9 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 	regGroup, err3 := regexp.Compile("^\\s*(\\S+)\\s*,\\s*(\\S)\\s*,\\s*(\\S+)\\s*(#.*)?$")
 	
 	if err1 != nil || err2 != nil || err3 != nil {
-		fmt.Printf("Invalid regex %v\n", err1)
-		fmt.Printf("Invalid regex %v\n", err2)
-		fmt.Printf("Invalid regex %v\n", err3)
+		fmt.Printf("Invalid regex: %v\n", err1)
+		fmt.Printf("Invalid regex: %v\n", err2)
+		fmt.Printf("Invalid regex: %v\n", err3)
 		return nil, fmt.Errorf("found invalid regex\n")
 	}
 

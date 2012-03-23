@@ -70,12 +70,12 @@ func trieStarExtend(node *TrieNode, ref Reference, stars map[Char]*TrieNode) {
 	indices, poss := node.Pos.Iter()
 	for idx := range indices {
 		mpos := <- poss
-		plen := byte(len(ref.(*UnicodeReference).Pats[idx].Pat) - 1)
+		plen := byte(len(ref.(*UnicodeReference).Pats[idx].Pat))
 		if mpos == 0 { continue }
 
 		var k byte
 		for k = 0; k < plen; k += 1 {
-			if mpos & (1 << k) == 0 { break }
+			if mpos & (1 << k) != 0 { break }
 		}
 
 		char, next, valid := ref.Next(idx, k)
@@ -96,7 +96,6 @@ func StarExtender(p Pattern, ref Reference) Patterns {
 	result := MakePatterns()
 	patterns := make(map[Char]*TrieNode)
 	stars := make(map[Char]*TrieNode)
-
 	node := p.(*TrieNode)
 	trieSimpleExtend(node, ref, patterns)
 	trieStarExtend(node, ref, stars)
