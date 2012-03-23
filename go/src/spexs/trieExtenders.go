@@ -43,6 +43,7 @@ func SimpleExtender(p Pattern, ref Reference) Patterns {
 func trieGroupCombine(n *TrieNode, ref Reference, patterns map[Char]*TrieNode) {
 	for _, g := range ref.(*UnicodeReference).Groups {
 		pat := NewTrieNode(g.Id, n)
+		pat.IsGroup = true
 		patterns[g.Id] = pat
 		for _, char := range g.Chars {
 			if _, exists := patterns[char]; exists {
@@ -65,20 +66,19 @@ func GroupExtender(p Pattern, ref Reference) Patterns {
 	return result
 }
 
-/*
 func trieStarExtend(node *TrieNode, ref Reference, stars map[Char]*TrieNode) {
-	lowest := make(map[int]Pos)
+	indices, poss := node.Pos.Iter()
+	for idx := range indices {
+		mpos := <- poss
+		plen := byte(len(ref.(*UnicodeReference).Pats[idx].Pat) - 1)
+		if mpos == 0 { continue }
 
-	for p := range node.Pos.Iter() {
-		idx, _ := PosDecode(p)
-		cur, exists := lowest[idx]
-		if !exists || p < cur {
-			lowest[idx] = p
+		var k byte
+		for k = 0; k < plen; k += 1 {
+			if mpos & (1 << k) == 0 { break }
 		}
-	}
 
-	for _, p := range lowest {
-		char, next, valid := ref.Next(p);
+		char, next, valid := ref.Next(idx, k)
 		for valid {
 			pat, exists := stars[char]
 			if !exists {
@@ -86,8 +86,8 @@ func trieStarExtend(node *TrieNode, ref Reference, stars map[Char]*TrieNode) {
 				pat.IsStar = true
 				stars[char] = pat
 			}
-			pat.Pos.Add(next)
-			char, next, valid = ref.Next(next)
+			pat.Pos.Add(idx, next)
+			char, next, valid = ref.Next(idx, next)
 		}
 	}
 }
@@ -124,4 +124,3 @@ func GroupStarExtender(p Pattern, ref Reference) Patterns {
 	close(result)
 	return result
 }
-*/

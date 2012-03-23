@@ -21,8 +21,8 @@ var (
 var extenders = map[string] ExtenderFunc {
 	"simple" : SimpleExtender,
 	"group"  : GroupExtender,
-	//"star"   : StarExtender,
-	//"regexp"  : GroupStarExtender,
+	"star"   : StarExtender,
+	"regexp"  : GroupStarExtender,
 }
 
 type PatternFilterCreator func(limit int) FilterFunc
