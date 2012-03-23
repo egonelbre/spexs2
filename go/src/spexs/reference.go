@@ -25,14 +25,11 @@ type UnicodeReference struct {
 	Groups   []Group
 }
 
-func (ref *UnicodeReference) Next(p Pos) (Char, Pos, bool) {
-	idx, pos := PosDecode(p)
-
+func (ref *UnicodeReference) Next(idx int, pos int) (Char, int, bool) {
 	if int(pos) >= len(ref.Pats[idx].Pat) {
-		return 0, EmptyPos, false
+		return 0, 0, false
 	}
 
 	rune, width := utf8.DecodeRune(ref.Pats[idx].Pat[pos:])
-	next_pos := Pos(int64(p) + int64(width))
-	return Char(rune), next_pos, true
+	return Char(rune), pos + width, true
 }

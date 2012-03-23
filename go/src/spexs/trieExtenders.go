@@ -7,7 +7,11 @@ func output(out Patterns, patterns map[Char]*TrieNode) {
 }
 
 func trieSimpleExtend(n *TrieNode, ref Reference, patterns map[Char]*TrieNode) {
-	for pos := range n.Pos.Iter() {
+	indices, poss := n.Pos.Iter()
+	for idx := range indices {
+		mpos := <- poss
+		
+		
 		char, next, valid := ref.Next(pos)
 		if !valid {
 			continue

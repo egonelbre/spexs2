@@ -17,7 +17,7 @@ func MakePatterns() Patterns {
 }
 
 type Reference interface {
-	Next(pos Pos) (Char, Pos, bool)
+	Next(idx int, pos int) (Char, int, bool)
 }
 
 type Pooler interface {

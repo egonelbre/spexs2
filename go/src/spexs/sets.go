@@ -1,103 +1,64 @@
 package spexs
 
-type Pos uint64
-
-const (
-	PATTERN_LENGTH_BITS = 5
-	PATTERN_LENGTH_MASK = (1 << PATTERN_LENGTH_BITS) - 1
-	EmptyPos            = 0
-)
-
-// meaning pattern length can be at most = 2^4-1
-// and can there can be at most 2^(64 - 4) patterns
-
-// pos must be < 16
-func PosEncode(idx int, pos byte) Pos {
-	idxe := uint64(idx << PATTERN_LENGTH_BITS)
-	pose := uint64(pos & PATTERN_LENGTH_MASK)
-	return Pos(idxe | pose)
-}
-
-func PosDecode(p Pos) (idx int, pos byte) {
-	pos = byte(p & PATTERN_LENGTH_MASK)
-	idx = int(p >> PATTERN_LENGTH_BITS)
-	return
-}
-
 type Set interface {
-	Add(val Pos)
-	Contains(val Pos) bool
+	Add(idx int, pos byte)
+	Contains(idx int, pos byte) bool
 	Length() int
-	Iter() chan Pos
+	Iter() (chan int, chan int)
 }
 
 type HashSet struct {
-	data map[Pos]bool
+	data map[int]int
 }
 
 func NewHashSet() *HashSet {
-	return &HashSet{make(map[Pos]bool)}
+	return &HashSet{make(map[int]int)}
 }
 
-func (hs *HashSet) Add(val Pos) {
-	hs.data[val] = true
+func (hs *HashSet) Add(idx int, pos byte) {
+	val, exists := hs.data[idx]
+	if !exists {
+		val = 0
+	}
+	hs.data[idx] = val | (1 << pos)
 }
 
-func (hs *HashSet) Contains(val Pos) bool {
-	_, exists := hs.data[val]
-	return exists
+func (hs *HashSet) Contains(idx int, pos byte) bool {
+	val, exists := hs.data[idx]
+	return exists && (val & (1 << pos) != 0)
 }
 
 func (hs *HashSet) Length() int {
 	return len(hs.data)
 }
 
-func (hs *HashSet) Iter() chan Pos {
-	ch := make(chan Pos, 100)
+func (hs *HashSet) Iter() (chan int, chan int) {
+	indices := make(chan int, 100)
+	poss := make(chan int, 100)
+
 	go func(){
-		for v, _ := range hs.data {
-			ch <- v
+		for idx, pos := range hs.data {
+			indices <- idx
+			poss <- pos
 		}
-		close(ch)
+		close(indices)
+		close(poss)
 	}()
-	return ch
-}
-
-// result can't be hs nor gs
-func SetAnd(h Set, g Set, result Set) {
-	var first, second Set
-
-	if h.Length() < g.Length() {
-		first = h
-		second = g
-	} else {
-		first = g
-		second = h
-	}
-
-	for item := range first.Iter() {
-		if second.Contains(item) {
-			result.Add(item)
-		}
-	}
-}
-
-func SetOr(h Set, g Set, result Set) {
-	if h != result {
-		for item := range h.Iter() {
-			result.Add(item)
-		}
-	}
-	if g != result {
-		for item := range g.Iter() {
-			result.Add(item)
-		}
-	}
+	return indices, poss
 }
 
 func SetAddSet(h Set, g Set) {
-	for item := range g.Iter() {
-		h.Add(item)
+	switch h.(type){
+	case *HashSet : 
+		for gidx, gval := range g.(*HashSet).data {
+			hval, exists := h.(*HashSet).data[gidx]
+			if exists {
+				h.(*HashSet).data[gidx] = gval | hval
+			} else {
+				h.(*HashSet).data[gidx] = gval
+			}
+		}
+		default :
 	}
 }
 
@@ -114,10 +75,9 @@ func NewFullSet(ref *UnicodeReference) *FullSet {
 	return f
 }
 
-func (f *FullSet) Add(val Pos) {}
+func (f *FullSet) Add(idx int, pos byte) {}
 
-func (f *FullSet) Contains(val Pos) bool {
-	idx, pos := PosDecode(val)
+func (f *FullSet) Contains(idx int, pos byte) bool {
 	return idx < len(f.Ref.Pats) && int(pos) < len(f.Ref.Pats[idx].Pat)
 }
 
@@ -125,16 +85,18 @@ func (f *FullSet) Length() int {
 	return f.Count
 }
 
-func (f *FullSet) Iter() chan Pos {
-	ch := make(chan Pos, 100)
+func (f *FullSet) Iter() (chan int, chan int) {
+	indices := make(chan int, 100)
+	poss := make(chan int, 100)
+
 	go func(){
 		for idx, pat := range f.Ref.Pats {
-			/* TODO: iterate properly utf8 style */
-			for pos, _ := range pat.Pat {
-				ch <- PosEncode(idx, uint8(pos))
-			}
+			indices <- idx
+			poss <- (2 << byte(len(pat.Pat) - 1))
 		}
-		close(ch)
+		close(indices)
+		close(poss)
 	}()
-	return ch
+	return indices, poss
 }
+
