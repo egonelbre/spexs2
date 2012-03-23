@@ -10,13 +10,15 @@ func trieSimpleExtend(n *TrieNode, ref Reference, patterns map[Char]*TrieNode) {
 	indices, poss := n.Pos.Iter()
 	for idx := range indices {
 		mpos := <- poss
-		plen := byte(len(ref.(*UnicodeReference).Pats[idx].Pat) - 1)
+		plen := byte(len(ref.(*UnicodeReference).Pats[idx].Pat))
 		var k byte
 		for k = 0; (k < plen) && (mpos > 0); k += 1 {
 			if mpos & (1 << k) == 0 { continue }
 			mpos &^= 1 << k
 
-			char, next, _ := ref.Next(idx, k)
+			char, next, valid := ref.Next(idx, k)
+			if !valid { break }
+
 			pat, exists := patterns[char]
 			if !exists {
 				pat = NewTrieNode(char, n)
@@ -40,10 +42,11 @@ func SimpleExtender(p Pattern, ref Reference) Patterns {
 }
 
 
-func trieGroupCombine(n *TrieNode, ref Reference, patterns map[Char]*TrieNode) {
+func trieGroupCombine(n *TrieNode, ref Reference, patterns map[Char]*TrieNode, star bool) {
 	for _, g := range ref.(*UnicodeReference).Groups {
 		pat := NewTrieNode(g.Id, n)
 		pat.IsGroup = true
+		pat.IsStar = star
 		patterns[g.Id] = pat
 		for _, char := range g.Chars {
 			if _, exists := patterns[char]; exists {
@@ -59,7 +62,7 @@ func GroupExtender(p Pattern, ref Reference) Patterns {
 
 	node := p.(*TrieNode)
 	trieSimpleExtend(node, ref, patterns)
-	trieGroupCombine(node, ref, patterns)
+	trieGroupCombine(node, ref, patterns, false)
 
 	output(result, patterns)
 	close(result)
@@ -113,9 +116,9 @@ func GroupStarExtender(p Pattern, ref Reference) Patterns {
 
 	node := p.(*TrieNode)
 	trieSimpleExtend(node, ref, patterns)
-	trieGroupCombine(node, ref, patterns)
+	trieGroupCombine(node, ref, patterns, false)
 	trieStarExtend(node, ref, stars)
-	trieGroupCombine(node, ref, stars)
+	trieGroupCombine(node, ref, stars, true)
 
 	output(result, patterns)
 	output(result, stars)

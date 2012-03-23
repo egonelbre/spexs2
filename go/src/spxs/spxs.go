@@ -17,6 +17,7 @@ var (
     limitValue *int = flag.Int("limit", 5, "value for limiter")
     topCount *int = flag.Int("top", 10, "only print top amount")
     procs *int = flag.Int("procs", 4, "processors to use")
+    verbose *bool = flag.Bool("verbose", false, "print debug information")
 )
 
 var extenders = map[string] ExtenderFunc {
@@ -49,6 +50,9 @@ var fitnesses = map[string] FitnessFunc {
 		},
 	"len" : func(a Pattern) float32 {
 		return float32(a.(*TrieNode).Len())
+		},
+	"count" : func(a Pattern) float32 {
+		return float32(a.(*TrieNode).Pos.Len())
 		},
 }
 
@@ -105,31 +109,51 @@ func main() {
 
 	in = NewPriorityPool(inputOrdering, 1000000000)
  	in.Put(NewFullNodeFromRef(ref))
- 	out = NewFifoPool()
-	//out = NewPriorityPool(fitness, *topCount)
+	out = NewPriorityPool(fitness, *topCount)
 
 
 	maxInQueue := 0
-	go func(){
-		for {
-			print(in.Len(), "\n")
-			if in.Len() > maxInQueue {
-				maxInQueue = in.Len()
+	if *verbose {
+		go func(){
+			for {
+				fmt.Printf("queue size: %v\n", in.Len())
+				if in.Len() > maxInQueue {
+					maxInQueue = in.Len()
+				}
+				time.Sleep(1000*1000*100)
 			}
-			time.Sleep(1000*1000*100)
-		}
-	}()
+		}()
+	}
 
-	RunParallel(ref,in,out,extender,acceptable,(*procs)*4)
-	 
+	if *procs == 1 {
+		Run(ref,in,out,extender,acceptable)
+	} else {
+		RunParallel(ref,in,out,extender,acceptable,*procs)
+	}	
+	
+	fmt.Printf("match, regexp, count, fitness\n")
 	p, ok := out.Take()
 	for ok {
 		n := p.(*TrieNode)
-		name := ref.ReplaceGroups(n.String())
-		fmt.Printf("%s\t%v\t%v\n", name, n.Pos.Len(), fitness(p))
+		name := n.String()
+		regex := ref.ReplaceGroups(name)
+		fmt.Printf("%s, %v, %v, %v\n", name, regex,n.Pos.Len(), fitness(p))
+		
+		if *verbose {
+			indices, poss := n.Pos.Iter()
+			for idx := range indices {
+				<-poss
+				fmt.Printf("%v, ", idx)
+			}
+			fmt.Printf("\n\n\n")
+		}
+		
 		p, ok = out.Take()
 	}
 
-	print("maximum items in queue: ", maxInQueue, "\n")
-	fmt.Printf("\n\n")
+	if *verbose {
+		fmt.Printf("maximum items in queue: %v\n", maxInQueue)
+	}
+	
+	fmt.Printf("\n")
 }
