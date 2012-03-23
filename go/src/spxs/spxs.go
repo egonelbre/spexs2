@@ -54,6 +54,9 @@ var fitnesses = map[string] FitnessFunc {
 	"count" : func(a Pattern) float32 {
 		return float32(a.(*TrieNode).Pos.Len())
 		},
+	"complexity" : func(a Pattern) float32 {
+		return float32(a.(*TrieNode).Complexity())
+		},
 }
 
 func inputOrdering(a Pattern) float32 {
@@ -77,6 +80,11 @@ func main() {
 
 	if _, exists := limiters[*limiterName]; !exists {
 		fmt.Printf("Limiter function '%v' not found!\n", *limiterName)
+		ok = false
+	}
+
+	if _, exists := fitnesses[*fitnessName]; !exists {
+		fmt.Printf("Fitness function '%v' not found!\n", *limiterName)
 		ok = false
 	}
 
