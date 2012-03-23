@@ -92,7 +92,7 @@ func (f *FullSet) Iter() (chan int, chan int) {
 	go func(){
 		for idx, pat := range f.Ref.Pats {
 			indices <- idx
-			poss <- (2 << byte(len(pat.Pat) - 1))
+			poss <- (2 << byte(len(pat.Pat)) - 1)
 		}
 		close(indices)
 		close(poss)
