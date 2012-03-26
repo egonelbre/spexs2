@@ -10,6 +10,7 @@ import (
 	"strings"
 	"regexp"
 	"fmt"
+	"log"
 )
 
 func chars(s string) []Char {
@@ -28,15 +29,16 @@ func pattern(data string) *ReferencePattern {
 	return &p
 }
 
-func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReference, err error) {
+func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReference) {
 	var (
 		file *os.File
 		reader *bufio.Reader
 		line string
+		err error
 	)
 
 	if file, err = os.Open(refName); err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 	
 	ref = NewUnicodeReference(1024)
@@ -44,7 +46,7 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 	reader = bufio.NewReader(file)
 	for err == nil {
 		if line, err = reader.ReadString('\n'); err != nil && err != io.EOF {
-			return nil, fmt.Errorf("Unable to read reference file '%v'", refName)
+			log.Fatal(err)
 		}
 		
 		line = strings.TrimSpace(line)
@@ -63,19 +65,12 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 	err = nil
 
 	if file, err = os.Open(charName); err != nil {
-		return nil, fmt.Errorf("Unable to read charset file '%v'", charName)
+		log.Fatal(err)
 	}
 
-	regComment, err1 := regexp.Compile("^\\s*(#.*)?$")
-	regAlphabet, err2 := regexp.Compile("^\\s*(\\S+)\\s*(#.*)?$")
-	regGroup, err3 := regexp.Compile("^\\s*(\\S+)\\s*,\\s*(\\S)\\s*,\\s*(\\S+)\\s*(#.*)?$")
-	
-	if err1 != nil || err2 != nil || err3 != nil {
-		fmt.Printf("Invalid regex: %v\n", err1)
-		fmt.Printf("Invalid regex: %v\n", err2)
-		fmt.Printf("Invalid regex: %v\n", err3)
-		return nil, fmt.Errorf("found invalid regex\n")
-	}
+	regComment, _ := regexp.Compile("^\\s*(#.*)?$")
+	regAlphabet, _ := regexp.Compile("^\\s*(\\S+)\\s*(#.*)?$")
+	regGroup, _ := regexp.Compile("^\\s*(\\S+)\\s*,\\s*(\\S)\\s*,\\s*(\\S+)\\s*(#.*)?$")
 
 	first := true
 	lineNo := 0
@@ -83,7 +78,7 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 
 	for err == nil {
 		if line, err = reader.ReadString('\n'); err != nil && err != io.EOF {
-			return nil, err
+			log.Fatal(err)
 		}
 		line = strings.TrimSpace(line)
 		lineNo += 1;
@@ -109,7 +104,6 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 
 		fmt.Printf("Invalid charset entry on line %v : %v\n", lineNo, line)
 	}
-	err = nil
 
 	return
 }

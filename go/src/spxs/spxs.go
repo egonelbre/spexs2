@@ -6,6 +6,10 @@ import (
 	"runtime"
 	"time"
 	"flag"
+
+	"runtime/pprof"
+	"os"
+	"log"
 )
 
 var (
@@ -18,6 +22,7 @@ var (
     topCount *int = flag.Int("top", 10, "only print top amount")
     procs *int = flag.Int("procs", 4, "processors to use")
     verbose *bool = flag.Bool("verbose", false, "print debug information")
+    cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
 var extenders = map[string] ExtenderFunc {
@@ -96,9 +101,17 @@ func main() {
 		runtime.GOMAXPROCS(*procs)
 	}
 
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	var (
 		ref *UnicodeReference
-		err error
 		out Pooler
 		in Pooler
 		acceptable FilterFunc
@@ -106,11 +119,7 @@ func main() {
 		fitness FitnessFunc
 	)
 
-	if ref, err = NewReferenceFromFile(*referenceFile, *characterFile); err != nil {
-		fmt.Printf("Error occured while reading reference/character file: %v\n", err)
-		return
-	}
-	
+	ref = NewReferenceFromFile(*referenceFile, *characterFile)
 	extender = extenders[*extenderName]
 	acceptable = limiters[*limiterName](*limitValue)
 	fitness = fitnesses[*fitnessName]
