@@ -51,47 +51,47 @@ var (
     cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
-var extenders = map[string] ExtenderFunc {
+var extenders = map[string] TrieExtenderFunc {
 	"simple" : SimpleExtender,
 	"group"  : GroupExtender,
 	"star"   : StarExtender,
 	"regexp"  : GroupStarExtender,
 }
 
-type PatternFilterCreator func(limit int) FilterFunc
+type PatternFilterCreator func(limit int) TrieFilterFunc
 
 var limiters = map[string] PatternFilterCreator {
-	"count"  : func(limit int) FilterFunc {
-		return func(p Pattern) bool {
-			return p.(*TrieNode).Pos.Len() >= limit
+	"count"  : func(limit int) TrieFilterFunc {
+		return func(p *TrieNode) bool {
+			return p.Pos.Len() >= limit
 		}},
-	"length" : func(limit int) FilterFunc {
-		return func(p Pattern) bool { 
-			return p.(*TrieNode).Len() <= limit
+	"length" : func(limit int) TrieFilterFunc {
+		return func(p *TrieNode) bool { 
+			return p.Len() <= limit
 		}},
-	"complexity" : func(limit int) FilterFunc {
-		return func(p Pattern) bool { 
-			return p.(*TrieNode).Complexity() <= limit
+	"complexity" : func(limit int) TrieFilterFunc {
+		return func(p *TrieNode) bool { 
+			return p.Complexity() <= limit
 		}},
 }
 
-var fitnesses = map[string] FitnessFunc {
-	"def" : func(a Pattern) float32 {
-		return float32(a.(*TrieNode).Len()*a.(*TrieNode).Pos.Len())
+var fitnesses = map[string] TrieFitnessFunc {
+	"def" : func(p *TrieNode) float32 {
+		return float32(p.Len()*p.Pos.Len())
 		},
-	"len" : func(a Pattern) float32 {
-		return float32(a.(*TrieNode).Len())
+	"len" : func(p *TrieNode) float32 {
+		return float32(p.Len())
 		},
-	"count" : func(a Pattern) float32 {
-		return float32(a.(*TrieNode).Pos.Len())
+	"count" : func(p *TrieNode) float32 {
+		return float32(p.Pos.Len())
 		},
-	"complexity" : func(a Pattern) float32 {
-		return float32(a.(*TrieNode).Complexity())
+	"complexity" : func(p *TrieNode) float32 {
+		return float32(p.Complexity())
 		},
 }
 
-func inputOrdering(a Pattern) float32 {
-	return 1/float32(a.(*TrieNode).Len())
+func inputOrdering(p *TrieNode) float32 {
+	return 1/float32(p.Len())
 }
 
 func main() {
@@ -138,11 +138,11 @@ func main() {
 
 	var (
 		ref *UnicodeReference
-		out Pooler
-		in Pooler
-		acceptable FilterFunc
-		extender ExtenderFunc
-		fitness FitnessFunc
+		out TriePooler
+		in TriePooler
+		acceptable TrieFilterFunc
+		extender TrieExtenderFunc
+		fitness TrieFitnessFunc
 	)
 
 	ref = NewReferenceFromFile(*referenceFile, *characterFile)
@@ -169,21 +169,20 @@ func main() {
 	}
 
 	if *procs == 1 {
-		Run(ref,in,out,extender,acceptable)
+		RunTrie(ref,in,out,extender,acceptable)
 	} else {
-		RunParallel(ref,in,out,extender,acceptable,*procs)
+		RunTrieParallel(ref,in,out,extender,acceptable,*procs)
 	}	
 	
 	fmt.Printf("match, regexp, count, fitness\n")
-	p, ok := out.Take()
+	node, ok := out.Take()
 	for ok {
-		n := p.(*TrieNode)
-		name := n.String()
+		name := node.String()
 		regex := ref.ReplaceGroups(name)
-		fmt.Printf("%s, %v, %v, %v\n", name, regex,n.Pos.Len(), fitness(p))
+		fmt.Printf("%s, %v, %v, %v\n", name, regex, node.Pos.Len(), fitness(node))
 		
 		if *verbose {
-			indices, poss := n.Pos.Iter()
+			indices, poss := node.Pos.Iter()
 			for idx := range indices {
 				<-poss
 				fmt.Printf("%v, ", idx)
@@ -191,7 +190,7 @@ func main() {
 			fmt.Printf("\n\n\n")
 		}
 		
-		p, ok = out.Take()
+		node, ok = out.Take()
 	}
 
 	if *verbose {

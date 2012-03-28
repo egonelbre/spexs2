@@ -18,7 +18,7 @@ func NewFifoPool() *FifoPool {
 	return p
 }
 
-func (p *FifoPool) Take() (Pattern, bool) {
+func (p *FifoPool) Take() (*TrieNode, bool) {
 	<-p.token
 	if p.list.Len() == 0 {
 		p.token <- 1
@@ -27,10 +27,10 @@ func (p *FifoPool) Take() (Pattern, bool) {
 	tmp := p.list.Front()
 	p.list.Remove(tmp)
 	p.token <- 1
-	return tmp.Value.(Pattern), true
+	return tmp.Value.(*TrieNode), true
 }
 
-func (p *FifoPool) Put(pat Pattern) {
+func (p *FifoPool) Put(pat *TrieNode) {
 	<-p.token
 	p.list.PushBack(pat)
 	p.token <- 1
@@ -40,19 +40,19 @@ func (p *FifoPool) Len() int {
 	return p.list.Len()
 }
 
-type FitnessFunc func(a Pattern) float32
+type TrieFitnessFunc func(p *TrieNode) float32
 
 type PriorityPool struct {
 	token   chan int
-	items   []Pattern
-	Fitness FitnessFunc
+	items   []*TrieNode
+	Fitness TrieFitnessFunc
 	limit   int
 }
 
-func NewPriorityPool(fitness FitnessFunc, limit int) *PriorityPool {
+func NewPriorityPool(fitness TrieFitnessFunc, limit int) *PriorityPool {
 	p := &PriorityPool{}
 	p.token = make(chan int, 1)
-	p.items = make([]Pattern, 0)
+	p.items = make([]*TrieNode, 0)
 	p.limit = limit
 	p.Fitness = fitness
 	p.token <- 1
@@ -65,7 +65,7 @@ func (p *PriorityPool) IsEmpty() bool {
     return len(p.items) == 0
 }
 
-func (p *PriorityPool) Take() (Pattern, bool) {
+func (p *PriorityPool) Take() (*TrieNode, bool) {
 	<-p.token
 	if p.IsEmpty() {
 		p.token <- 1
@@ -73,10 +73,10 @@ func (p *PriorityPool) Take() (Pattern, bool) {
 	}
 	v := heap.Pop(p)
 	p.token <- 1
-	return v.(Pattern), true
+	return v.(*TrieNode), true
 }
 
-func (p *PriorityPool) Put(pat Pattern) {
+func (p *PriorityPool) Put(pat *TrieNode) {
 	<-p.token
 	heap.Push(p, pat)
 	if p.Len() > p.limit {
@@ -102,7 +102,7 @@ func (p *PriorityPool) Less(i, j int) bool {
 
 // heap.Interface
 func (p *PriorityPool) Push(x interface{}) {
-	p.items = append(p.items, x.(Pattern))
+	p.items = append(p.items, x.(*TrieNode))
 }
 
 func (p *PriorityPool) Pop() interface{} {
