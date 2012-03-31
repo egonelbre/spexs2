@@ -11,7 +11,7 @@ type TrieNode struct {
 }
 
 func NewTrieNode(char Char, parent *TrieNode) *TrieNode {
-	return &TrieNode{char, parent, NewHashSet(), false, false, -1, -1}
+	return &TrieNode{char, parent, NewHashSet(parent.Pos.Len() / 2), false, false, -1, -1}
 }
 
 func NewFullNodeFromRef(ref *UnicodeReference) *TrieNode {

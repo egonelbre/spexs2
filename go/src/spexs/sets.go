@@ -11,8 +11,8 @@ type HashSet struct {
 	data map[int]int
 }
 
-func NewHashSet() *HashSet {
-	return &HashSet{make(map[int]int)}
+func NewHashSet(size int) *HashSet {
+	return &HashSet{make(map[int]int, size)}
 }
 
 func (hs *HashSet) Add(idx int, pos byte) {
