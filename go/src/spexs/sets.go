@@ -4,7 +4,7 @@ type Set interface {
 	Add(idx int, pos byte)
 	Contains(idx int, pos byte) bool
 	Len() int
-	Iter() (chan int, chan int)
+	Iter() map[int]int
 }
 
 type HashSet struct {
@@ -32,19 +32,8 @@ func (hs *HashSet) Len() int {
 	return len(hs.data)
 }
 
-func (hs *HashSet) Iter() (chan int, chan int) {
-	indices := make(chan int, 100)
-	poss := make(chan int, 100)
-
-	go func(){
-		for idx, pos := range hs.data {
-			indices <- idx
-			poss <- pos
-		}
-		close(indices)
-		close(poss)
-	}()
-	return indices, poss
+func (hs *HashSet) Iter() map[int]int {
+	return hs.data;
 }
 
 func SetAddSet(h Set, g Set) {
@@ -83,18 +72,13 @@ func (f *FullSet) Len() int {
 	return f.Count
 }
 
-func (f *FullSet) Iter() (chan int, chan int) {
-	indices := make(chan int, 100)
-	poss := make(chan int, 100)
+func (f *FullSet) Iter() map[int]int {
+	result := make(map[int]int, len(f.Ref.Pats))
 
-	go func(){
-		for idx, pat := range f.Ref.Pats {
-			indices <- idx
-			poss <- (2 << byte(len(pat.Pat)) - 1)
-		}
-		close(indices)
-		close(poss)
-	}()
-	return indices, poss
+	for idx, pat := range f.Ref.Pats {
+		result[idx] = 2 << byte(len(pat.Pat)) - 1
+	}
+
+	return result
 }
 

@@ -8,9 +8,8 @@ func output(out TrieNodes, patterns map[Char]*TrieNode) {
 
 func trieSimpleExtend(node *TrieNode, ref *UnicodeReference, 
 		patterns map[Char]*TrieNode) {
-	indices, poss := node.Pos.Iter()
-	for idx := range indices {
-		mpos := <- poss
+
+	for idx, mpos := range node.Pos.Iter() {
 		plen := byte(len(ref.Pats[idx].Pat))
 		var k byte
 		for k = 0; (k < plen) && (mpos > 0); k += 1 {
@@ -69,9 +68,7 @@ func GroupExtender(node *TrieNode, ref *UnicodeReference) TrieNodes {
 }
 
 func trieStarExtend(node *TrieNode, ref Reference, stars map[Char]*TrieNode) {
-	indices, poss := node.Pos.Iter()
-	for idx := range indices {
-		mpos := <- poss
+	for idx, mpos := range node.Pos.Iter() {
 		plen := byte(len(ref.(*UnicodeReference).Pats[idx].Pat))
 		if mpos == 0 { continue }
 

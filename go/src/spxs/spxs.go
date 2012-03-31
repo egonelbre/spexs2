@@ -182,9 +182,7 @@ func main() {
 		fmt.Printf("%s, %v, %v, %v\n", name, regex, node.Pos.Len(), fitness(node))
 		
 		if *verbose {
-			indices, poss := node.Pos.Iter()
-			for idx := range indices {
-				<-poss
+			for idx := range node.Pos.Iter() {
 				fmt.Printf("%v, ", idx)
 			}
 			fmt.Printf("\n\n\n")
