@@ -1,0 +1,50 @@
+{
+	"default" : {
+		"data" : {
+			"input" : "",
+			"validation" : "",
+		},
+		"alphabet" : "ACGT",
+		"groups" : [
+			{"group":"AC", "name":"M"},
+			{"group":"AG", "name":"R"},
+			{"group":"AT", "name":"W"},
+			{"group":"CG", "name":"S"},
+			{"group":"CT", "name":"Y"},
+			{"group":"GT", "name":"K"},
+		],
+		"output" : {
+			"order" : {"complexity":{}},
+			"show" : 10
+		},
+	},
+	"triplets": {
+		"groups" : [
+			{"group":"CGT", "name":"B"},
+			{"group":"AGT", "name":"D"},
+			{"group":"ACT", "name":"H"},
+			{"group":"ACG", "name":"V"},
+		],
+	},
+	"simple" : {
+		"extension" : {
+			"method" : {"regex":{}},
+			"filter" : [
+				{"length" : {"max":7}},
+				{"count"  : {"min":0.01}},
+				{"p-value" : {"min":-0.1, "max":0.1}},
+			],
+		},
+		"output" : {
+			"order" : {"p-value":{}},
+			"filter" : [
+				{"length" : {"min":6, "max":7}},
+			],
+			"show": -1,
+		},
+	},
+	"alternative" : {
+		"alphabet" : "ABCD",
+		"generate-groups" : {"max":2},
+	}
+}
