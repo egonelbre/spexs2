@@ -49,9 +49,9 @@ func RunParallel(ref Reference, input Pooler, results Pooler,
 
 	start := make(chan int, 1000)
 	stop := make(chan int, 1000)
-	
+
 	for i := 0; i < num_threads; i++ {
-		go func(){
+		go func() {
 			start <- 1
 			defer func() { stop <- 1 }()
 

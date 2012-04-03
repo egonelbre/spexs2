@@ -14,7 +14,6 @@ func (p *string_pattern) String() string {
 	return p.v
 }
 
-
 func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
 	val, ok := p.Take()
 	if ok != expectedOk {
@@ -22,18 +21,18 @@ func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
 	}
 	if ok && val.String() != expected {
 		t.Errorf("didn't get correct value, got='%s', expected='%s'", val, expected)
-	}	
+	}
 }
 
 func TestFifoPool(t *testing.T) {
 	p := NewFifoPool()
-	
+
 	p.Put(newString("alpha"))
 	p.Put(newString("beta"))
-	
+
 	testTake(t, p, "alpha", true)
 	testTake(t, p, "beta", true)
-	
+
 	p.Put(newString("gamma"))
 	p.Put(newString("delta"))
 
@@ -48,12 +47,12 @@ func TestPriorityPool(t *testing.T) {
 		return float32(len(p.String()))
 	}
 	p := NewPriorityPool(lenFitness, 100)
-	
-	p.Put(newString("bc"))	
+
+	p.Put(newString("bc"))
 	p.Put(newString("defg"))
 	p.Put(newString("a"))
 	p.Put(newString("def"))
-	
+
 	testTake(t, p, "a", true)
 	testTake(t, p, "bc", true)
 
@@ -64,6 +63,6 @@ func TestPriorityPool(t *testing.T) {
 	testTake(t, p, "def", true)
 	testTake(t, p, "defg", true)
 	testTake(t, p, "defgh", true)
-	
+
 	testTake(t, p, "", false)
 }

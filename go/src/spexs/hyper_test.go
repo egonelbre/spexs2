@@ -7,7 +7,7 @@ func BenchmarkLogGamma(b *testing.B) {
 		for r := 0; r < 1000; r += 1 {
 			HypergeometricSplitLog(v, r, 13000, 13000)
 		}
-	} 
+	}
 }
 
 func BenchmarkGamma(b *testing.B) {
@@ -15,5 +15,5 @@ func BenchmarkGamma(b *testing.B) {
 		for r := 0; r < 1000; r += 1 {
 			HypergeometricSplit(v, r, 13000, 13000)
 		}
-	} 
+	}
 }

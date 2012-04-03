@@ -1,16 +1,16 @@
 package main
 
 import (
-	. "spexs"
-	"bytes"
-	"unicode/utf8"
-	"os"
-	"io"
 	"bufio"
-	"strings"
-	"regexp"
+	"bytes"
 	"fmt"
+	"io"
 	"log"
+	"os"
+	"regexp"
+	. "spexs"
+	"strings"
+	"unicode/utf8"
 )
 
 func chars(s string) []Char {
@@ -31,16 +31,16 @@ func pattern(data string) *ReferencePattern {
 
 func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReference) {
 	var (
-		file *os.File
+		file   *os.File
 		reader *bufio.Reader
-		line string
-		err error
+		line   string
+		err    error
 	)
 
 	if file, err = os.Open(refName); err != nil {
 		log.Fatal(err)
 	}
-	
+
 	ref = NewUnicodeReference(1024)
 
 	reader = bufio.NewReader(file)
@@ -48,9 +48,9 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 		if line, err = reader.ReadString('\n'); err != nil && err != io.EOF {
 			log.Fatal(err)
 		}
-		
+
 		line = strings.TrimSpace(line)
-		
+
 		if len(line) == 0 {
 			continue
 		}
@@ -81,7 +81,7 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 			log.Fatal(err)
 		}
 		line = strings.TrimSpace(line)
-		lineNo += 1;
+		lineNo += 1
 
 		if regComment.MatchString(line) {
 			continue
@@ -93,7 +93,7 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 			first = false
 			continue
 		}
-		
+
 		if !first && regGroup.MatchString(line) {
 			tokens := regGroup.FindStringSubmatch(line)
 			id := chars(tokens[2])[0]

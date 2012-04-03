@@ -1,10 +1,9 @@
 package spexs
 
 import (
-	"unicode/utf8"
 	"bytes"
+	"unicode/utf8"
 )
-
 
 type Char rune
 
@@ -25,13 +24,13 @@ type ReferencePattern struct {
 }
 
 type UnicodeReference struct {
-	Pats     []ReferencePattern
-	Alphabet []Char
-	Groups   map[Char]Group
+	Pats      []ReferencePattern
+	Alphabet  []Char
+	Groups    map[Char]Group
 	Groupings []int
 }
 
-func NewUnicodeReference(size int) *UnicodeReference{
+func NewUnicodeReference(size int) *UnicodeReference {
 	ref := &UnicodeReference{}
 	ref.Pats = make([]ReferencePattern, 0, size)
 	ref.Alphabet = make([]Char, 0, 8)
@@ -49,9 +48,9 @@ func (ref *UnicodeReference) Next(idx int, pos byte) (Char, byte, bool) {
 	return Char(rune), byte(pos + byte(width)), true
 }
 
-func (ref *UnicodeReference) ReplaceGroups(pat string) (string) {
+func (ref *UnicodeReference) ReplaceGroups(pat string) string {
 	buf := bytes.NewBufferString("")
-	for _, c := range(pat) {
+	for _, c := range pat {
 		if grp, exists := ref.Groups[Char(c)]; exists {
 			buf.WriteString(grp.Name)
 			continue

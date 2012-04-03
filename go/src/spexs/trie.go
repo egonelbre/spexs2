@@ -1,14 +1,14 @@
 package spexs
 
 type TrieNode struct {
-	Char   Char
-	Parent *TrieNode
-	Pos    Set
-	IsGroup bool
-	IsStar bool
-	length int
+	Char       Char
+	Parent     *TrieNode
+	Pos        Set
+	IsGroup    bool
+	IsStar     bool
+	length     int
 	complexity int
-	pvalue float64
+	pvalue     float64
 }
 
 func NewTrieNode(char Char, parent *TrieNode) *TrieNode {
@@ -27,7 +27,7 @@ func (n *TrieNode) String() string {
 			return n.Parent.String() + string(n.Char)
 		}
 	}
-	return "";
+	return ""
 }
 
 func (n *TrieNode) Len() int {

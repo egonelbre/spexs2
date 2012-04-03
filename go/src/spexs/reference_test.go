@@ -1,9 +1,9 @@
 package spexs
 
 import (
+	"bytes"
 	"testing"
 	"unicode/utf8"
-	"bytes"
 )
 
 func chars(s string) []Char {
@@ -43,10 +43,10 @@ func createTestUnicodeReference() *UnicodeReference {
 	return u
 }
 
-func TestUnicodeReferenceNext(t *testing.T){
+func TestUnicodeReferenceNext(t *testing.T) {
 	u := createTestUnicodeReference()
 
-	testStr := func (idx int, str string) {
+	testStr := func(idx int, str string) {
 		p := PosEncode(idx, 0)
 		var x Char
 		var ok bool
@@ -60,7 +60,7 @@ func TestUnicodeReferenceNext(t *testing.T){
 			}
 		}
 	}
-	
+
 	testStr(0, "ACGTACGG")
 	testStr(2, "ACGGCTA")
 	testStr(1, "CAGTCCG")

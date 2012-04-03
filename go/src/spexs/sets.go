@@ -25,7 +25,7 @@ func (hs *HashSet) Add(idx int, pos byte) {
 
 func (hs *HashSet) Contains(idx int, pos byte) bool {
 	val, exists := hs.data[idx]
-	return exists && (val & (1 << pos) != 0)
+	return exists && (val&(1<<pos) != 0)
 }
 
 func (hs *HashSet) Len() int {
@@ -33,12 +33,12 @@ func (hs *HashSet) Len() int {
 }
 
 func (hs *HashSet) Iter() map[int]int {
-	return hs.data;
+	return hs.data
 }
 
 func SetAddSet(h Set, g Set) {
-	switch h.(type){
-	case *HashSet : 
+	switch h.(type) {
+	case *HashSet:
 		for gidx, gval := range g.(*HashSet).data {
 			hval, exists := h.(*HashSet).data[gidx]
 			if exists {
@@ -47,7 +47,7 @@ func SetAddSet(h Set, g Set) {
 				h.(*HashSet).data[gidx] = gval
 			}
 		}
-		default :
+	default:
 	}
 }
 
@@ -76,9 +76,8 @@ func (f *FullSet) Iter() map[int]int {
 	result := make(map[int]int, len(f.Ref.Pats))
 
 	for idx, pat := range f.Ref.Pats {
-		result[idx] = 2 << byte(len(pat.Pat)) - 1
+		result[idx] = 2<<byte(len(pat.Pat)) - 1
 	}
 
 	return result
 }
-

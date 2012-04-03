@@ -5,12 +5,11 @@ import (
 	"unicode/utf8"
 )
 
-
 func TestTrieNodeString(t *testing.T) {
 	root := NewTrieNode(0, nil)
-	var add func (base *TrieNode, s string) *TrieNode
+	var add func(base *TrieNode, s string) *TrieNode
 
-	add = func (base *TrieNode, s string) *TrieNode {
+	add = func(base *TrieNode, s string) *TrieNode {
 		if len(s) <= 0 {
 			return base
 		}

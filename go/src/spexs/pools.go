@@ -1,13 +1,13 @@
 package spexs
 
 import (
-	"container/list"
 	"container/heap"
+	"container/list"
 )
 
 type FifoPool struct {
 	token chan int
-	list *list.List
+	list  *list.List
 }
 
 func NewFifoPool() *FifoPool {
@@ -62,7 +62,7 @@ func NewPriorityPool(fitness TrieFitnessFunc, limit int) *PriorityPool {
 }
 
 func (p *PriorityPool) IsEmpty() bool {
-    return len(p.items) == 0
+	return len(p.items) == 0
 }
 
 func (p *PriorityPool) Take() (*TrieNode, bool) {
