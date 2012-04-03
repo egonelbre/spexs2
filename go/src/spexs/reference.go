@@ -21,12 +21,14 @@ func NewGroup(name string, id Char, chars []Char) *Group {
 type ReferencePattern struct {
 	Pat   []byte
 	Count int // this refers to rune count in Pat
+	Group int // group count
 }
 
 type UnicodeReference struct {
 	Pats     []ReferencePattern
 	Alphabet []Char
 	Groups   map[Char]Group
+	Groupings []int
 }
 
 func NewUnicodeReference(size int) *UnicodeReference{
@@ -34,6 +36,7 @@ func NewUnicodeReference(size int) *UnicodeReference{
 	ref.Pats = make([]ReferencePattern, 0, size)
 	ref.Alphabet = make([]Char, 0, 8)
 	ref.Groups = make(map[Char]Group)
+	ref.Groupings = make([]int, 2) // fix use multiple
 	return ref
 }
 

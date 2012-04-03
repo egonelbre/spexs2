@@ -40,7 +40,7 @@ func (p *FifoPool) Len() int {
 	return p.list.Len()
 }
 
-type TrieFitnessFunc func(p *TrieNode) float32
+type TrieFitnessFunc func(p *TrieNode) float64
 
 type PriorityPool struct {
 	token   chan int

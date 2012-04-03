@@ -32,20 +32,26 @@ import (
 	fitness ===
 	-p-value: -1
 
-
 	/group/inbox/elbre
 
  	// -acceptable
 */
 
 var (
+    profile *string = flag.String("profile", "default", "profile to be loaded from configuration file, by default loads the first")
+    configFile *string = flag.String("conf", "", "configuration file")
+
     characterFile *string = flag.String("chars", "", "character set file")
-    referenceFile *string = flag.String("ref", "", "reference file")   
+    referenceFile *string = flag.String("ref", "", "reference file (can also be set from configuration file)")
+    validationFile *string = flag.String("val", "", "validation file (can also be set from configuration file)")
+
     extenderName *string = flag.String("extender", "regexp", "method used for extending nodes (simple, group, star, regex)")
     limiterName *string = flag.String("limiter", "count", "method used to determine whether node is accptable for extending (count, length, complexity)")
     fitnessName *string = flag.String("fitness", "def", "fitness function used for sorting (def)")
     limitValue *int = flag.Int("limit", 5, "value for limiter")
+
     topCount *int = flag.Int("top", 10, "only print top amount")
+
     procs *int = flag.Int("procs", 4, "processors to use")
     verbose *bool = flag.Bool("verbose", false, "print debug information")
     cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
@@ -76,22 +82,22 @@ var limiters = map[string] PatternFilterCreator {
 }
 
 var fitnesses = map[string] TrieFitnessFunc {
-	"def" : func(p *TrieNode) float32 {
-		return float32(p.Len()*p.Pos.Len())
+	"def" : func(p *TrieNode) float64 {
+		return float64(p.Len()*p.Pos.Len())
 		},
-	"len" : func(p *TrieNode) float32 {
-		return float32(p.Len())
+	"len" : func(p *TrieNode) float64 {
+		return float64(p.Len())
 		},
-	"count" : func(p *TrieNode) float32 {
-		return float32(p.Pos.Len())
+	"count" : func(p *TrieNode) float64 {
+		return float64(p.Pos.Len())
 		},
-	"complexity" : func(p *TrieNode) float32 {
-		return float32(p.Complexity())
+	"complexity" : func(p *TrieNode) float64 {
+		return float64(p.Complexity())
 		},
 }
 
-func inputOrdering(p *TrieNode) float32 {
-	return 1/float32(p.Len())
+func inputOrdering(p *TrieNode) float64 {
+	return 1/float64(p.Len())
 }
 
 func main() {
@@ -174,12 +180,12 @@ func main() {
 		RunTrieParallel(ref,in,out,extender,acceptable,*procs)
 	}	
 	
-	fmt.Printf("match, regexp, count, fitness\n")
+	fmt.Printf("match, regexp, count, fitness, p-value\n")
 	node, ok := out.Take()
 	for ok {
 		name := node.String()
 		regex := ref.ReplaceGroups(name)
-		fmt.Printf("%s, %v, %v, %v\n", name, regex, node.Pos.Len(), fitness(node))
+		fmt.Printf("%s, %v, %v, %v, %v\n", name, regex, node.Pos.Len(), fitness(node), node.PValue(ref))
 		
 		if *verbose {
 			for idx := range node.Pos.Iter() {

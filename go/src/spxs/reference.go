@@ -105,5 +105,9 @@ func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReferenc
 		fmt.Printf("Invalid charset entry on line %v : %v\n", lineNo, line)
 	}
 
+	ref.Groupings = make([]int, 2)
+	ref.Groupings[0] = len(ref.Pats)
+	ref.Groupings[1] = 0
+
 	return
 }
