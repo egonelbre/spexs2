@@ -1,10 +1,10 @@
 {
-	"default" : {
-		"data" : {
-			"input" : "",
-			"validation" : "",
-		},
-		"alphabet" : "ACGT",
+	"data" : {
+		"input" : "",
+		"validation" : "",
+	},
+	"alphabet" : {
+		"characters" : "ACGT",
 		"groups" : [
 			{"group":"AC", "name":"M"},
 			{"group":"AG", "name":"R"},
@@ -13,38 +13,28 @@
 			{"group":"CT", "name":"Y"},
 			{"group":"GT", "name":"K"},
 		],
-		"output" : {
-			"order" : {"complexity":{}},
-			"show" : 10
-		},
 	},
-	"triplets": {
-		"groups" : [
-			{"group":"CGT", "name":"B"},
-			{"group":"AGT", "name":"D"},
-			{"group":"ACT", "name":"H"},
-			{"group":"ACG", "name":"V"},
+	"extension" : {
+		"method" : {"group":{}},
+		"filter" : [
+			{"length" : {"max":7}},
+			{"count" : {"min":0.01}},
+			{"p-value" : {"min":-0.2, "max":0.2, "disabled":true}},
 		],
 	},
-	"simple" : {
-		"extension" : {
-			"method" : {"regex":{}},
-			"filter" : [
-				{"length" : {"max":7}},
-				{"count"  : {"min":0.01}},
-				{"p-value" : {"min":-0.1, "max":0.1}},
-			],
-		},
-		"output" : {
-			"order" : {"p-value":{}},
-			"filter" : [
-				{"length" : {"min":6, "max":7}},
-			],
-			"show": -1,
-		},
+	"output" : {
+		"order" : {"p-value":{}},
+		"filter" : [
+			{"length" : {"min":6, "max":7}},
+			{"p-value" : {"min":-0.1, "max":0.1}},
+		],
+		"show": -1,
 	},
-	"alternative" : {
-		"alphabet" : "ABCD",
-		"generate-groups" : {"max":2},
+
+	"aliases" : {
+		"ref" : {"desc":"input file",            "set":["data.input"]},
+		"val" : {"desc":"validation file",       "set":["data.validation"]},
+		"p-min" : {"desc":"minimum for p-value", "set":["extension.filter.p-value.min", "output.filter.p-value.min"]},
+		"p-max" : {"desc":"maximum for p-value", "set":["extension.filter.p-value.max", "output.filter.p-value.max"]},
 	}
 }

@@ -38,8 +38,7 @@ import (
 */
 
 var (
-	profile    *string = flag.String("profile", "default", "profile to be loaded from configuration file, by default loads the first")
-	configFile *string = flag.String("conf", "", "configuration file")
+	configFile *string = flag.String("conf", "conf.json", "configuration file(s), comma-delimited")
 
 	characterFile  *string = flag.String("chars", "", "character set file")
 	referenceFile  *string = flag.String("ref", "", "reference file (can also be set from configuration file)")
