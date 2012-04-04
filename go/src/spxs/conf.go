@@ -21,13 +21,15 @@ const baseConfiguration = `{
 		"Groups" : {}
 	},
 	"Extension" : {
-		"Method" : {},
+		"Method" : "simple",
+		"Args" : {},
 		"Filter" : {}
 	},
 	"Output" : {
-		"Order" : {},
+		"Order" : "p-value",
+		"Args" : {},
 		"Filter" : {},
-		"Show": -1
+		"Count": -1
 	},
 	"Aliases" : {
 		"ref" : {"Desc":"input file", "Modify":["Data.Input"]},
@@ -47,13 +49,15 @@ type Conf struct {
 		}
 	}
 	Extension struct {
-		Method map[string]interface{}
+		Method string
+		Args map[string]interface{}
 		Filter map[string]interface{}
 	}
 	Output struct {
-		Order map[string]interface{}
+		Order string 
+		Args map[string]interface{}
 		Filter map[string]interface{}
-		Show int
+		Count int
 	}
 	Aliases map[string]struct {
 		Desc string
@@ -72,10 +76,16 @@ func (conf *Conf) ApplyJson(js string){
 func (conf *Conf) SetFQN(name string, value string){
 	// extension.filter.pvalue.min
 	// convert to {"extension":{"filter":{"pvalue":{"min":value}}}}
+	// then apply as an json
 	names := strings.Split(name, ".")
 	js := value
 
-	if _, err := strconv.ParseFloat(value, 64); err != nil{
+	_, err := strconv.ParseFloat(value, 64)
+	isNumeric := err != nil
+	isJson := len(value) > 1 && value[0] == '{'
+
+	if !isNumeric && !isJson  {
+		// probably a string
 		js = `"` + value + `"`;
 	}
 	
@@ -110,7 +120,8 @@ func readBaseConfiguration(config string) Conf {
 	return conf
 }
 
-func readConfiguration(configFiles []string) Conf {
+func ReadConfiguration(configs string) Conf {
+	configFiles := strings.Split(configs, ",")
 	conf := readBaseConfiguration(baseConfiguration)
 
 	for _, configFile := range configFiles {

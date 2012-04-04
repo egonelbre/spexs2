@@ -7,7 +7,7 @@ import (
 )
 
 func ApplyObject(src interface{}, dest interface{}) {
-	var buf bytes.Buffer
+	var buf *bytes.Buffer
 	enc := json.NewEncoder(buf)
 	if err := enc.Encode(&src); err != nil {
 		log.Println(err)

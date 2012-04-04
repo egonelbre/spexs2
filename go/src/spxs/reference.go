@@ -29,6 +29,10 @@ func pattern(data string) *ReferencePattern {
 	return &p
 }
 
+func CreateReference(conf Conf) *UnicodeReference {
+	
+}
+
 func NewReferenceFromFile(refName string, charName string) (ref *UnicodeReference) {
 	var (
 		file   *os.File

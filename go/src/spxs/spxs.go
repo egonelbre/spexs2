@@ -57,15 +57,16 @@ func main() {
 		return
 	}
 
-	configFiles := strings.Split(*configs, ",")
-	conf := readConfiguration(configFiles)
+	conf := ReadConfiguration(*configs)
+	setup := CreateSetup(conf)
 
-	var setup Setup
-	//setup := createSetup(conf)
+	// RUNTIME SETUP
 
 	if *procs > 0 {
 		runtime.GOMAXPROCS(*procs)
 	}
+
+	// DEBUG SETUP
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -76,18 +77,15 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	maxInQueue := 0
+	// debugging the input queue
 	if *verbose {
 		go func() {
 			for {
-				fmt.Printf("queue size: %v\n", in.Len())
-				if in.Len() > maxInQueue {
-					maxInQueue = in.Len()
-				}
+				fmt.Printf("queue size: %v\n", setup.In.Len())
 				time.Sleep(1000 * 1000 * 100)
 			}
 		}()
-	}
+	}	
 
 	if *procs == 1 {
 		RunTrie(setup.Ref, setup.In, setup.Out, setup.Extender, setup.Extendable, setup.Outputtable)
@@ -99,8 +97,8 @@ func main() {
 	node, ok := setup.Out.Take()
 	for ok {
 		name := node.String()
-		regex := ref.ReplaceGroups(name)
-		fmt.Printf("%s, %v, %v, %v, %v\n", name, regex, node.Pos.Len(), fitness(node), node.PValue(ref))
+		regex := setup.Ref.ReplaceGroups(name)
+		fmt.Printf("%s, %v, %v, %v, %v\n", name, regex, node.Pos.Len(), setup.Fitness(node), node.PValue(setup.Ref))
 
 		if *verbose {
 			for idx := range node.Pos.Iter() {
@@ -110,10 +108,6 @@ func main() {
 		}
 
 		node, ok = setup.Out.Take()
-	}
-
-	if *verbose {
-		fmt.Printf("maximum items in queue: %v\n", maxInQueue)
 	}
 
 	fmt.Printf("\n")
