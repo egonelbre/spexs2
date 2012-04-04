@@ -5,7 +5,7 @@ import (
 	. "spexs"
 )
 
-var extenders = map[string] TrieExtenderFunc {
+var extenders = map[string]TrieExtenderFunc{
 	"simple": SimpleExtender,
 	"group":  GroupExtender,
 	"star":   StarExtender,
@@ -22,6 +22,6 @@ func CreateExtender(conf Conf, setup Setup) TrieExtenderFunc {
 	if _, valid := extenders[conf.Extension.Method]; !valid {
 		log.Fatal("No extender named: ", conf.Extension.Method)
 	}
-	
+
 	return extenders[conf.Extension.Method]
 }

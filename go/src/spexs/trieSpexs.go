@@ -33,7 +33,7 @@ func RunTrie(ref *UnicodeReference, input TriePooler, results TriePooler,
 }
 
 func RunTrieParallel(ref *UnicodeReference, input TriePooler, results TriePooler,
-	extender TrieExtenderFunc, extendable TrieFilterFunc, outputtable TrieFilterFunc, 
+	extender TrieExtenderFunc, extendable TrieFilterFunc, outputtable TrieFilterFunc,
 	num_threads int) {
 
 	start := make(chan int, 1000)

@@ -35,7 +35,7 @@ func CreateReference(conf Conf) *UnicodeReference {
 
 	addPatternsFromFile(ref, conf.Data.Input, 0)
 	addPatternsFromFile(ref, conf.Data.Validation, 1)
-	
+
 	return ref
 }
 
@@ -56,7 +56,7 @@ func pattern(data string, group int) ReferencePattern {
 	return p
 }
 
-func addPatternsFromFile(ref *UnicodeReference, filename string, group int){
+func addPatternsFromFile(ref *UnicodeReference, filename string, group int) {
 	var (
 		file   *os.File
 		reader *bufio.Reader

@@ -4,21 +4,20 @@ import (
 	. "spexs"
 )
 
-const MAX_POOL_SIZE = 1024*1024*1024
+const MAX_POOL_SIZE = 1024 * 1024 * 1024
 
 type Setup struct {
-	Ref        *UnicodeReference
-	Out        TriePooler
-	In         TriePooler
+	Ref *UnicodeReference
+	Out TriePooler
+	In  TriePooler
 
-	Extender   TrieExtenderFunc
-	
-	Extendable TrieFilterFunc
+	Extender TrieExtenderFunc
+
+	Extendable  TrieFilterFunc
 	Outputtable TrieFilterFunc
 
-	Fitness    TrieFitnessFunc
+	Fitness TrieFitnessFunc
 }
-
 
 type TrieFitnessCreator func(interface{}) TrieFitnessFunc
 type TrieExtenderCreator func(interface{}) TrieExtenderFunc
@@ -45,7 +44,7 @@ func CreateSetup(conf Conf) Setup {
 	var setup Setup
 
 	setup.Ref = CreateReference(conf)
-	
+
 	setup.In = CreateInput(conf)
 	setup.Fitness = CreateFitness(conf, setup)
 	setup.Out = CreateOutput(conf, setup.Fitness)

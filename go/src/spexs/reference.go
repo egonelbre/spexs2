@@ -60,11 +60,11 @@ func (ref *UnicodeReference) ReplaceGroups(pat string) string {
 	return string(buf.Bytes())
 }
 
-func (ref *UnicodeReference) AddGroup(group Group){
+func (ref *UnicodeReference) AddGroup(group Group) {
 	ref.Groups[group.Id] = group
 }
 
-func (ref *UnicodeReference) AddPattern(pat ReferencePattern){
+func (ref *UnicodeReference) AddPattern(pat ReferencePattern) {
 	ref.Pats = append(ref.Pats, pat)
-	ref.Groupings[ pat.Group ] += 1
+	ref.Groupings[pat.Group] += 1
 }

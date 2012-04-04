@@ -1,8 +1,8 @@
 package main
 
 import (
-	. "spexs"
 	"log"
+	. "spexs"
 )
 
 var fitnesses = map[string]TrieFitnessFunc{

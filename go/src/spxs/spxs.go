@@ -45,10 +45,6 @@ var (
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
-func setupRuntime() {
-	
-}
-
 func main() {
 	flag.Parse()
 
@@ -85,7 +81,7 @@ func main() {
 				time.Sleep(1000 * 1000 * 100)
 			}
 		}()
-	}	
+	}
 
 	if *procs == 1 {
 		RunTrie(setup.Ref, setup.In, setup.Out, setup.Extender, setup.Extendable, setup.Outputtable)

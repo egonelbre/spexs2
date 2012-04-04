@@ -1,14 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"flag"
 	"log"
 	"os"
-	"encoding/json"
 	"regexp"
-	"bytes"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 const baseConfiguration = `{
@@ -39,33 +39,33 @@ const baseConfiguration = `{
 
 type Conf struct {
 	Data struct {
-		Input string
+		Input      string
 		Validation string
 	}
 	Alphabet struct {
 		Characters string
-		Groups map[string]struct {
+		Groups     map[string]struct {
 			Group string
 		}
 	}
 	Extension struct {
 		Method string
-		Args map[string]interface{}
+		Args   map[string]interface{}
 		Filter map[string]interface{}
 	}
 	Output struct {
-		Order string 
-		Args map[string]interface{}
+		Order  string
+		Args   map[string]interface{}
 		Filter map[string]interface{}
-		Count int
+		Count  int
 	}
 	Aliases map[string]struct {
-		Desc string
+		Desc   string
 		Modify []string
 	}
 }
 
-func (conf *Conf) ApplyJson(js string){
+func (conf *Conf) ApplyJson(js string) {
 	dec := json.NewDecoder(bytes.NewBufferString(js))
 	if err := dec.Decode(&conf); err != nil {
 		log.Println("Error in json:", js)
@@ -73,7 +73,7 @@ func (conf *Conf) ApplyJson(js string){
 	}
 }
 
-func (conf *Conf) SetFQN(name string, value string){
+func (conf *Conf) SetFQN(name string, value string) {
 	// extension.filter.pvalue.min
 	// convert to {"extension":{"filter":{"pvalue":{"min":value}}}}
 	// then apply as an json
@@ -84,12 +84,12 @@ func (conf *Conf) SetFQN(name string, value string){
 	isNumeric := err != nil
 	isJson := len(value) > 1 && value[0] == '{'
 
-	if !isNumeric && !isJson  {
+	if !isNumeric && !isJson {
 		// probably a string
-		js = `"` + value + `"`;
+		js = `"` + value + `"`
 	}
-	
-	for i := len(names)-1 ; i >= 0; i -= 1 {
+
+	for i := len(names) - 1; i >= 0; i -= 1 {
 		js = `{"` + names[i] + `":` + js + `}`
 	}
 
@@ -116,7 +116,7 @@ func readBaseConfiguration(config string) Conf {
 		log.Println("Error in base configuration")
 		log.Fatal(err)
 	}
-	
+
 	return conf
 }
 

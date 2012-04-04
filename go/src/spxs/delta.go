@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
 	"bytes"
 	"encoding/json"
+	"log"
 )
 
 func ApplyObject(src interface{}, dest interface{}) {

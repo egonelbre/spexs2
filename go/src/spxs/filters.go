@@ -1,22 +1,22 @@
 package main
 
 import (
-	. "spexs"
-	"math"
 	"log"
+	"math"
+	. "spexs"
 )
 
 type TrieFilterCreator func(interface{}, Setup) TrieFilterFunc
 
-type GenericFilterConf struct { Min, Max float64 }
+type GenericFilterConf struct{ Min, Max float64 }
 
 func TrueFilter(p *TrieNode) bool {
 	return true
 }
 
-var Filters = map[string] TrieFilterCreator {
-	"count": CountFilterCreator,
-	"length": LengthFilterCreator,
+var Filters = map[string]TrieFilterCreator{
+	"count":   CountFilterCreator,
+	"length":  LengthFilterCreator,
 	"p-value": PValueFilterCreator,
 }
 
@@ -33,10 +33,12 @@ func CreateFilter(conf map[string]interface{}, setup Setup) TrieFilterFunc {
 	}
 
 	switch len(filters) {
-	case 0 : return TrueFilter
-	case 1 : return filters[0]
+	case 0:
+		return TrueFilter
+	case 1:
+		return filters[0]
 	}
-	
+
 	// create a composite filter
 	return func(p *TrieNode) bool {
 		for _, f := range filters {
@@ -45,7 +47,7 @@ func CreateFilter(conf map[string]interface{}, setup Setup) TrieFilterFunc {
 			}
 		}
 		return true
-	}	
+	}
 }
 
 type TrieValueFunc func(p *TrieNode) float64
@@ -59,7 +61,7 @@ func GenericFilter(value TrieValueFunc, config interface{}) TrieFilterFunc {
 
 	min, max := conf.Min, conf.Max
 	low, high := !math.IsNaN(conf.Min), !math.IsNaN(conf.Max)
-	
+
 	if low && high {
 		return func(p *TrieNode) bool {
 			return (value(p) <= max) && (value(p) > min)
@@ -79,19 +81,19 @@ func GenericFilter(value TrieValueFunc, config interface{}) TrieFilterFunc {
 }
 
 func CountFilterCreator(conf interface{}, setup Setup) TrieFilterFunc {
-	return GenericFilter(func(p *TrieNode) float64{
+	return GenericFilter(func(p *TrieNode) float64 {
 		return float64(p.Pos.Len())
 	}, conf)
 }
 
-func LengthFilterCreator(conf interface{}, setup Setup) TrieFilterFunc {	
-	return GenericFilter(func(p *TrieNode) float64{
+func LengthFilterCreator(conf interface{}, setup Setup) TrieFilterFunc {
+	return GenericFilter(func(p *TrieNode) float64 {
 		return float64(p.Pos.Len())
 	}, conf)
 }
 
 func PValueFilterCreator(conf interface{}, setup Setup) TrieFilterFunc {
-	return GenericFilter(func(p *TrieNode) float64{
+	return GenericFilter(func(p *TrieNode) float64 {
 		return p.PValue(setup.Ref)
 	}, conf)
 }
