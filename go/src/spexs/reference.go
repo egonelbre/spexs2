@@ -9,7 +9,7 @@ type Char rune
 
 type Group struct {
 	Id    Char
-	Name  string
+	Long  string
 	Chars []Char
 }
 
@@ -20,7 +20,7 @@ func NewGroup(name string, id Char, chars []Char) *Group {
 type ReferencePattern struct {
 	Pat   []byte
 	Count int // this refers to rune count in Pat
-	Group int // group count
+	Group int // validation or reference group
 }
 
 type UnicodeReference struct {
@@ -52,10 +52,19 @@ func (ref *UnicodeReference) ReplaceGroups(pat string) string {
 	buf := bytes.NewBufferString("")
 	for _, c := range pat {
 		if grp, exists := ref.Groups[Char(c)]; exists {
-			buf.WriteString(grp.Name)
+			buf.WriteString(grp.Long)
 			continue
 		}
 		buf.WriteRune(c)
 	}
 	return string(buf.Bytes())
+}
+
+func (ref *UnicodeReference) AddGroup(group Group){
+	ref.Groups[group.Id] = group
+}
+
+func (ref *UnicodeReference) AddPattern(pat ReferencePattern){
+	ref.Pats = append(ref.Pats, pat)
+	ref.Groupings[ pat.Group ] += 1
 }
