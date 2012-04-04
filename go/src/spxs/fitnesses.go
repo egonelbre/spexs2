@@ -27,6 +27,13 @@ func CreateFitness(conf Conf, setup Setup) TrieFitnessFunc {
 
 	//TODO: read in additional args
 
+	//HACK - this should be implemented as a proper dispatch
+	if conf.Ouput.Order == "p-value" {
+		return func(p *TrieNode){
+			return p.PValue(setup.Ref)
+		}
+	}
+
 	if _, valid := fitnesses[conf.Output.Order]; !valid {
 		log.Fatal("No ordering/fitness named: ", conf.Output.Order)
 	}
