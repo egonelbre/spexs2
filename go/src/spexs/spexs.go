@@ -30,13 +30,15 @@ type FilterFunc func(p Pattern) bool
 type ExtenderFunc func(p Pattern, ref Reference) Patterns
 
 func Run(ref Reference, input Pooler, results Pooler,
-	extender ExtenderFunc, acceptable FilterFunc) {
+	extender ExtenderFunc, extendable FilterFunc, outputtable FilterFunc) {
 	p, valid := input.Take()
 	for valid {
 		pats := extender(p, ref)
 		for ep := range pats {
-			if acceptable(ep) {
+			if extendable(ep) {
 				input.Put(ep)
+			}
+			if outputtable(ep) {
 				results.Put(ep)
 			}
 		}
@@ -45,7 +47,7 @@ func Run(ref Reference, input Pooler, results Pooler,
 }
 
 func RunParallel(ref Reference, input Pooler, results Pooler,
-	extender ExtenderFunc, acceptable FilterFunc, num_threads int) {
+	extender ExtenderFunc, extendable FilterFunc, outputtable FilterFunc, num_threads int) {
 
 	start := make(chan int, 1000)
 	stop := make(chan int, 1000)
@@ -63,8 +65,10 @@ func RunParallel(ref Reference, input Pooler, results Pooler,
 
 				pats := extender(p, ref)
 				for ep := range pats {
-					if acceptable(ep) {
+					if extendable(ep) {
 						input.Put(ep)
+					}
+					if outputtable(ep) {
 						results.Put(ep)
 					}
 				}

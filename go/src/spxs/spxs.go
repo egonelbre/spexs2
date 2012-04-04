@@ -38,98 +38,30 @@ import (
 */
 
 var (
-	configFile *string = flag.String("conf", "conf.json", "configuration file(s), comma-delimited")
-
-	characterFile  *string = flag.String("chars", "", "character set file")
-	referenceFile  *string = flag.String("ref", "", "reference file (can also be set from configuration file)")
-	validationFile *string = flag.String("val", "", "validation file (can also be set from configuration file)")
-
-	extenderName *string = flag.String("extender", "regexp", "method used for extending nodes (simple, group, star, regex)")
-	limiterName  *string = flag.String("limiter", "count", "method used to determine whether node is accptable for extending (count, length, complexity)")
-	fitnessName  *string = flag.String("fitness", "def", "fitness function used for sorting (def)")
-	limitValue   *int    = flag.Int("limit", 5, "value for limiter")
-
-	topCount *int = flag.Int("top", 10, "only print top amount")
+	configs *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
 
 	procs      *int    = flag.Int("procs", 4, "processors to use")
 	verbose    *bool   = flag.Bool("verbose", false, "print debug information")
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
-var extenders = map[string]TrieExtenderFunc{
-	"simple": SimpleExtender,
-	"group":  GroupExtender,
-	"star":   StarExtender,
-	"regexp": GroupStarExtender,
-}
-
-type PatternFilterCreator func(limit int) TrieFilterFunc
-
-var limiters = map[string]PatternFilterCreator{
-	"count": func(limit int) TrieFilterFunc {
-		return func(p *TrieNode) bool {
-			return p.Pos.Len() >= limit
-		}
-	},
-	"length": func(limit int) TrieFilterFunc {
-		return func(p *TrieNode) bool {
-			return p.Len() <= limit
-		}
-	},
-	"complexity": func(limit int) TrieFilterFunc {
-		return func(p *TrieNode) bool {
-			return p.Complexity() <= limit
-		}
-	},
-}
-
-var fitnesses = map[string]TrieFitnessFunc{
-	"def": func(p *TrieNode) float64 {
-		return float64(p.Len() * p.Pos.Len())
-	},
-	"len": func(p *TrieNode) float64 {
-		return float64(p.Len())
-	},
-	"count": func(p *TrieNode) float64 {
-		return float64(p.Pos.Len())
-	},
-	"complexity": func(p *TrieNode) float64 {
-		return float64(p.Complexity())
-	},
-}
-
-func inputOrdering(p *TrieNode) float64 {
-	return 1 / float64(p.Len())
+func setupRuntime() {
+	
 }
 
 func main() {
 	flag.Parse()
 
-	ok := true
-
-	if *referenceFile == "" || *characterFile == "" {
-		fmt.Printf("Reference and character files are required!\n")
-		ok = false
-	}
-
-	if _, exists := extenders[*extenderName]; !exists {
-		fmt.Printf("Extender function '%v' not found!\n", *extenderName)
-		ok = false
-	}
-
-	if _, exists := limiters[*limiterName]; !exists {
-		fmt.Printf("Limiter function '%v' not found!\n", *limiterName)
-		ok = false
-	}
-
-	if _, exists := fitnesses[*fitnessName]; !exists {
-		fmt.Printf("Fitness function '%v' not found!\n", *limiterName)
-		ok = false
-	}
-
-	if !ok {
+	if *configs == "" {
+		fmt.Println("Configuration file is required!")
 		return
 	}
+
+	configFiles := strings.Split(*configs, ",")
+	conf := readConfiguration(configFiles)
+
+	var setup Setup
+	//setup := createSetup(conf)
 
 	if *procs > 0 {
 		runtime.GOMAXPROCS(*procs)
@@ -143,24 +75,6 @@ func main() {
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
 	}
-
-	var (
-		ref        *UnicodeReference
-		out        TriePooler
-		in         TriePooler
-		acceptable TrieFilterFunc
-		extender   TrieExtenderFunc
-		fitness    TrieFitnessFunc
-	)
-
-	ref = NewReferenceFromFile(*referenceFile, *characterFile)
-	extender = extenders[*extenderName]
-	acceptable = limiters[*limiterName](*limitValue)
-	fitness = fitnesses[*fitnessName]
-
-	in = NewPriorityPool(inputOrdering, 1000000000)
-	in.Put(NewFullNodeFromRef(ref))
-	out = NewPriorityPool(fitness, *topCount)
 
 	maxInQueue := 0
 	if *verbose {
@@ -176,13 +90,13 @@ func main() {
 	}
 
 	if *procs == 1 {
-		RunTrie(ref, in, out, extender, acceptable)
+		RunTrie(setup.Ref, setup.In, setup.Out, setup.Extender, setup.Extendable, setup.Outputtable)
 	} else {
-		RunTrieParallel(ref, in, out, extender, acceptable, *procs)
+		RunTrieParallel(setup.Ref, setup.In, setup.Out, setup.Extender, setup.Extendable, setup.Outputtable, *procs)
 	}
 
 	fmt.Printf("match, regexp, count, fitness, p-value\n")
-	node, ok := out.Take()
+	node, ok := setup.Out.Take()
 	for ok {
 		name := node.String()
 		regex := ref.ReplaceGroups(name)
@@ -195,7 +109,7 @@ func main() {
 			fmt.Printf("\n\n\n")
 		}
 
-		node, ok = out.Take()
+		node, ok = setup.Out.Take()
 	}
 
 	if *verbose {

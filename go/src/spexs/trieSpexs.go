@@ -16,13 +16,15 @@ type TrieFilterFunc func(p *TrieNode) bool
 type TrieExtenderFunc func(p *TrieNode, ref *UnicodeReference) TrieNodes
 
 func RunTrie(ref *UnicodeReference, input TriePooler, results TriePooler,
-	extender TrieExtenderFunc, acceptable TrieFilterFunc) {
+	extender TrieExtenderFunc, extendable TrieFilterFunc, outputtable TrieFilterFunc) {
 	p, valid := input.Take()
 	for valid {
 		pats := extender(p, ref)
 		for ep := range pats {
-			if acceptable(ep) {
+			if extendable(ep) {
 				input.Put(ep)
+			}
+			if outputtable(ep) {
 				results.Put(ep)
 			}
 		}
@@ -31,7 +33,8 @@ func RunTrie(ref *UnicodeReference, input TriePooler, results TriePooler,
 }
 
 func RunTrieParallel(ref *UnicodeReference, input TriePooler, results TriePooler,
-	extender TrieExtenderFunc, acceptable TrieFilterFunc, num_threads int) {
+	extender TrieExtenderFunc, extendable TrieFilterFunc, outputtable TrieFilterFunc, 
+	num_threads int) {
 
 	start := make(chan int, 1000)
 	stop := make(chan int, 1000)
@@ -49,8 +52,10 @@ func RunTrieParallel(ref *UnicodeReference, input TriePooler, results TriePooler
 
 				pats := extender(p, ref)
 				for ep := range pats {
-					if acceptable(ep) {
+					if extendable(ep) {
 						input.Put(ep)
+					}
+					if outputtable(ep) {
 						results.Put(ep)
 					}
 				}
