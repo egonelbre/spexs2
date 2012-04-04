@@ -21,21 +21,19 @@ var Filters = map[string]TrieFilterCreator{
 }
 
 func CreateFilter(conf map[string]interface{}, setup Setup) TrieFilterFunc {
-	filters := make([]TrieFilterFunc, 1)
+	filters := make([]TrieFilterFunc, 0)
 
 	for name, args := range conf {
 		if _, valid := Filters[name]; !valid {
 			log.Fatal("No filter named: ", name)
 		}
-
 		f := Filters[name](args, setup)
 		filters = append(filters, f)
 	}
 
-	switch len(filters) {
-	case 0:
+	if len(filters) == 0 {
 		return TrueFilter
-	case 1:
+	} else if len(filters) == 1 {
 		return filters[0]
 	}
 
@@ -57,7 +55,7 @@ func GenericFilter(value TrieValueFunc, config interface{}) TrieFilterFunc {
 	conf.Min = math.NaN()
 	conf.Max = math.NaN()
 
-	ApplyObject(config, conf)
+	ApplyObject(&config, &conf)
 
 	min, max := conf.Min, conf.Max
 	low, high := !math.IsNaN(conf.Min), !math.IsNaN(conf.Max)
@@ -76,19 +74,19 @@ func GenericFilter(value TrieValueFunc, config interface{}) TrieFilterFunc {
 		}
 	}
 
-	log.Fatal("Neither min or max was defined for count filter.")
+	log.Fatal("Neither min or max was defined for count filter.")	
 	return TrueFilter
 }
 
 func CountFilterCreator(conf interface{}, setup Setup) TrieFilterFunc {
 	return GenericFilter(func(p *TrieNode) float64 {
-		return float64(p.Pos.Len())
+		return float64(p.Pos.Len()) / float64(len(setup.Ref.Pats))
 	}, conf)
 }
 
 func LengthFilterCreator(conf interface{}, setup Setup) TrieFilterFunc {
 	return GenericFilter(func(p *TrieNode) float64 {
-		return float64(p.Pos.Len())
+		return float64(p.Len())
 	}, conf)
 }
 

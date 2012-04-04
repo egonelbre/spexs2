@@ -12,28 +12,28 @@ import (
 )
 
 const baseConfiguration = `{
-	"Data" : {
-		"Input" : "",
-		"Validation" : ""
+	"data" : {
+		"input" : "",
+		"validation" : ""
 	},
-	"Alphabet" : {
-		"Characters" : "",
-		"Groups" : {}
+	"alphabet" : {
+		"characters" : "",
+		"groups" : {}
 	},
-	"Extension" : {
-		"Method" : "simple",
-		"Args" : {},
-		"Filter" : {}
+	"extension" : {
+		"method" : "simple",
+		"args" : {},
+		"filter" : {}
 	},
-	"Output" : {
-		"Order" : "p-value",
-		"Args" : {},
-		"Filter" : {},
-		"Count": -1
+	"output" : {
+		"order" : "p-value",
+		"args" : {},
+		"filter" : {},
+		"count": -1
 	},
-	"Aliases" : {
-		"ref" : {"Desc":"input file", "Modify":["Data.Input"]},
-		"val" : {"Desc":"validation file", "Modify":["Data.Validation"]}
+	"aliases" : {
+		"ref" : {"desc":"input file", "modify":["data.input"]},
+		"val" : {"desc":"validation file", "modify":["data.validation"]}
 	}
 }`
 
@@ -81,7 +81,7 @@ func (conf *Conf) SetFQN(name string, value string) {
 	js := value
 
 	_, err := strconv.ParseFloat(value, 64)
-	isNumeric := err != nil
+	isNumeric := err == nil
 	isJson := len(value) > 1 && value[0] == '{'
 
 	if !isNumeric && !isJson {
@@ -146,7 +146,6 @@ func ReadConfiguration(configs string) Conf {
 	regArg, _ := regexp.Compile("^\\s*-*(.*)=(.*)$")
 
 	for _, arg := range flag.Args() {
-		log.Println("processing: ", arg)
 		if !regArg.MatchString(arg) {
 			log.Fatal("Argument was not in correct form: ", arg)
 		}

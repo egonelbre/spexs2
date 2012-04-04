@@ -13,9 +13,7 @@ import (
 )
 
 /*
-	multiple limiters
-	output limiters
-	p-value binom/hyper
+	p-value binom
 
 	flexibility wildcards
 	[-max_gap_nr nr]		- How many flexible gaps at most
@@ -25,16 +23,6 @@ import (
  	[-init_gap_len nr] 		- Initiate that value (can require longer/shorter first motif...)
  	[-only_print_if_gap_allowed]	- only report motif if gap could be allowed at that pos
 
-	output ===
-	-length:6..
-	-count:10..
-
-	fitness ===
-	-p-value: -1
-
-	/group/inbox/elbre
-
- 	// -acceptable
 */
 
 var (
@@ -83,7 +71,7 @@ func main() {
 		}()
 	}
 
-	if *procs == 1 {
+	if *procs <= 1 {
 		RunTrie(setup.Ref, setup.In, setup.Out, setup.Extender, setup.Extendable, setup.Outputtable)
 	} else {
 		RunTrieParallel(setup.Ref, setup.In, setup.Out, setup.Extender, setup.Extendable, setup.Outputtable, *procs)

@@ -33,8 +33,15 @@ func CreateReference(conf Conf) *UnicodeReference {
 		ref.AddGroup(group)
 	}
 
+	if conf.Data.Input == "" {
+		log.Fatal("Data file not defined")
+	}
+
 	addPatternsFromFile(ref, conf.Data.Input, 0)
-	addPatternsFromFile(ref, conf.Data.Validation, 1)
+	
+	if conf.Data.Validation != "" {
+		addPatternsFromFile(ref, conf.Data.Validation, 1)
+	}
 
 	return ref
 }
@@ -65,6 +72,7 @@ func addPatternsFromFile(ref *UnicodeReference, filename string, group int) {
 	)
 
 	if file, err = os.Open(filename); err != nil {
+		log.Println("Did not find data file:", filename)
 		log.Fatal(err)
 	}
 

@@ -21,18 +21,16 @@
 		"args" : {"group":{}},
 		"filter" : {
 			"length" : {"max":7},
-			"count" : {"min":0.01},
-			"p-value" : {"min":-0.2, "max":0.2}
+			"count" : {"min":0.1}
 		}
 	},
 	"output" : {
-		"order" : "p-value",
+		"order" : "len",
 		"args" : {"p-value":{}},
 		"filter" : {
-			"length" : {"min":6, "max":7},
-			"p-value" : {"min":-0.1, "max":0.1}
+			"length" : {"min":6, "max":7}
 		},
-		"count": -1
+		"count": 10
 	},
 	"aliases" : {
 		"ref" : {"desc":"input file",            "modify":["data.input"]},

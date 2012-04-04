@@ -28,26 +28,27 @@ func lengthFitness(p *TrieNode) float64 {
 
 type PatternFilterCreator func(limit int) TrieFilterFunc
 
-func CreateInput(conf Conf) TriePooler {
-	return NewPriorityPool(lengthFitness, MAX_POOL_SIZE)
+func CreateInput(conf Conf, setup Setup) TriePooler {
+	in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE)
+	in.Put(NewFullNodeFromRef(setup.Ref))
+	return in
 }
 
-func CreateOutput(conf Conf, fitness TrieFitnessFunc) TriePooler {
+func CreateOutput(conf Conf, setup Setup) TriePooler {
 	size := conf.Output.Count
 	if size < 0 {
 		size = MAX_POOL_SIZE
 	}
-	return NewPriorityPool(fitness, size)
+	return NewPriorityPool(setup.Fitness, size)
 }
 
 func CreateSetup(conf Conf) Setup {
 	var setup Setup
-
 	setup.Ref = CreateReference(conf)
 
-	setup.In = CreateInput(conf)
+	setup.In = CreateInput(conf, setup)
 	setup.Fitness = CreateFitness(conf, setup)
-	setup.Out = CreateOutput(conf, setup.Fitness)
+	setup.Out = CreateOutput(conf, setup)
 
 	setup.Extender = CreateExtender(conf, setup)
 	setup.Extendable = CreateFilter(conf.Extension.Filter, setup)
