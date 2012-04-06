@@ -50,13 +50,13 @@ type Conf struct {
 	}
 	Extension struct {
 		Method string
-		Args   map[string]interface{}
-		Filter map[string]interface{}
+		Args   map[string]map[string]interface{}
+		Filter map[string]map[string]interface{}
 	}
 	Output struct {
 		Order  string
-		Args   map[string]interface{}
-		Filter map[string]interface{}
+		Args   map[string]map[string]interface{}
+		Filter map[string]map[string]interface{}
 		Count  int
 	}
 	Aliases map[string]struct {

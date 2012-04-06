@@ -6,21 +6,31 @@ import (
 	. "spexs"
 )
 
-type TrieFilterCreator func(interface{}, Setup) TrieFilterFunc
+type filterConf map[string]interface{}
+type filterCreator func(filterConf, Setup) TrieFilterFunc
 
-type GenericFilterConf struct{ Min, Max float64 }
+type genericFilterConf struct{ Min, Max float64 }
 
-func TrueFilter(p *TrieNode) bool {
+func trueFilter(p *TrieNode) bool {
 	return true
 }
 
-var Filters = map[string]TrieFilterCreator{
-	"count":   CountFilterCreator,
-	"length":  LengthFilterCreator,
-	"p-value": PValueFilterCreator,
+var Filters = map[string] filterCreator {
+	"length":  func(conf filterConf, setup Setup) TrieFilterFunc {
+		return genericFilter(func(p *TrieNode) float64 {
+			return float64(p.Len())
+	}, conf)},
+	"count": func(conf filterConf, setup Setup) TrieFilterFunc {
+		return genericFilter(func(p *TrieNode) float64 {
+			return float64(p.Pos.Len()) / float64(len(setup.Ref.Pats))
+	}, conf)},
+	"p-value": func(conf filterConf, setup Setup) TrieFilterFunc {
+		return genericFilter(func(p *TrieNode) float64 {
+			return p.PValue(setup.Ref)
+	}, conf)},
 }
 
-func CreateFilter(conf map[string]interface{}, setup Setup) TrieFilterFunc {
+func CreateFilter(conf map[string]map[string]interface{}, setup Setup) TrieFilterFunc {
 	filters := make([]TrieFilterFunc, 0)
 
 	for name, args := range conf {
@@ -32,7 +42,7 @@ func CreateFilter(conf map[string]interface{}, setup Setup) TrieFilterFunc {
 	}
 
 	if len(filters) == 0 {
-		return TrueFilter
+		return trueFilter
 	} else if len(filters) == 1 {
 		return filters[0]
 	}
@@ -48,10 +58,10 @@ func CreateFilter(conf map[string]interface{}, setup Setup) TrieFilterFunc {
 	}
 }
 
-type TrieValueFunc func(p *TrieNode) float64
+type valueFunc func(p *TrieNode) float64
 
-func GenericFilter(value TrieValueFunc, config interface{}) TrieFilterFunc {
-	var conf GenericFilterConf
+func genericFilter(value valueFunc, config interface{}) TrieFilterFunc {
+	var conf genericFilterConf
 	conf.Min = math.NaN()
 	conf.Max = math.NaN()
 
@@ -75,23 +85,5 @@ func GenericFilter(value TrieValueFunc, config interface{}) TrieFilterFunc {
 	}
 
 	log.Fatal("Neither min or max was defined for count filter.")	
-	return TrueFilter
-}
-
-func CountFilterCreator(conf interface{}, setup Setup) TrieFilterFunc {
-	return GenericFilter(func(p *TrieNode) float64 {
-		return float64(p.Pos.Len()) / float64(len(setup.Ref.Pats))
-	}, conf)
-}
-
-func LengthFilterCreator(conf interface{}, setup Setup) TrieFilterFunc {
-	return GenericFilter(func(p *TrieNode) float64 {
-		return float64(p.Len())
-	}, conf)
-}
-
-func PValueFilterCreator(conf interface{}, setup Setup) TrieFilterFunc {
-	return GenericFilter(func(p *TrieNode) float64 {
-		return p.PValue(setup.Ref)
-	}, conf)
+	return trueFilter
 }

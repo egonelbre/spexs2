@@ -5,11 +5,20 @@ import (
 	. "spexs"
 )
 
-var extenders = map[string]TrieExtenderFunc{
-	"simple": SimpleExtender,
-	"group":  GroupExtender,
-	"star":   StarExtender,
-	"regexp": GroupStarExtender,
+type extenderConf interface{}
+type extenderCreator func(conf extenderConf, setup Setup) TrieExtenderFunc
+
+func simpleExtender(f TrieExtenderFunc) extenderCreator {
+	return func(conf extenderConf, setup Setup) TrieExtenderFunc {
+		return f
+	}
+}
+
+var extenders = map[string] extenderCreator{
+	"simple": simpleExtender(SimpleExtender),
+	"group":  simpleExtender(GroupExtender),
+	"star":   simpleExtender(StarExtender),
+	"regexp": simpleExtender(GroupStarExtender),
 }
 
 func CreateExtender(conf Conf, setup Setup) TrieExtenderFunc {
@@ -17,11 +26,12 @@ func CreateExtender(conf Conf, setup Setup) TrieExtenderFunc {
 		log.Fatal("Extender not defined!")
 	}
 
-	//TODO: read in additional args
-
-	if _, valid := extenders[conf.Extension.Method]; !valid {
+	extenderCreate, valid := extenders[conf.Extension.Method]
+	if !valid {
 		log.Fatal("No extender named: ", conf.Extension.Method)
 	}
 
-	return extenders[conf.Extension.Method]
+	args := conf.Extension.Args[conf.Extension.Method]
+
+	return extenderCreate(args, setup)
 }
