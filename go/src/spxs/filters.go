@@ -84,6 +84,6 @@ func genericFilter(value valueFunc, config interface{}) TrieFilterFunc {
 		}
 	}
 
-	log.Fatal("Neither min or max was defined for count filter.")	
+	log.Fatal("Neither min or max was defined for filter.")	
 	return trueFilter
 }
