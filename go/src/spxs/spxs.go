@@ -7,6 +7,7 @@ import (
 	. "spexs"
 	"time"
 
+	"sort"
 	"log"
 	"os"
 	"runtime/pprof"
@@ -27,11 +28,38 @@ import (
 
 var (
 	configs *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
+	details *bool = flag.Bool("details", false, "detailed help")
 
 	procs      *int    = flag.Int("procs", 4, "processors to use")
 	verbose    *bool   = flag.Bool("verbose", false, "print debug information")
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
 )
+
+func PrintHelp(conf Conf){
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "spxs [FLAGS] [OPTIONS]\n\n")
+	fmt.Fprintf(os.Stderr, "FLAGS: \n")
+	flag.PrintDefaults()
+	fmt.Fprintf(os.Stderr, "\nOPTIONS: \n")
+
+	keys := make([]string, len(conf.Aliases))
+	i := 0
+	for key := range conf.Aliases {
+		keys[i] = key
+		i += 1
+	}
+	sort.Strings(keys)
+
+	for _, name := range keys {
+		args := conf.Aliases[name]
+		fmt.Fprintf(os.Stderr, "  %s : %s\n", name, args.Desc)
+	}
+
+	fmt.Fprintf(os.Stderr, "\nEXAMPLES: \n")
+	fmt.Fprintf(os.Stderr, "  spxs -procs=4 ref=data.dna val=random.dna\n")
+
+	fmt.Fprintf(os.Stderr, "\n")
+}
 
 func main() {
 	flag.Parse()
@@ -42,6 +70,12 @@ func main() {
 	}
 
 	conf := ReadConfiguration(*configs)
+
+	if *details {
+		PrintHelp(conf)
+		os.Exit(0)
+	}
+
 	setup := CreateSetup(conf)
 
 	// RUNTIME SETUP
