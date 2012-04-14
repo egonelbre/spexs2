@@ -16,9 +16,9 @@ type TrieFilterFunc func(p *TrieNode) bool
 type TrieExtenderFunc func(p *TrieNode, ref *UnicodeReference) TrieNodes
 
 func RunTrie(ref *UnicodeReference, input TriePooler, results TriePooler,
-	extender TrieExtenderFunc, 
+	extender TrieExtenderFunc,
 	extendable TrieFilterFunc, outputtable TrieFilterFunc) {
-	
+
 	p, valid := input.Take()
 	for valid {
 		pats := extender(p, ref)

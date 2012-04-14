@@ -14,7 +14,7 @@ func simpleExtender(f TrieExtenderFunc) extenderCreator {
 	}
 }
 
-var extenders = map[string] extenderCreator{
+var extenders = map[string]extenderCreator{
 	"simple": simpleExtender(SimpleExtender),
 	"group":  simpleExtender(GroupExtender),
 	"star":   simpleExtender(StarExtender),

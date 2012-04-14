@@ -7,10 +7,10 @@ import (
 	. "spexs"
 	"time"
 
-	"sort"
 	"log"
 	"os"
 	"runtime/pprof"
+	"sort"
 )
 
 /*
@@ -28,14 +28,14 @@ import (
 
 var (
 	configs *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
-	details *bool = flag.Bool("details", false, "detailed help")
+	details *bool   = flag.Bool("details", false, "detailed help")
 
 	procs      *int    = flag.Int("procs", 4, "processors to use")
 	verbose    *bool   = flag.Bool("verbose", false, "print debug information")
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
-func PrintHelp(conf Conf){
+func PrintHelp(conf Conf) {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "spxs [FLAGS] [OPTIONS]\n\n")
 	fmt.Fprintf(os.Stderr, "FLAGS: \n")

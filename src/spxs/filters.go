@@ -15,19 +15,22 @@ func trueFilter(p *TrieNode) bool {
 	return true
 }
 
-var Filters = map[string] filterCreator {
-	"length":  func(conf filterConf, setup Setup) TrieFilterFunc {
+var Filters = map[string]filterCreator{
+	"length": func(conf filterConf, setup Setup) TrieFilterFunc {
 		return genericFilter(func(p *TrieNode) float64 {
 			return float64(p.Len())
-	}, conf)},
+		}, conf)
+	},
 	"count": func(conf filterConf, setup Setup) TrieFilterFunc {
 		return genericFilter(func(p *TrieNode) float64 {
 			return float64(p.Pos.Len()) / float64(len(setup.Ref.Pats))
-	}, conf)},
+		}, conf)
+	},
 	"p-value": func(conf filterConf, setup Setup) TrieFilterFunc {
 		return genericFilter(func(p *TrieNode) float64 {
 			return p.PValue(setup.Ref)
-	}, conf)},
+		}, conf)
+	},
 }
 
 func CreateFilter(conf map[string]map[string]interface{}, setup Setup) TrieFilterFunc {
@@ -84,6 +87,6 @@ func genericFilter(value valueFunc, config interface{}) TrieFilterFunc {
 		}
 	}
 
-	log.Fatal("Neither min or max was defined for filter.")	
+	log.Fatal("Neither min or max was defined for filter.")
 	return trueFilter
 }

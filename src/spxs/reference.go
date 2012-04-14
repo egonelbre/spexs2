@@ -38,7 +38,7 @@ func CreateReference(conf Conf) *UnicodeReference {
 	}
 
 	addPatternsFromFile(ref, conf.Data.Input, 0)
-	
+
 	if conf.Data.Validation != "" {
 		addPatternsFromFile(ref, conf.Data.Validation, 1)
 	}

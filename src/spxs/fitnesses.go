@@ -15,7 +15,7 @@ func simpleFitness(f TrieFitnessFunc) fitnessCreator {
 	}
 }
 
-var fitnesses = map[string] fitnessCreator {
+var fitnesses = map[string]fitnessCreator{
 	"def": simpleFitness(
 		func(p *TrieNode) float64 {
 			return float64(p.Len() * p.Pos.Len())
@@ -35,7 +35,8 @@ var fitnesses = map[string] fitnessCreator {
 	"p-value": func(conf fitnessConf, setup Setup) TrieFitnessFunc {
 		return func(p *TrieNode) float64 {
 			return p.PValue(setup.Ref)
-		}},
+		}
+	},
 }
 
 func CreateFitness(conf Conf, setup Setup) TrieFitnessFunc {
