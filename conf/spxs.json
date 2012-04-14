@@ -28,7 +28,7 @@
 		"order" : "len",
 		"args" : {"p-value":{}},
 		"filter" : {
-			"length" : {"min":6, "max":7}
+			"length" : {"min":2, "max":7}
 		},
 		"count": 10
 	},

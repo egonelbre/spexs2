@@ -1,4 +1,4 @@
 #!/bin/bash
 export GOPATH=`pwd`
-go build spxs
-time spxs ref=data/dna.gen
+
+time ./bin/spxs --conf=conf/spxs.json ref=data/dna.gen
