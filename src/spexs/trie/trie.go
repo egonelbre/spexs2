@@ -1,9 +1,14 @@
 package trie
 
+import (
+	"spexs"
+	"stats"
+)
+
 type TrieNode struct {
 	Char       Char
 	Parent     *TrieNode
-	Pos        Set
+	Pos        spexs.Set
 	IsGroup    bool
 	IsStar     bool
 	length     int
@@ -12,11 +17,17 @@ type TrieNode struct {
 }
 
 func NewNode(char Char, parent Pattern) Pattern {
-	return &TrieNode{char, parent, NewHashSet(parent.Pos.Len() / 2), false, false, -1, -1, -1}
+	tn := &TrieNode{char, parent.TrieNode, spexs.NewHashSet(parent.Pos.Len() / 2), false, false, -1, -1, -1}
+	var p Pattern
+	p.TrieNode = tn;
+	return p
 }
 
-func NewFullNodeFromRef(ref Reference) Pattern {
-	return &TrieNode{0, nil, NewFullSet(ref), false, false, -1, -1, -1}
+func NewFullNode(ref Reference) Pattern {
+	tn := &TrieNode{0, nil, NewFullSet(ref), false, false, -1, -1, -1};
+	var p Pattern
+	p.TrieNode = tn;
+	return p
 }
 
 func (n *TrieNode) String() string {
@@ -67,6 +78,6 @@ func (n *TrieNode) PValue(ref Reference) float64 {
 		counts[ref.Pats[idx].Group] += 1
 	}
 
-	n.pvalue = HypergeometricSplitLog(counts[0], counts[1], ref.Groupings[0], ref.Groupings[1])
+	n.pvalue = stats.HypergeometricSplitLog(counts[0], counts[1], ref.Groupings[0], ref.Groupings[1])
 	return n.pvalue
 }

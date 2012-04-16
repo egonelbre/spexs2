@@ -40,19 +40,17 @@ func (p *FifoPool) Len() int {
 	return p.list.Len()
 }
 
-type TrieFitnessFunc func(p Pattern) float64
-
 type PriorityPool struct {
 	token   chan int
 	items   []Pattern
-	Fitness TrieFitnessFunc
+	Fitness FitnessFunc
 	limit   int
 }
 
-func NewPriorityPool(fitness TrieFitnessFunc, limit int) *PriorityPool {
+func NewPriorityPool(fitness FitnessFunc, limit int) *PriorityPool {
 	p := &PriorityPool{}
 	p.token = make(chan int, 1)
-	p.items = make([]*TrieNode, 0)
+	p.items = make([]Pattern, 0)
 	p.limit = limit
 	p.Fitness = fitness
 	p.token <- 1

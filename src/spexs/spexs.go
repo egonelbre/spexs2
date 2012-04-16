@@ -1,4 +1,4 @@
-package trie
+package spexs
 
 const (
 	patternsBufferSize = 128
@@ -6,7 +6,7 @@ const (
 
 type Patterns chan Pattern
 
-type Pooler interface{}{
+type Pooler interface {
 	Take() (Pattern, bool)
 	Put(Pattern)
 	Len() int
@@ -53,8 +53,8 @@ func RunParallel(s Setup, routines int){
 	stop := make(chan int, routines)
 
 	for i := 0; i < routines; i += 1 {
-		go func(s Setup) {
-			defer func() { stop <- 1}
+		go func(s Setup){
+			defer func(){ stop <- 1}()
 			Run(s)
 		}(s)
 	}

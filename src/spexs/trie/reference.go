@@ -5,8 +5,6 @@ import (
 	"unicode/utf8"
 )
 
-type Char rune
-
 type Group struct {
 	Id    Char
 	Long  string

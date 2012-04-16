@@ -1,5 +1,7 @@
 package trie
 
+import "spexs"
+
 func output(out Patterns, patterns map[Char]Pattern) {
 	for _, node := range patterns {
 		out <- node
@@ -33,7 +35,7 @@ func simpleExtend(node Pattern, ref Reference, patterns map[Char]Pattern) {
 }
 
 func SimpleExtender(node Pattern, ref Reference) Patterns {
-	result := MakePatterns()
+	result := NewPatterns()
 	patterns := make(map[Char]Pattern)
 
 	simpleExtend(node, ref, patterns)
@@ -51,14 +53,14 @@ func groupCombine(node Pattern, ref Reference, patterns map[Char]Pattern, star b
 		patterns[g.Id] = pat
 		for _, char := range g.Chars {
 			if _, exists := patterns[char]; exists {
-				SetAddSet(patterns[g.Id].Pos, patterns[char].Pos)
+				spexs.SetAddSet(patterns[g.Id].Pos, patterns[char].Pos)
 			}
 		}
 	}
 }
 
 func GroupExtender(node Pattern, ref Reference) Patterns {
-	result := MakePatterns()
+	result := NewPatterns()
 	patterns := make(map[Char]Pattern)
 
 	simpleExtend(node, ref, patterns)
@@ -71,7 +73,7 @@ func GroupExtender(node Pattern, ref Reference) Patterns {
 
 func trieStarExtend(node Pattern, ref Reference, stars map[Char]Pattern) {
 	for idx, mpos := range node.Pos.Iter() {
-		plen := byte(len(ref.(Reference).Pats[idx].Pat))
+		plen := byte(len(ref.Pats[idx].Pat))
 		if mpos == 0 {
 			continue
 		}
@@ -98,7 +100,7 @@ func trieStarExtend(node Pattern, ref Reference, stars map[Char]Pattern) {
 }
 
 func StarExtender(node Pattern, ref Reference) Patterns {
-	result := MakePatterns()
+	result := NewPatterns()
 	patterns := make(map[Char]Pattern)
 	stars := make(map[Char]Pattern)
 	simpleExtend(node, ref, patterns)
@@ -106,12 +108,13 @@ func StarExtender(node Pattern, ref Reference) Patterns {
 
 	output(result, patterns)
 	output(result, stars)
+	
 	close(result)
 	return result
 }
 
 func GroupStarExtender(node Pattern, ref Reference) Patterns {
-	result := MakePatterns()
+	result := NewPatterns()
 	patterns := make(map[Char]Pattern)
 	stars := make(map[Char]Pattern)
 

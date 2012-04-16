@@ -6,7 +6,7 @@ const (
 
 type Patterns chan Pattern
 
-type Pooler interface{}{
+type Pooler interface {
 	Take() (Pattern, bool)
 	Put(Pattern)
 	Len() int
@@ -14,6 +14,7 @@ type Pooler interface{}{
 
 type FilterFunc func(p Pattern, ref Reference) bool
 type ExtenderFunc func(p Pattern, ref Reference) Patterns
+type FitnessFunc func(p Pattern) float64
 
 type Setup struct {
 	Ref Reference
@@ -53,8 +54,8 @@ func RunParallel(s Setup, routines int){
 	stop := make(chan int, routines)
 
 	for i := 0; i < routines; i += 1 {
-		go func(s Setup) {
-			defer func() { stop <- 1}
+		go func(s Setup){
+			defer func(){ stop <- 1}()
 			Run(s)
 		}(s)
 	}
