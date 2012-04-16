@@ -4,6 +4,8 @@ const (
 	patternsBufferSize = 128
 )
 
+type Char rune
+
 type Patterns chan *Pattern
 
 type Pooler interface {

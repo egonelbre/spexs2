@@ -1,10 +1,22 @@
 package spexs
 
+import "fmt"
+
 const (
 	patternsBufferSize = 128
 )
 
+type Char rune
+
+type Pattern interface {
+	fmt.Stringer
+}
+
 type Patterns chan Pattern
+
+type Reference interface {
+	Next(idx int, pos byte) (Char, byte, bool)
+} 
 
 type Pooler interface {
 	Take() (Pattern, bool)

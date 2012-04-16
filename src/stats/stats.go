@@ -16,7 +16,7 @@ func gamma(v int) float64 {
 // O - total observed in validation, r - total items in validation set
 // using logarithmic gamma function
 func HypergeometricSplitLog(o int, r int, O int, R int) float64 {
-	nom := lnG(O+1) + lnG(R+1) + lnG(o+r+1) + lnG(O+R-o-r)
+	nom := lnG(O+1) + lnG(R+1) + lnG(o+r+1) + lnG(O+R-o-r+1)
 	denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lnG(O+R+1)
 	return math.Exp(nom - denom)
 }
