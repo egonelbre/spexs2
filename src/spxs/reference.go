@@ -6,13 +6,13 @@ import (
 	"io"
 	"log"
 	"os"
-	. "spexs"
+	. "spexs/trie"
 	"strings"
 	"unicode/utf8"
 )
 
-func CreateReference(conf Conf) *UnicodeReference {
-	ref := NewUnicodeReference(1024)
+func CreateReference(conf Conf) *Reference {
+	ref := NewReference(1024)
 
 	if conf.Alphabet.Characters == "" {
 		log.Fatal("No alphabet defined!")
@@ -63,7 +63,7 @@ func pattern(data string, group int) ReferencePattern {
 	return p
 }
 
-func addPatternsFromFile(ref *UnicodeReference, filename string, group int) {
+func addPatternsFromFile(ref *Reference, filename string, group int) {
 	var (
 		file   *os.File
 		reader *bufio.Reader

@@ -76,7 +76,7 @@ func (n *Pattern) Complexity() int {
 	return 0
 }
 
-func (n *Pattern) PValue(ref Reference) float64 {
+func (n *Pattern) PValue(ref *Reference) float64 {
 	if n.pvalue >= 0 {
 		return n.pvalue
 	}

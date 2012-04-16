@@ -1,40 +1,27 @@
 package main
 
 import (
-	. "spexs"
+	. "spexs/trie"
 )
 
 const MAX_POOL_SIZE = 1024 * 1024 * 1024
 
-type Setup struct {
-	Ref *UnicodeReference
-	Out TriePooler
-	In  TriePooler
+type TrieFitnessCreator func(interface{}) FitnessFunc
+type TrieExtenderCreator func(interface{}) ExtenderFunc
 
-	Extender TrieExtenderFunc
-
-	Extendable  TrieFilterFunc
-	Outputtable TrieFilterFunc
-
-	Fitness TrieFitnessFunc
-}
-
-type TrieFitnessCreator func(interface{}) TrieFitnessFunc
-type TrieExtenderCreator func(interface{}) TrieExtenderFunc
-
-func lengthFitness(p *TrieNode) float64 {
+func lengthFitness(p *Pattern) float64 {
 	return 1 / float64(p.Len())
 }
 
-type PatternFilterCreator func(limit int) TrieFilterFunc
+type PatternFilterCreator func(limit int) FilterFunc
 
-func CreateInput(conf Conf, setup Setup) TriePooler {
+func CreateInput(conf Conf, setup Setup) Pooler {
 	in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE)
-	in.Put(NewFullNodeFromRef(setup.Ref))
+	in.Put(NewFullPattern(setup.Ref))
 	return in
 }
 
-func CreateOutput(conf Conf, setup Setup) TriePooler {
+func CreateOutput(conf Conf, setup Setup) Pooler {
 	size := conf.Output.Count
 	if size < 0 {
 		size = MAX_POOL_SIZE

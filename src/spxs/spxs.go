@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"runtime"
-	. "spexs"
+	. "spexs/trie"
 	"time"
 
 	"log"
@@ -106,9 +106,9 @@ func main() {
 	}
 
 	if *procs <= 1 {
-		RunTrie(setup.Ref, setup.In, setup.Out, setup.Extender, setup.Extendable, setup.Outputtable)
+		Run(setup)
 	} else {
-		RunTrieParallel(setup.Ref, setup.In, setup.Out, setup.Extender, setup.Extendable, setup.Outputtable, *procs)
+		RunParallel(setup, *procs)
 	}
 
 	fmt.Printf("match, regexp, count, fitness, p-value\n")

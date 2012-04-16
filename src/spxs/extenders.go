@@ -2,14 +2,14 @@ package main
 
 import (
 	"log"
-	. "spexs"
+	. "spexs/trie"
 )
 
 type extenderConf interface{}
-type extenderCreator func(conf extenderConf, setup Setup) TrieExtenderFunc
+type extenderCreator func(conf extenderConf, setup Setup) ExtenderFunc
 
-func simpleExtender(f TrieExtenderFunc) extenderCreator {
-	return func(conf extenderConf, setup Setup) TrieExtenderFunc {
+func simpleExtender(f ExtenderFunc) extenderCreator {
+	return func(conf extenderConf, setup Setup) ExtenderFunc {
 		return f
 	}
 }
@@ -21,7 +21,7 @@ var extenders = map[string]extenderCreator{
 	"regexp": simpleExtender(GroupStarExtender),
 }
 
-func CreateExtender(conf Conf, setup Setup) TrieExtenderFunc {
+func CreateExtender(conf Conf, setup Setup) ExtenderFunc {
 	if conf.Extension.Method == "" {
 		log.Fatal("Extender not defined!")
 	}

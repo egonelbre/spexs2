@@ -26,6 +26,7 @@ type Pooler interface {
 
 type FilterFunc func(p Pattern, ref Reference) bool
 type ExtenderFunc func(p Pattern, ref Reference) Patterns
+type FitnessFunc func(p *Pattern) float64
 
 type Setup struct {
 	Ref Reference
@@ -36,6 +37,8 @@ type Setup struct {
 
 	Extendable  FilterFunc
 	Outputtable FilterFunc
+
+	Fitness FitnessFunc
 }
 
 func NewPatterns() Patterns {
