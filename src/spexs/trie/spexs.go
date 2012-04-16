@@ -14,8 +14,8 @@ type Pooler interface {
 	Len() int
 }
 
-type FilterFunc func(p *Pattern, ref *Reference) bool
 type ExtenderFunc func(p *Pattern, ref *Reference) Patterns
+type FilterFunc func(p *Pattern) bool
 type FitnessFunc func(p *Pattern) float64
 
 type Setup struct {
@@ -44,10 +44,10 @@ func Run(s Setup) {
 
 		extensions := s.Extender(p, s.Ref)
 		for extended := range extensions {
-			if s.Extendable(extended, s.Ref) {
+			if s.Extendable(extended) {
 				s.In.Put(extended)
 			}
-			if s.Outputtable(extended, s.Ref) {
+			if s.Outputtable(extended) {
 				s.Out.Put(extended)
 			}
 		}
