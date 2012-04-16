@@ -1,5 +1,9 @@
 package trie
 
+const (
+	patternsBufferSize = 128
+)
+
 type Patterns chan Pattern
 
 type Pooler interface{}{
@@ -22,7 +26,11 @@ type Setup struct {
 	Outputtable FilterFunc
 }
 
-func Run(s setup){
+func NewPatterns() Patterns {
+	return make(Patterns, patternsBufferSize)
+}
+
+func Run(s Setup){
 	for {
 		p, valid := s.In.Take()
 		if !valid {
@@ -41,14 +49,14 @@ func Run(s setup){
 	}
 }
 
-func RunParallel(s setup, routines int){
+func RunParallel(s Setup, routines int){
 	stop := make(chan int, routines)
 
 	for i := 0; i < routines; i += 1 {
-		go func() {
+		go func(s Setup) {
 			defer func() { stop <- 1}
 			Run(s)
-		}()
+		}(s)
 	}
 
 	for i := 0; i < routines; i += 1 {
