@@ -30,3 +30,12 @@ func HypergeometricSplit(o int, r int, O int, R int) float64 {
 	denom := gamma(o+1) * gamma(O-o+1) * gamma(r+1) * gamma(R-r+1) * gamma(O+R+1)
 	return nom / denom
 }
+
+// returns probability of split of
+// choosing x items from N items
+// p - probability of getting one item
+func BinomialProb(x int, N int, p float64) float64 {
+	nom := lnG(N + 1)
+	denom := lnG(x+1) + lnG(N-x+1)
+	return math.Exp(nom-denom) * math.Pow(p, float64(x)) * math.Pow(1-p, float64(N-x))
+}

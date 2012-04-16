@@ -56,3 +56,28 @@ func TestLogGamma(t *testing.T) {
 func TestGamma(t *testing.T) {
 	testGamma(t, HypergeometricSplit)
 }
+
+type binomTest struct {
+	x, N   int
+	p      float64
+	result float64
+}
+
+func TestBinomial(t *testing.T) {
+	// verification result was calculated with
+	// binomial(N, x) * p^x * p^(N-x)
+
+	tests := [...]binomTest{
+		{0, 4, 0.25, 81.0 / 256.0},
+		{1, 4, 0.25, 27.0 / 64.0},
+		{2, 4, 0.25, 27.0 / 128.0},
+	}
+
+	for i, test := range tests {
+		p := BinomialProb(test.x, test.N, test.p)
+
+		if math.Abs(p-test.result) > epsilon {
+			t.Errorf("fail %v: got %v, expected %v, \nerr=%v", i, p, test.result, math.Abs(p-test.result))
+		}
+	}
+}
