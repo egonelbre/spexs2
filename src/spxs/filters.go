@@ -15,7 +15,7 @@ func trueFilter(p *Pattern, ref *Reference) bool {
 	return true
 }
 
-var Filters = map[string] filterCreator {
+var Filters = map[string]filterCreator{
 	"length": func(conf filterConf) FilterFunc {
 		return genericFilter(func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Len())

@@ -11,12 +11,12 @@ func TestHashSet(t *testing.T) {
 	hs := NewHashSet(10)
 
 	good := map[p]bool{
-		p{0, 0}:        true,
-		p{13,  1}:       true,
-		p{14,  2}:       true,
-		p{1025235,  3}:  true,
-		p{2000,  15}:    true,
-		p{200000,  30}: true,
+		p{0, 0}:       true,
+		p{13, 1}:      true,
+		p{14, 2}:      true,
+		p{1025235, 3}: true,
+		p{2000, 15}:   true,
+		p{200000, 30}: true,
 	}
 
 	for pos := range good {
@@ -30,12 +30,12 @@ func TestHashSet(t *testing.T) {
 	}
 
 	invalid := map[p]bool{
-		p{10,  0}:       true,
-		p{15,  0}:       true,
-		p{20,  3}:       true,
-		p{102535,  53}:  true,
-		p{2001,  63}:    true,
-		p{2000300,  41}: true,
+		p{10, 0}:       true,
+		p{15, 0}:       true,
+		p{20, 3}:       true,
+		p{102535, 53}:  true,
+		p{2001, 63}:    true,
+		p{2000300, 41}: true,
 	}
 
 	for pos := range invalid {

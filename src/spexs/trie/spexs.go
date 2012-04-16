@@ -35,7 +35,7 @@ func NewPatterns() Patterns {
 	return make(Patterns, patternsBufferSize)
 }
 
-func Run(s Setup){
+func Run(s Setup) {
 	for {
 		p, valid := s.In.Take()
 		if !valid {
@@ -54,12 +54,12 @@ func Run(s Setup){
 	}
 }
 
-func RunParallel(s Setup, routines int){
+func RunParallel(s Setup, routines int) {
 	stop := make(chan int, routines)
 
 	for i := 0; i < routines; i += 1 {
-		go func(s Setup){
-			defer func(){ stop <- 1}()
+		go func(s Setup) {
+			defer func() { stop <- 1 }()
 			Run(s)
 		}(s)
 	}

@@ -24,7 +24,7 @@ func add(base *Pattern, s string) *Pattern {
 
 func TestTrieNodeString(t *testing.T) {
 	root := pat("")
-	
+
 	a := add(root, "hello")
 	b := add(a, " world")
 	c := add(root, "hello mXgic")

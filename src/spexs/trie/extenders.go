@@ -108,7 +108,7 @@ func StarExtender(node *Pattern, ref *Reference) Patterns {
 
 	output(result, patterns)
 	output(result, stars)
-	
+
 	close(result)
 	return result
 }

@@ -1,8 +1,8 @@
 package stats
 
 import (
-	"testing"
 	"math"
+	"testing"
 )
 
 const epsilon = 0.000001
@@ -25,26 +25,25 @@ func BenchmarkGamma(b *testing.B) {
 	benchGamma(b, HypergeometricSplit)
 }
 
-
-type gammaTest struct { 
+type gammaTest struct {
 	o, O, r, R int
-	result float64
+	result     float64
 }
 
 func testGamma(t *testing.T, fn gammaFunc) {
 	// verification result was calculated with
 	// binomial(O, o) * binomial(R, r)/binomial(O+R, o+r)
 
-	tests := [...] gammaTest{
-		{2,5,  2,10, 30.0/91.0},
-		{2,45, 9,40, 71632.0/5645577.0},
+	tests := [...]gammaTest{
+		{2, 5, 2, 10, 30.0 / 91.0},
+		{2, 45, 9, 40, 71632.0 / 5645577.0},
 	}
 
 	for i, test := range tests {
 		p := fn(test.o, test.r, test.O, test.R)
 		p2 := fn(test.r, test.o, test.R, test.O) // since the test must be symmetric
-		
-		if math.Abs(p - test.result) > epsilon || math.Abs(p2 - test.result) > epsilon {
+
+		if math.Abs(p-test.result) > epsilon || math.Abs(p2-test.result) > epsilon {
 			t.Errorf("fail %v: got (%v, %v), expected %v, \nerr=(%v,%v)", i, p, p2, test.result, math.Abs(p-test.result), math.Abs(p2-test.result))
 		}
 	}
