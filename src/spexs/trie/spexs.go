@@ -4,20 +4,20 @@ const (
 	patternsBufferSize = 128
 )
 
-type Patterns chan Pattern
+type Patterns chan *Pattern
 
 type Pooler interface {
-	Take() (Pattern, bool)
-	Put(Pattern)
+	Take() (*Pattern, bool)
+	Put(*Pattern)
 	Len() int
 }
 
-type FilterFunc func(p Pattern, ref Reference) bool
-type ExtenderFunc func(p Pattern, ref Reference) Patterns
-type FitnessFunc func(p Pattern) float64
+type FilterFunc func(p *Pattern, ref *Reference) bool
+type ExtenderFunc func(p *Pattern, ref *Reference) Patterns
+type FitnessFunc func(p *Pattern) float64
 
 type Setup struct {
-	Ref Reference
+	Ref *Reference
 	Out Pooler
 	In  Pooler
 

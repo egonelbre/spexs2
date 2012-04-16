@@ -2,18 +2,6 @@ package trie
 
 import "testing"
 
-type string_pattern struct {
-	v string
-}
-
-func newString(v string) *string_pattern {
-	return &string_pattern{v}
-}
-
-func (p *string_pattern) String() string {
-	return p.v
-}
-
 func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
 	val, ok := p.Take()
 	if ok != expectedOk {
@@ -27,14 +15,14 @@ func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
 func TestFifoPool(t *testing.T) {
 	p := NewFifoPool()
 
-	p.Put(newString("alpha"))
-	p.Put(newString("beta"))
+	p.Put(pat("alpha"))
+	p.Put(pat("beta"))
 
 	testTake(t, p, "alpha", true)
 	testTake(t, p, "beta", true)
 
-	p.Put(newString("gamma"))
-	p.Put(newString("delta"))
+	p.Put(pat("gamma"))
+	p.Put(pat("delta"))
 
 	testTake(t, p, "gamma", true)
 	testTake(t, p, "delta", true)
@@ -43,21 +31,21 @@ func TestFifoPool(t *testing.T) {
 }
 
 func TestPriorityPool(t *testing.T) {
-	lenFitness := func(p Pattern) float32 {
-		return float32(len(p.String()))
+	lenFitness := func(p *Pattern) float64 {
+		return float64(len(p.String()))
 	}
 	p := NewPriorityPool(lenFitness, 100)
 
-	p.Put(newString("bc"))
-	p.Put(newString("defg"))
-	p.Put(newString("a"))
-	p.Put(newString("def"))
+	p.Put(pat("bc"))
+	p.Put(pat("defg"))
+	p.Put(pat("a"))
+	p.Put(pat("def"))
 
 	testTake(t, p, "a", true)
 	testTake(t, p, "bc", true)
 
-	p.Put(newString("x"))
-	p.Put(newString("defgh"))
+	p.Put(pat("x"))
+	p.Put(pat("defgh"))
 
 	testTake(t, p, "x", true)
 	testTake(t, p, "def", true)

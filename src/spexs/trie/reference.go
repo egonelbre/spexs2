@@ -21,15 +21,15 @@ type ReferencePattern struct {
 	Group int // validation or reference group
 }
 
-type UnicodeReference struct {
+type Reference struct {
 	Pats      []ReferencePattern
 	Alphabet  []Char
 	Groups    map[Char]Group
 	Groupings []int
 }
 
-func NewUnicodeReference(size int) *UnicodeReference {
-	ref := &UnicodeReference{}
+func NewReference(size int) *Reference {
+	ref := &Reference{}
 	ref.Pats = make([]ReferencePattern, 0, size)
 	ref.Alphabet = make([]Char, 0, 8)
 	ref.Groups = make(map[Char]Group)
@@ -37,7 +37,7 @@ func NewUnicodeReference(size int) *UnicodeReference {
 	return ref
 }
 
-func (ref *UnicodeReference) Next(idx int, pos byte) (Char, byte, bool) {
+func (ref *Reference) Next(idx int, pos byte) (Char, byte, bool) {
 	if int(pos) >= len(ref.Pats[idx].Pat) {
 		return 0, 0, false
 	}
@@ -46,7 +46,7 @@ func (ref *UnicodeReference) Next(idx int, pos byte) (Char, byte, bool) {
 	return Char(rune), byte(pos + byte(width)), true
 }
 
-func (ref *UnicodeReference) ReplaceGroups(pat string) string {
+func (ref *Reference) ReplaceGroups(pat string) string {
 	buf := bytes.NewBufferString("")
 	for _, c := range pat {
 		if grp, exists := ref.Groups[Char(c)]; exists {
@@ -58,11 +58,11 @@ func (ref *UnicodeReference) ReplaceGroups(pat string) string {
 	return string(buf.Bytes())
 }
 
-func (ref *UnicodeReference) AddGroup(group Group) {
+func (ref *Reference) AddGroup(group Group) {
 	ref.Groups[group.Id] = group
 }
 
-func (ref *UnicodeReference) AddPattern(pat ReferencePattern) {
+func (ref *Reference) AddPattern(pat ReferencePattern) {
 	ref.Pats = append(ref.Pats, pat)
 	ref.Groupings[pat.Group] += 1
 }

@@ -1,11 +1,11 @@
 package trie
 
 type FullSet struct {
-	Ref   Reference
+	Ref   *Reference
 	Count int
 }
 
-func NewFullSet(ref Reference) *FullSet {
+func NewFullSet(ref *Reference) *FullSet {
 	f := &FullSet{ref, 0}
 	f.Count = len(ref.Pats)
 	return f

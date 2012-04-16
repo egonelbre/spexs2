@@ -19,39 +19,38 @@ func pattern(data string) ReferencePattern {
 	b := bytes.NewBufferString(data)
 	p.Pat = b.Bytes()
 	p.Count = utf8.RuneCount(p.Pat)
+	p.Group = 0
 	return p
 }
 
-func createTestUnicodeReference() *UnicodeReference {
-	u := &UnicodeReference{}
+func createTestReference() *Reference {
+	u := NewReference(10)
 	u.Alphabet = chars("ACGT")
 
-	u.Groups = make([]Group, 6)
-	u.Groups[0] = *NewGroup("[AC]", '1', chars("AC"))
-	u.Groups[1] = *NewGroup("[AG]", '2', chars("AG"))
-	u.Groups[2] = *NewGroup("[AT]", '3', chars("AT"))
-	u.Groups[3] = *NewGroup("[CG]", '4', chars("CG"))
-	u.Groups[4] = *NewGroup("[CT]", '5', chars("CT"))
-	u.Groups[5] = *NewGroup("[GT]", '6', chars("GT"))
+	u.AddGroup(*NewGroup("[AC]", '1', chars("AC")))
+	u.AddGroup(*NewGroup("[AG]", '2', chars("AG")))
+	u.AddGroup(*NewGroup("[AT]", '3', chars("AT")))
+	u.AddGroup(*NewGroup("[CG]", '4', chars("CG")))
+	u.AddGroup(*NewGroup("[CT]", '5', chars("CT")))
+	u.AddGroup(*NewGroup("[GT]", '6', chars("GT")))
 
-	u.Pats = make([]ReferencePattern, 4)
-	u.Pats[0] = pattern("ACGTACGG")
-	u.Pats[1] = pattern("CAGTCCG")
-	u.Pats[2] = pattern("ACGGCTA")
-	u.Pats[3] = pattern("GGTCAACTG")
+	u.AddPattern(pattern("ACGTACGG"))
+	u.AddPattern(pattern("CAGTCCG"))
+	u.AddPattern(pattern("ACGGCTA"))
+	u.AddPattern(pattern("GGTCAACTG"))
 
 	return u
 }
 
-func TestUnicodeReferenceNext(t *testing.T) {
-	u := createTestUnicodeReference()
+func TestReferenceNext(t *testing.T) {
+	u := createTestReference()
 
 	testStr := func(idx int, str string) {
-		p := PosEncode(idx, 0)
 		var x Char
 		var ok bool
+		idx, pos := idx, byte(0)
 		for _, c := range str {
-			x, p, ok = u.Next(p)
+			x, pos, ok = u.Next(idx, pos)
 			if !ok {
 				t.Errorf("string '%s' ended too early", str)
 			}
