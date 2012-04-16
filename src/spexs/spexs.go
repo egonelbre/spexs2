@@ -1,82 +1,65 @@
-package spexs
-
-import "fmt"
+package trie
 
 const (
-	patternsBufferSize = 100
+	patternsBufferSize = 128
 )
-
-type Pattern interface {
-	fmt.Stringer
-}
 
 type Patterns chan Pattern
 
-func MakePatterns() Patterns {
-	return make(Patterns, patternsBufferSize)
-}
-
-type Reference interface {
-	Next(idx int, pos byte) (Char, byte, bool)
-}
-
-type Pooler interface {
+type Pooler interface{}{
 	Take() (Pattern, bool)
 	Put(Pattern)
 	Len() int
 }
 
-type FilterFunc func(p Pattern) bool
+type FilterFunc func(p Pattern, ref Reference) bool
 type ExtenderFunc func(p Pattern, ref Reference) Patterns
 
-func Run(ref Reference, input Pooler, results Pooler,
-	extender ExtenderFunc, extendable FilterFunc, outputtable FilterFunc) {
-	p, valid := input.Take()
-	for valid {
-		pats := extender(p, ref)
-		for ep := range pats {
-			if extendable(ep) {
-				input.Put(ep)
+type Setup struct {
+	Ref Reference
+	Out Pooler
+	In  Pooler
+
+	Extender ExtenderFunc
+
+	Extendable  FilterFunc
+	Outputtable FilterFunc
+}
+
+func NewPatterns() Patterns {
+	return make(Patterns, patternsBufferSize)
+}
+
+func Run(s Setup){
+	for {
+		p, valid := s.In.Take()
+		if !valid {
+			return
+		}
+
+		extensions := s.Extender(p, s.Ref)
+		for extended := range extensions {
+			if s.Extendable(extended, s.Ref) {
+				s.In.Put(extended)
 			}
-			if outputtable(ep) {
-				results.Put(ep)
+			if s.Outputtable(extended, s.Ref) {
+				s.Out.Put(extended)
 			}
 		}
-		p, valid = input.Take()
 	}
 }
 
-func RunParallel(ref Reference, input Pooler, results Pooler,
-	extender ExtenderFunc, extendable FilterFunc, outputtable FilterFunc, num_threads int) {
+func RunParallel(s Setup, routines int){
+	stop := make(chan int, routines)
 
-	start := make(chan int, 1000)
-	stop := make(chan int, 1000)
-
-	for i := 0; i < num_threads; i++ {
-		go func() {
-			start <- 1
-			defer func() { stop <- 1 }()
-
-			for {
-				p, valid := input.Take()
-				if !valid {
-					return
-				}
-
-				pats := extender(p, ref)
-				for ep := range pats {
-					if extendable(ep) {
-						input.Put(ep)
-					}
-					if outputtable(ep) {
-						results.Put(ep)
-					}
-				}
-			}
-		}()
+	for i := 0; i < routines; i += 1 {
+		go func(s Setup) {
+			defer func() { stop <- 1}
+			Run(s)
+		}(s)
 	}
 
-	for i := 0; i < num_threads; i++ {
+	for i := 0; i < routines; i += 1 {
 		<-stop
 	}
 }

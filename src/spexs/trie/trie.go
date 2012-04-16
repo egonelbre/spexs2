@@ -1,4 +1,4 @@
-package spexs
+package trie
 
 type TrieNode struct {
 	Char       Char
@@ -11,11 +11,11 @@ type TrieNode struct {
 	pvalue     float64
 }
 
-func NewTrieNode(char Char, parent *TrieNode) *TrieNode {
+func NewNode(char Char, parent Pattern) Pattern {
 	return &TrieNode{char, parent, NewHashSet(parent.Pos.Len() / 2), false, false, -1, -1, -1}
 }
 
-func NewFullNodeFromRef(ref *UnicodeReference) *TrieNode {
+func NewFullNodeFromRef(ref Reference) Pattern {
 	return &TrieNode{0, nil, NewFullSet(ref), false, false, -1, -1, -1}
 }
 
@@ -56,7 +56,7 @@ func (n *TrieNode) Complexity() int {
 	return 0
 }
 
-func (n *TrieNode) PValue(ref *UnicodeReference) float64 {
+func (n *TrieNode) PValue(ref Reference) float64 {
 	if n.pvalue >= 0 {
 		return n.pvalue
 	}

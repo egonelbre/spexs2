@@ -1,13 +1,12 @@
-package spexs
+package trie
 
-func output(out TrieNodes, patterns map[Char]*TrieNode) {
+func output(out Patterns, patterns map[Char]Pattern) {
 	for _, node := range patterns {
 		out <- node
 	}
 }
 
-func trieSimpleExtend(node *TrieNode, ref *UnicodeReference,
-	patterns map[Char]*TrieNode) {
+func simpleExtend(node Pattern, ref Reference, patterns map[Char]Pattern) {
 
 	for idx, mpos := range node.Pos.Iter() {
 		plen := byte(len(ref.Pats[idx].Pat))
@@ -25,7 +24,7 @@ func trieSimpleExtend(node *TrieNode, ref *UnicodeReference,
 
 			pat, exists := patterns[char]
 			if !exists {
-				pat = NewTrieNode(char, node)
+				pat = NewNode(char, node)
 				patterns[char] = pat
 			}
 			pat.Pos.Add(idx, next)
@@ -33,20 +32,20 @@ func trieSimpleExtend(node *TrieNode, ref *UnicodeReference,
 	}
 }
 
-func SimpleExtender(node *TrieNode, ref *UnicodeReference) TrieNodes {
-	result := MakeTrieNodes()
-	patterns := make(map[Char]*TrieNode)
+func SimpleExtender(node Pattern, ref Reference) Patterns {
+	result := MakePatterns()
+	patterns := make(map[Char]Pattern)
 
-	trieSimpleExtend(node, ref, patterns)
+	simpleExtend(node, ref, patterns)
 
 	output(result, patterns)
 	close(result)
 	return result
 }
 
-func trieGroupCombine(node *TrieNode, ref *UnicodeReference, patterns map[Char]*TrieNode, star bool) {
+func groupCombine(node Pattern, ref Reference, patterns map[Char]Pattern, star bool) {
 	for _, g := range ref.Groups {
-		pat := NewTrieNode(g.Id, node)
+		pat := NewNode(g.Id, node)
 		pat.IsGroup = true
 		pat.IsStar = star
 		patterns[g.Id] = pat
@@ -58,21 +57,21 @@ func trieGroupCombine(node *TrieNode, ref *UnicodeReference, patterns map[Char]*
 	}
 }
 
-func GroupExtender(node *TrieNode, ref *UnicodeReference) TrieNodes {
-	result := MakeTrieNodes()
-	patterns := make(map[Char]*TrieNode)
+func GroupExtender(node Pattern, ref Reference) Patterns {
+	result := MakePatterns()
+	patterns := make(map[Char]Pattern)
 
-	trieSimpleExtend(node, ref, patterns)
-	trieGroupCombine(node, ref, patterns, false)
+	simpleExtend(node, ref, patterns)
+	groupCombine(node, ref, patterns, false)
 
 	output(result, patterns)
 	close(result)
 	return result
 }
 
-func trieStarExtend(node *TrieNode, ref Reference, stars map[Char]*TrieNode) {
+func trieStarExtend(node Pattern, ref Reference, stars map[Char]Pattern) {
 	for idx, mpos := range node.Pos.Iter() {
-		plen := byte(len(ref.(*UnicodeReference).Pats[idx].Pat))
+		plen := byte(len(ref.(Reference).Pats[idx].Pat))
 		if mpos == 0 {
 			continue
 		}
@@ -88,7 +87,7 @@ func trieStarExtend(node *TrieNode, ref Reference, stars map[Char]*TrieNode) {
 		for valid {
 			pat, exists := stars[char]
 			if !exists {
-				pat = NewTrieNode(char, node)
+				pat = NewNode(char, node)
 				pat.IsStar = true
 				stars[char] = pat
 			}
@@ -98,11 +97,11 @@ func trieStarExtend(node *TrieNode, ref Reference, stars map[Char]*TrieNode) {
 	}
 }
 
-func StarExtender(node *TrieNode, ref *UnicodeReference) TrieNodes {
-	result := MakeTrieNodes()
-	patterns := make(map[Char]*TrieNode)
-	stars := make(map[Char]*TrieNode)
-	trieSimpleExtend(node, ref, patterns)
+func StarExtender(node Pattern, ref Reference) Patterns {
+	result := MakePatterns()
+	patterns := make(map[Char]Pattern)
+	stars := make(map[Char]Pattern)
+	simpleExtend(node, ref, patterns)
 	trieStarExtend(node, ref, stars)
 
 	output(result, patterns)
@@ -111,15 +110,15 @@ func StarExtender(node *TrieNode, ref *UnicodeReference) TrieNodes {
 	return result
 }
 
-func GroupStarExtender(node *TrieNode, ref *UnicodeReference) TrieNodes {
-	result := MakeTrieNodes()
-	patterns := make(map[Char]*TrieNode)
-	stars := make(map[Char]*TrieNode)
+func GroupStarExtender(node Pattern, ref Reference) Patterns {
+	result := MakePatterns()
+	patterns := make(map[Char]Pattern)
+	stars := make(map[Char]Pattern)
 
-	trieSimpleExtend(node, ref, patterns)
-	trieGroupCombine(node, ref, patterns, false)
+	simpleExtend(node, ref, patterns)
+	groupCombine(node, ref, patterns, false)
 	trieStarExtend(node, ref, stars)
-	trieGroupCombine(node, ref, stars, true)
+	groupCombine(node, ref, stars, true)
 
 	output(result, patterns)
 	output(result, stars)

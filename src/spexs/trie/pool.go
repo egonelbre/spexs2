@@ -1,4 +1,4 @@
-package spexs
+package trie
 
 import (
 	"container/heap"
@@ -18,7 +18,7 @@ func NewFifoPool() *FifoPool {
 	return p
 }
 
-func (p *FifoPool) Take() (*TrieNode, bool) {
+func (p *FifoPool) Take() (Pattern, bool) {
 	<-p.token
 	if p.list.Len() == 0 {
 		p.token <- 1
@@ -27,10 +27,10 @@ func (p *FifoPool) Take() (*TrieNode, bool) {
 	tmp := p.list.Front()
 	p.list.Remove(tmp)
 	p.token <- 1
-	return tmp.Value.(*TrieNode), true
+	return tmp.Value.(Pattern), true
 }
 
-func (p *FifoPool) Put(pat *TrieNode) {
+func (p *FifoPool) Put(pat Pattern) {
 	<-p.token
 	p.list.PushBack(pat)
 	p.token <- 1
@@ -40,11 +40,11 @@ func (p *FifoPool) Len() int {
 	return p.list.Len()
 }
 
-type TrieFitnessFunc func(p *TrieNode) float64
+type TrieFitnessFunc func(p Pattern) float64
 
 type PriorityPool struct {
 	token   chan int
-	items   []*TrieNode
+	items   []Pattern
 	Fitness TrieFitnessFunc
 	limit   int
 }
@@ -65,7 +65,7 @@ func (p *PriorityPool) IsEmpty() bool {
 	return len(p.items) == 0
 }
 
-func (p *PriorityPool) Take() (*TrieNode, bool) {
+func (p *PriorityPool) Take() (Pattern, bool) {
 	<-p.token
 	if p.IsEmpty() {
 		p.token <- 1
@@ -73,10 +73,10 @@ func (p *PriorityPool) Take() (*TrieNode, bool) {
 	}
 	v := heap.Pop(p)
 	p.token <- 1
-	return v.(*TrieNode), true
+	return v.(Pattern), true
 }
 
-func (p *PriorityPool) Put(pat *TrieNode) {
+func (p *PriorityPool) Put(pat Pattern) {
 	<-p.token
 	heap.Push(p, pat)
 	if p.Len() > p.limit {
@@ -102,7 +102,7 @@ func (p *PriorityPool) Less(i, j int) bool {
 
 // heap.Interface
 func (p *PriorityPool) Push(x interface{}) {
-	p.items = append(p.items, x.(*TrieNode))
+	p.items = append(p.items, x.(Pattern))
 }
 
 func (p *PriorityPool) Pop() interface{} {
