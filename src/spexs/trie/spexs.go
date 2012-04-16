@@ -12,7 +12,7 @@ type Pooler interface{}{
 	Len() int
 }
 
-type FilterFunc func(p Pattern) bool
+type FilterFunc func(p Pattern, ref Reference) bool
 type ExtenderFunc func(p Pattern, ref Reference) Patterns
 
 type Setup struct {
@@ -38,12 +38,12 @@ func Run(s Setup){
 		}
 
 		extensions := s.Extender(p, s.Ref)
-		for extension := range extensions {
-			if s.Extendable(extension) {
-				s.In.Put(extension)
+		for extended := range extensions {
+			if s.Extendable(extended, s.Ref) {
+				s.In.Put(extended)
 			}
-			if s.Outputtable(extension) {
-				s.Out.Put(extension)
+			if s.Outputtable(extended, s.Ref) {
+				s.Out.Put(extended)
 			}
 		}
 	}
