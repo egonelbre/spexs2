@@ -7,7 +7,7 @@ import (
 )
 
 type filterConf map[string]interface{}
-type filterCreator func(filterConf, Setup) FilterFunc
+type filterCreator func(filterConf, AppSetup) FilterFunc
 
 type genericFilterConf struct{ Min, Max float64 }
 
@@ -16,24 +16,24 @@ func trueFilter(p *Pattern) bool {
 }
 
 var Filters = map[string]filterCreator{
-	"length": func(conf filterConf, setup Setup) FilterFunc {
+	"length": func(conf filterConf, setup AppSetup) FilterFunc {
 		return genericFilter(func(p *Pattern) float64 {
 			return float64(p.Len())
 		}, conf)
 	},
-	"count": func(conf filterConf, setup Setup) FilterFunc {
+	"count": func(conf filterConf, setup AppSetup) FilterFunc {
 		return genericFilter(func(p *Pattern) float64 {
 			return float64(p.Pos.Len()) / float64(len(setup.Ref.Pats))
 		}, conf)
 	},
-	"p-value": func(conf filterConf, setup Setup) FilterFunc {
+	"p-value": func(conf filterConf, setup AppSetup) FilterFunc {
 		return genericFilter(func(p *Pattern) float64 {
 			return p.PValue(setup.Ref)
 		}, conf)
 	},
 }
 
-func CreateFilter(conf map[string]map[string]interface{}, setup Setup) FilterFunc {
+func CreateFilter(conf map[string]map[string]interface{}, setup AppSetup) FilterFunc {
 	filters := make([]FilterFunc, 0)
 
 	for name, args := range conf {

@@ -6,10 +6,10 @@ import (
 )
 
 type extenderConf interface{}
-type extenderCreator func(conf extenderConf, setup Setup) ExtenderFunc
+type extenderCreator func(conf extenderConf, setup AppSetup) ExtenderFunc
 
 func simpleExtender(f ExtenderFunc) extenderCreator {
-	return func(conf extenderConf, setup Setup) ExtenderFunc {
+	return func(conf extenderConf, setup AppSetup) ExtenderFunc {
 		return f
 	}
 }
@@ -21,7 +21,7 @@ var extenders = map[string]extenderCreator{
 	"regexp": simpleExtender(GroupStarExtender),
 }
 
-func CreateExtender(conf Conf, setup Setup) ExtenderFunc {
+func CreateExtender(conf Conf, setup AppSetup) ExtenderFunc {
 	if conf.Extension.Method == "" {
 		log.Fatal("Extender not defined!")
 	}

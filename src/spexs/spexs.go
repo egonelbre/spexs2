@@ -27,8 +27,6 @@ type Setup struct {
 
 	Extendable  FilterFunc
 	Outputtable FilterFunc
-
-	Fitness FitnessFunc
 }
 
 func NewPatterns() Patterns {

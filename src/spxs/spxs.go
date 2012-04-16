@@ -106,9 +106,9 @@ func main() {
 	}
 
 	if *procs <= 1 {
-		Run(setup)
+		Run(setup.Setup)
 	} else {
-		RunParallel(setup, *procs)
+		RunParallel(setup.Setup, *procs)
 	}
 
 	fmt.Printf("match, regexp, count, fitness, p-value\n")

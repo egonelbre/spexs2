@@ -7,10 +7,10 @@ import (
 
 type fitnessConf map[string]interface{}
 
-type fitnessCreator func(fitnessConf, Setup) FitnessFunc
+type fitnessCreator func(fitnessConf, AppSetup) FitnessFunc
 
 func simpleFitness(f FitnessFunc) fitnessCreator {
-	return func(conf fitnessConf, setup Setup) FitnessFunc {
+	return func(conf fitnessConf, setup AppSetup) FitnessFunc {
 		return f
 	}
 }
@@ -32,14 +32,14 @@ var fitnesses = map[string]fitnessCreator{
 		func(p *Pattern) float64 {
 			return float64(p.Complexity())
 		}),
-	"p-value": func(conf fitnessConf, setup Setup) FitnessFunc {
+	"p-value": func(conf fitnessConf, setup AppSetup) FitnessFunc {
 		return func(p *Pattern) float64 {
 			return p.PValue(setup.Ref)
 		}
 	},
 }
 
-func CreateFitness(conf Conf, setup Setup) FitnessFunc {
+func CreateFitness(conf Conf, setup AppSetup) FitnessFunc {
 	if conf.Output.Order == "" {
 		log.Fatal("Output ordering not defined!")
 	}
