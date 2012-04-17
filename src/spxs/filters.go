@@ -7,28 +7,28 @@ import (
 )
 
 type filterConf map[string]interface{}
-type filterCreator func(filterConf, AppSetup) FilterFunc
+type filterCreator func(filterConf) FilterFunc
 
 type genericFilterConf struct{ Min, Max float64 }
 
-func trueFilter(p *Pattern) bool {
+func trueFilter(p *Pattern, ref *Reference) bool {
 	return true
 }
 
 var Filters = map[string]filterCreator{
-	"length": func(conf filterConf, setup AppSetup) FilterFunc {
-		return genericFilter(func(p *Pattern) float64 {
+	"length": func(conf filterConf) FilterFunc {
+		return genericFilter(func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Len())
 		}, conf)
 	},
-	"count": func(conf filterConf, setup AppSetup) FilterFunc {
-		return genericFilter(func(p *Pattern) float64 {
-			return float64(p.Pos.Len()) / float64(len(setup.Ref.Pats))
+	"count": func(conf filterConf) FilterFunc {
+		return genericFilter(func(p *Pattern, ref *Reference) float64 {
+			return float64(p.Pos.Len()) / float64(len(ref.Pats))
 		}, conf)
 	},
-	"p-value": func(conf filterConf, setup AppSetup) FilterFunc {
-		return genericFilter(func(p *Pattern) float64 {
-			return p.PValue(setup.Ref)
+	"p-value": func(conf filterConf) FilterFunc {
+		return genericFilter(func(p *Pattern, ref *Reference) float64 {
+			return p.PValue(ref)
 		}, conf)
 	},
 }
@@ -40,7 +40,7 @@ func CreateFilter(conf map[string]map[string]interface{}, setup AppSetup) Filter
 		if _, valid := Filters[name]; !valid {
 			log.Fatal("No filter named: ", name)
 		}
-		f := Filters[name](args, setup)
+		f := Filters[name](args)
 		filters = append(filters, f)
 	}
 
@@ -51,9 +51,9 @@ func CreateFilter(conf map[string]map[string]interface{}, setup AppSetup) Filter
 	}
 
 	// create a composite filter
-	return func(p *Pattern) bool {
+	return func(p *Pattern, ref *Reference) bool {
 		for _, f := range filters {
-			if !f(p) {
+			if !f(p, ref) {
 				return false
 			}
 		}
@@ -61,7 +61,7 @@ func CreateFilter(conf map[string]map[string]interface{}, setup AppSetup) Filter
 	}
 }
 
-type valueFunc func(*Pattern) float64
+type valueFunc func(*Pattern, *Reference) float64
 
 func genericFilter(value valueFunc, config interface{}) FilterFunc {
 	var conf genericFilterConf
@@ -74,16 +74,16 @@ func genericFilter(value valueFunc, config interface{}) FilterFunc {
 	low, high := !math.IsNaN(conf.Min), !math.IsNaN(conf.Max)
 
 	if low && high {
-		return func(p *Pattern) bool {
-			return (value(p) <= max) && (value(p) > min)
+		return func(p *Pattern, ref *Reference) bool {
+			return (value(p, ref) <= max) && (value(p, ref) > min)
 		}
 	} else if low {
-		return func(p *Pattern) bool {
-			return value(p) > min
+		return func(p *Pattern, ref *Reference) bool {
+			return value(p, ref) > min
 		}
 	} else if high {
-		return func(p *Pattern) bool {
-			return value(p) <= max
+		return func(p *Pattern, ref *Reference) bool {
+			return value(p, ref) <= max
 		}
 	}
 
