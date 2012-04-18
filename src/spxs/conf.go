@@ -29,7 +29,8 @@ const baseConfiguration = `{
 		"order" : "p-value",
 		"args" : {},
 		"filter" : {},
-		"count": -1
+		"count": -1,
+		"format": "{{.Regexp}} {{.Fitness}} {{.Length}} {{.Count}} {{.PValue}}\n"
 	},
 	"aliases" : {
 		"ref" : {"desc":"input file", "modify":["data.input"]},
@@ -58,6 +59,7 @@ type Conf struct {
 		Args   map[string]map[string]interface{}
 		Filter map[string]map[string]interface{}
 		Count  int
+		Format string
 	}
 	Aliases map[string]struct {
 		Desc   string

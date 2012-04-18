@@ -2,6 +2,7 @@ package main
 
 import (
 	. "spexs/trie"
+	"io"
 )
 
 const MAX_POOL_SIZE = 1024 * 1024 * 1024
@@ -9,9 +10,12 @@ const MAX_POOL_SIZE = 1024 * 1024 * 1024
 type TrieFitnessCreator func(interface{}) FitnessFunc
 type TrieExtenderCreator func(interface{}) ExtenderFunc
 
+type PrinterFunc func(io.Writer, *Pattern, *Reference)
+
 type AppSetup struct {
 	Setup
 	Fitness FitnessFunc
+	Printer PrinterFunc
 }
 
 func lengthFitness(p *Pattern) float64 {
@@ -45,6 +49,8 @@ func CreateSetup(conf Conf) AppSetup {
 	s.Extender = CreateExtender(conf, s)
 	s.Extendable = CreateFilter(conf.Extension.Filter, s)
 	s.Outputtable = CreateFilter(conf.Output.Filter, s)
+
+	s.Printer = CreatePrinter(conf, s)
 
 	return s
 }

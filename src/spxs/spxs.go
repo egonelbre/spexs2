@@ -111,7 +111,13 @@ func main() {
 		RunParallel(setup.Setup, *procs)
 	}
 
-	fmt.Printf("match, regexp, count, fitness, p-value\n")
+
+	node, ok := setup.Out.Take()
+	for ok {
+		setup.Printer(os.Stdout, node, setup.Ref)
+		node, ok = setup.Out.Take()
+	}
+	/*fmt.Printf("match, regexp, count, fitness, p-value\n")
 	node, ok := setup.Out.Take()
 	for ok {
 		name := node.String()
@@ -126,7 +132,7 @@ func main() {
 		}
 
 		node, ok = setup.Out.Take()
-	}
+	}*/
 
 	fmt.Printf("\n")
 }
