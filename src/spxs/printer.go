@@ -5,6 +5,7 @@ import (
 	"text/template"
 	"io"
 	"log"
+	"fmt"
 )
 
 type printerArgs struct{
@@ -22,7 +23,12 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		log.Fatal(err)
 	}
 
-	return func(out io.Writer, pat *Pattern, ref *Reference) {
+	f := func(out io.Writer, pat *Pattern, ref *Reference) {
+		if pat == nil {
+			fmt.Println(conf.Output.Format)
+			return
+		}
+
 		node := printerArgs{
 			Regexp : setup.Ref.ReplaceGroups(pat.String()),
 			PValue : pat.PValue(ref),
@@ -37,4 +43,8 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 			log.Fatal(err)
 		}
 	}
+
+	//TODO: test printer
+
+	return f
 }

@@ -61,6 +61,28 @@ func PrintHelp(conf Conf) {
 	fmt.Fprintf(os.Stderr, "\n")
 }
 
+func setupRuntime() {
+	if *procs > 0 {
+		runtime.GOMAXPROCS(*procs)
+	}
+}
+
+func startProfiler(outputFile string) bool {
+	if outputFile == "" {
+		return false
+	}
+	f, err := os.Create(outputFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pprof.StartCPUProfile(f)
+	return true
+}
+
+func stopProfiler() {
+	pprof.StopCPUProfile()
+}
+
 func main() {
 	flag.Parse()
 
@@ -78,21 +100,10 @@ func main() {
 
 	setup := CreateSetup(conf)
 
-	// RUNTIME SETUP
+	setupRuntime()
 
-	if *procs > 0 {
-		runtime.GOMAXPROCS(*procs)
-	}
-
-	// DEBUG SETUP
-
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
+	if startProfiler(*cpuprofile) {
+		defer stopProfiler()
 	}
 
 	// debugging the input queue
@@ -111,28 +122,13 @@ func main() {
 		RunParallel(setup.Setup, *procs)
 	}
 
+	setup.Printer(os.Stdout, nil, setup.Ref)
 
 	node, ok := setup.Out.Take()
 	for ok {
 		setup.Printer(os.Stdout, node, setup.Ref)
 		node, ok = setup.Out.Take()
 	}
-	/*fmt.Printf("match, regexp, count, fitness, p-value\n")
-	node, ok := setup.Out.Take()
-	for ok {
-		name := node.String()
-		regex := setup.Ref.ReplaceGroups(name)
-		fmt.Printf("%s, %v, %v, %v, %v\n", name, regex, node.Pos.Len(), setup.Fitness(node), node.PValue(setup.Ref))
-
-		if *verbose {
-			for idx := range node.Pos.Iter() {
-				fmt.Printf("%v, ", idx)
-			}
-			fmt.Printf("\n\n\n")
-		}
-
-		node, ok = setup.Out.Take()
-	}*/
 
 	fmt.Printf("\n")
 }

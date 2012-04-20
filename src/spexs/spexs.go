@@ -56,10 +56,10 @@ func RunParallel(s Setup, routines int) {
 	stop := make(chan int, routines)
 
 	for i := 0; i < routines; i += 1 {
-		go func(s Setup) {
+		go func() {
 			defer func() { stop <- 1 }()
 			Run(s)
-		}(s)
+		}()
 	}
 
 	for i := 0; i < routines; i += 1 {
