@@ -55,7 +55,7 @@ func (q Quit) Exec(d *Debugger){
 }
 
 func (e Err) Exec(d *Debugger){
-	fmt.Fprintf(d.Logout, "err: %v", e.Msg)
+	fmt.Fprintf(d.Logout, "err: %v\n", e.Msg)
 }
 
 func (b Break) Exec(d *Debugger){
