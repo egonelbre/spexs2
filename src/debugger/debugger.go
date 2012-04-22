@@ -1,63 +1,98 @@
 package debugger
 
-type Handler func(d *Debugger, cmd string, params []string)
+import (
+	"io"
+	"os"
+	"strings"
+	"strconv"
+)
 
-func DefaultHandler(d *Debugger, cmd string, params []string ){
-	switch cmd {
-		"info", "i":;
-		"run", "r":;
-		"skip", "s":;
-		"continue", "c", "":;
-		"quit", "q" :;
-	}
-}
+const (
+	cBreak = iota
+)
+
+type Handler func(d *Debugger, cmd string, params []string) Action
 
 type Debugger struct{
-	commands chan string
+	Commands chan string
+
 	Enabled bool
+	Watch chan int
 	Timeout int
 	Handler Handler
+	Logout io.Writer
 
+	control chan int
 	lock chan int
 }
 
-func New(f Handler) *Debugger {
+func New() *Debugger {
 	d := &Debugger{}
 	d.lock = make(chan int, 1)
 	d.lock <- 1
 
+	d.control = make(chan int, 10000)
 	d.Commands = make(chan string, 50)
+	d.Watch = make(chan int, 1)
 	d.Enabled = true
 	d.Timeout = 0
-	d.Handler = f
+	d.Handler = DefaultHandler
+	d.Logout = os.Stderr
+
+	return d
 }
 
-func (d *Debugger) Debug(){
-	d.DebugPrint(func(){})
-}
-
-func (d *Debugger) DebugPrint( output func() ){
+func (d *Debugger) Break( output func() ){
 	if !d.Enabled {
 		return
 	}
 
-	d.Lock()
+	<-d.lock
 
-	output()
+	if d.Enabled {
+		output()
+		d.HandleCommands()
+	}
 
-	d.HandleCommands()
-	d.Unlock()
+	d.lock <- 1
 }
 
 func (d *Debugger) HandleCommands(){
-	cmd <- d.commands
-	d.Handler(cmd, [])
+	handling: for {
+		select {
+		case ctrl := <-d.control:
+			switch ctrl {
+			case cBreak: break handling
+			}
+		case cmd := <-d.Commands:
+			tokens := strings.Split(cmd, " ")
+			action := d.Handler(d, tokens[0], tokens[1:len(tokens)])
+			action.Exec(d)
+		case <-d.Watch: 
+			d.Watch <- 1
+			break handling
+		}
+	}
 }
 
-func (d *Debugger) Lock(){
-	<- d.lock
-}
-
-func (d *Debugger) Unlock(){
-	d.lock <- 1
+func DefaultHandler(d *Debugger, cmd string, params []string ) Action {
+	switch cmd {
+		case "disable", "d": return Disable{}
+		case "skip", "s":
+			if len(params) > 0 {
+				timeout, err := strconv.Atoi(params[0])
+				if err == nil {
+					return Skip{timeout}
+				} else {
+					return Err{string(err.Error())}
+				}
+			} else {
+				return Err{"Requires skip count parameter."}
+			}
+		case "watch", "w": return Watch{}
+		case "": return Break{}
+		case "continue", "c": return Continue{}
+		case "quit", "q" : return Quit{}
+	}
+	return Nop{}
 }

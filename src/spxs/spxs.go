@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"runtime"
 	. "spexs/trie"
-	"time"
 
 	"log"
 	"os"
@@ -29,9 +28,10 @@ import (
 var (
 	configs *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
 	details *bool   = flag.Bool("details", false, "detailed help")
+	interactiveDebug *bool  = flag.Bool("debug", false, "attach step-by-step debugger")
+	verbose    *bool   = flag.Bool("verbose", false, "print extended debug info")
 
 	procs      *int    = flag.Int("procs", 4, "processors to use")
-	verbose    *bool   = flag.Bool("verbose", false, "print debug information")
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
@@ -106,14 +106,8 @@ func main() {
 		defer stopProfiler()
 	}
 
-	// debugging the input queue
-	if *verbose {
-		go func() {
-			for {
-				fmt.Printf("queue size: %v\n", setup.In.Len())
-				time.Sleep(1000 * 1000 * 100)
-			}
-		}()
+	if *interactiveDebug {
+		AttachDebugger(&setup)
 	}
 
 	if *procs <= 1 {
