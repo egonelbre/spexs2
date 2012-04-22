@@ -75,24 +75,36 @@ func (d *Debugger) HandleCommands(){
 	}
 }
 
+
+const defaultHandlerHelp = `
+  enter, c, continue: proceed to next step
+  s, skip [amount]: skip breaking for [amount] (max 100)
+  w, watch: watch output function without breaking
+  			(to reenable breaking press enter)
+  
+  d, disable: disable debugger
+  q, quit: terminate program
+  h, help: this help
+`
+
 func DefaultHandler(d *Debugger, cmd string, params []string ) Action {
 	switch cmd {
-		case "disable", "d": return Disable{}
-		case "skip", "s":
-			if len(params) > 0 {
-				timeout, err := strconv.Atoi(params[0])
-				if err == nil {
-					return Skip{timeout}
-				} else {
-					return Err{string(err.Error())}
-				}
+	case "disable", "d": return Disable{}
+	case "skip", "s":
+		if len(params) > 0 {
+			timeout, err := strconv.Atoi(params[0])
+			if err == nil {
+				return Skip{timeout}
 			} else {
-				return Err{"Requires skip count parameter."}
+				return Err{string(err.Error())}
 			}
-		case "watch", "w": return Watch{}
-		case "": return Break{}
-		case "continue", "c": return Continue{}
-		case "quit", "q" : return Quit{}
+		} else {
+			return Err{"Requires skip count parameter."}
+		}
+	case "watch", "w": return Watch{}
+	case "continue", "c", "": return Continue{}
+	case "quit", "q" : return Quit{}
+	case "help", "h" : return Msg{defaultHandlerHelp}
 	}
 	return Nop{}
 }
