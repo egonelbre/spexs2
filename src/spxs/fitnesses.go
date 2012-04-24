@@ -48,7 +48,6 @@ func CreateFitness(conf Conf, setup AppSetup) FitnessFunc {
 	if !valid {
 		log.Fatal("No ordering/fitness named: ", conf.Output.Order)
 	}
-
 	args := conf.Output.Args[conf.Output.Order]
 
 	return fitnessCreate(args, setup)

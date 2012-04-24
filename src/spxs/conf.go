@@ -27,6 +27,7 @@ const baseConfiguration = `{
 	},
 	"output" : {
 		"order" : "p-value",
+		"sort" : "desc",
 		"args" : {},
 		"filter" : {},
 		"count": -1,
@@ -56,6 +57,7 @@ type Conf struct {
 	}
 	Output struct {
 		Order  string
+		Sort   string
 		Args   map[string]map[string]interface{}
 		Filter map[string]map[string]interface{}
 		Count  int

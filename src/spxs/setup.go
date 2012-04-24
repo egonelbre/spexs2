@@ -25,7 +25,7 @@ func lengthFitness(p *Pattern) float64 {
 type PatternFilterCreator func(limit int) FilterFunc
 
 func CreateInput(conf Conf, setup AppSetup) Pooler {
-	in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE)
+	in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE, true)
 	in.Put(NewFullPattern(setup.Ref))
 	return in
 }
@@ -35,7 +35,7 @@ func CreateOutput(conf Conf, setup AppSetup, f FitnessFunc) Pooler {
 	if size < 0 {
 		size = MAX_POOL_SIZE
 	}
-	return NewPriorityPool(f, size)
+	return NewPriorityPool(f, size, conf.Output.Sort == "asc")
 }
 
 func CreateSetup(conf Conf) AppSetup {

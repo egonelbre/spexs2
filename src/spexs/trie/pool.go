@@ -44,16 +44,23 @@ type PriorityPool struct {
 	token   chan int
 	items   []*Pattern
 	Fitness FitnessFunc
-	limit   int
+	limit int
+	ascending int
 }
 
-func NewPriorityPool(fitness FitnessFunc, limit int) *PriorityPool {
+func NewPriorityPool(fitness FitnessFunc, limit int, ascending bool) *PriorityPool {
 	p := &PriorityPool{}
 	p.token = make(chan int, 1)
 	p.items = make([]*Pattern, 0)
 	p.limit = limit
 	p.Fitness = fitness
 	p.token <- 1
+
+	if ascending {
+		p.ascending = 1
+	} else {
+		p.ascending = -1
+	}
 
 	heap.Init(p)
 	return p
