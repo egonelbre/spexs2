@@ -23,7 +23,7 @@ var Filters = map[string]filterCreator{
 	},
 	"count": func(conf filterConf) FilterFunc {
 		return genericFilter(func(p *Pattern, ref *Reference) float64 {
-			return float64(p.Pos.Len()) / float64(len(ref.Pats))
+			return float64(p.Pos.Len()) / float64(ref.Groupings[0])
 		}, conf)
 	},
 	"p-value": func(conf filterConf) FilterFunc {
@@ -75,11 +75,11 @@ func genericFilter(value valueFunc, config interface{}) FilterFunc {
 
 	if low && high {
 		return func(p *Pattern, ref *Reference) bool {
-			return (value(p, ref) <= max) && (value(p, ref) > min)
+			return (value(p, ref) <= max) && (value(p, ref) >= min)
 		}
 	} else if low {
 		return func(p *Pattern, ref *Reference) bool {
-			return value(p, ref) > min
+			return value(p, ref) >= min
 		}
 	} else if high {
 		return func(p *Pattern, ref *Reference) bool {

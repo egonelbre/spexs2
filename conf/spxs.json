@@ -26,6 +26,7 @@
 	},
 	"output" : {
 		"order" : "len",
+		"sort" : "asc",
 		"args" : {"p-value":{}},
 		"filter" : {
 			"length" : {"min":2, "max":7}
@@ -33,9 +34,9 @@
 		"count": 10
 	},
 	"aliases" : {
-		"ref" : {"desc":"input file",            "modify":["data.input"]},
-		"val" : {"desc":"validation file",       "modify":["data.validation"]},
-		"p-min" : {"desc":"minimum for p-value", "modify":["extension.filter.p-value.min", "output.filter.p-value.min"]},
-		"p-max" : {"desc":"maximum for p-value", "modify":["extension.filter.p-value.max", "output.filter.p-value.max"]}
+		"inp" : {"desc":"input file",            "modify":["data.input"]},
+		"ref" : {"desc":"reference file",        "modify":["data.validation"]},
+		"p-min" : {"desc":"minimum for p-value", "modify":["output.filter.p-value.min"]},
+		"p-max" : {"desc":"maximum for p-value", "modify":["output.filter.p-value.max"]}
 	}
 }
