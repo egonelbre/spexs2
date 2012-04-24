@@ -39,8 +39,8 @@ func CreateReference(conf Conf) *Reference {
 
 	addPatternsFromFile(ref, conf.Data.Input, 0)
 
-	if conf.Data.Validation != "" {
-		addPatternsFromFile(ref, conf.Data.Validation, 1)
+	if conf.Data.Reference != "" {
+		addPatternsFromFile(ref, conf.Data.Reference, 1)
 	}
 
 	return ref

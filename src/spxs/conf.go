@@ -14,7 +14,7 @@ import (
 const baseConfiguration = `{
 	"data" : {
 		"input" : "",
-		"validation" : ""
+		"reference" : ""
 	},
 	"alphabet" : {
 		"characters" : "",
@@ -42,7 +42,7 @@ const baseConfiguration = `{
 type Conf struct {
 	Data struct {
 		Input      string
-		Validation string
+		Reference string
 	}
 	Alphabet struct {
 		Characters string

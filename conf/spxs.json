@@ -1,7 +1,7 @@
 {
 	"data" : {
 		"input" : "",
-		"validation" : ""
+		"reference" : ""
 	},
 
 	"alphabet" : {
@@ -35,7 +35,7 @@
 	},
 	"aliases" : {
 		"inp" : {"desc":"input file",            "modify":["data.input"]},
-		"ref" : {"desc":"reference file",        "modify":["data.validation"]},
+		"ref" : {"desc":"reference file",        "modify":["data.reference"]},
 		"p-min" : {"desc":"minimum for p-value", "modify":["output.filter.p-value.min"]},
 		"p-max" : {"desc":"maximum for p-value", "modify":["output.filter.p-value.max"]}
 	}
