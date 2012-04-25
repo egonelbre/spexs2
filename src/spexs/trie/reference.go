@@ -15,14 +15,14 @@ func NewGroup(name string, id Char, chars []Char) *Group {
 	return &Group{id, name, chars}
 }
 
-type ReferencePattern struct {
+type Sequence struct {
 	Pat   []byte
 	Count int // this refers to rune count in Pat
 	Group int // validation or reference group
 }
 
 type Reference struct {
-	Pats      []ReferencePattern
+	Pats      []Sequence
 	Alphabet  []Char
 	Groups    map[Char]Group
 	Groupings []int
@@ -30,7 +30,7 @@ type Reference struct {
 
 func NewReference(size int) *Reference {
 	ref := &Reference{}
-	ref.Pats = make([]ReferencePattern, 0, size)
+	ref.Pats = make([]Sequence, 0, size)
 	ref.Alphabet = make([]Char, 0, 8)
 	ref.Groups = make(map[Char]Group)
 	ref.Groupings = make([]int, 2) // fix use multiple
@@ -62,7 +62,7 @@ func (ref *Reference) AddGroup(group Group) {
 	ref.Groups[group.Id] = group
 }
 
-func (ref *Reference) AddPattern(pat ReferencePattern) {
+func (ref *Reference) AddPattern(pat Sequence) {
 	ref.Pats = append(ref.Pats, pat)
 	ref.Groupings[pat.Group] += 1
 }
