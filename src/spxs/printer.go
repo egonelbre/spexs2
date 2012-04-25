@@ -1,20 +1,20 @@
 package main
 
 import (
-	. "spexs/trie"
-	"text/template"
+	"fmt"
 	"io"
 	"log"
-	"fmt"
+	. "spexs/trie"
+	"text/template"
 )
 
-type printerArgs struct{
-	Str string
-	Regexp string
+type printerArgs struct {
+	Str     string
+	Regexp  string
 	Fitness float64
-	Length int
-	Count int
-	PValue float64
+	Length  int
+	Count   int
+	PValue  float64
 }
 
 func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
@@ -31,12 +31,12 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		}
 
 		node := printerArgs{
-			Str : pat.String(),
-			Regexp : setup.Ref.ReplaceGroups(pat.String()),
-			PValue : pat.PValue(ref),
-			Fitness : setup.Fitness(pat),
-			Length : pat.Len(),
-			Count : pat.Pos.Len(),
+			Str:     pat.String(),
+			Regexp:  setup.Ref.ReplaceGroups(pat.String()),
+			PValue:  pat.PValue(ref),
+			Fitness: setup.Fitness(pat),
+			Length:  pat.Len(),
+			Count:   pat.Pos.Len(),
 		}
 
 		err = tmpl.Execute(out, node)

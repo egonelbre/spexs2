@@ -41,10 +41,10 @@ func (p *FifoPool) Len() int {
 }
 
 type PriorityPool struct {
-	token   chan int
-	items   []*Pattern
-	Fitness FitnessFunc
-	limit int
+	token     chan int
+	items     []*Pattern
+	Fitness   FitnessFunc
+	limit     int
 	ascending int
 }
 

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"debugger"
 	"fmt"
 	. "spexs/trie"
-	"debugger"
 )
 
 var dbg = debugger.New()
@@ -14,7 +14,7 @@ func AttachDebugger(s *AppSetup) {
 	s.Extender = func(p *Pattern, ref *Reference) Patterns {
 		tmp := f(p, ref)
 		result := NewPatterns()
-		dbg.Break(func(){
+		dbg.Break(func() {
 			fmt.Fprintf(dbg.Logout, "extending: %v\n", ref.ReplaceGroups(p.String()))
 			for extended := range tmp {
 				result <- extended

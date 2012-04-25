@@ -14,8 +14,7 @@ func simpleFitness(f FitnessFunc) fitnessCreator {
 	}
 }
 
-var Fitnesses = map[string]fitnessCreator{
-}
+var Fitnesses = map[string]fitnessCreator{}
 
 func CreateFitness(conf Conf, setup AppSetup) FitnessFunc {
 	if conf.Output.Order == "" {

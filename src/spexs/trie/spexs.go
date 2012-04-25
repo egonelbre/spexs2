@@ -52,7 +52,7 @@ func Run(s Setup) {
 	}
 }
 
-func Parallel(f func(), routines int){
+func Parallel(f func(), routines int) {
 	stop := make(chan int, routines)
 	for i := 0; i < routines; i += 1 {
 		go func() {
@@ -66,5 +66,5 @@ func Parallel(f func(), routines int){
 }
 
 func RunParallel(s Setup, routines int) {
-	Parallel(func(){Run(s)}, routines)
+	Parallel(func() { Run(s) }, routines)
 }

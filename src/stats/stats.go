@@ -19,7 +19,7 @@ func HypergeometricSplit(o int, r int, O int, R int) float64 {
 	nom := lnG(O+1) + lnG(R+1) + lnG(o+r+1) + lnG(O+R-o-r+1)
 	denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lnG(O+R+1)
 	if r > 0 {
-		return math.Exp(nom - denom) + HypergeometricSplit(o+1, r-1, O, R)
+		return math.Exp(nom-denom) + HypergeometricSplit(o+1, r-1, O, R)
 	}
 	return math.Exp(nom - denom)
 }

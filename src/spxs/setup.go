@@ -1,8 +1,8 @@
 package main
 
 import (
-	. "spexs/trie"
 	"io"
+	. "spexs/trie"
 )
 
 const MAX_POOL_SIZE = 1024 * 1024 * 1024
@@ -55,8 +55,7 @@ func CreateSetup(conf Conf) AppSetup {
 	return s
 }
 
-
-func initSetup(){
+func initSetup() {
 	initFitnesses()
 	initFilters()
 }

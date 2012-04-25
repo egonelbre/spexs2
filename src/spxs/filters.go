@@ -15,8 +15,7 @@ func trueFilter(p *Pattern, ref *Reference) bool {
 	return true
 }
 
-var Filters = map[string]filterCreator {
-}
+var Filters = map[string]filterCreator{}
 
 func CreateFilter(conf map[string]map[string]interface{}, setup AppSetup) FilterFunc {
 	filters := make([]FilterFunc, 0)

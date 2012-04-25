@@ -14,7 +14,7 @@ type Pattern struct {
 	length     int
 	complexity int
 	pvalue     float64
-	ng int
+	ng         int
 }
 
 func NewPattern(char Char, parent *Pattern) *Pattern {
@@ -70,13 +70,12 @@ func (n *Pattern) NG() int {
 			} else {
 				n.ng = 1 + n.Parent.NG()
 			}
-			
+
 		}
 		return n.ng
 	}
 	return 0
 }
-
 
 func (n *Pattern) Complexity() int {
 	if n.Parent != nil {
@@ -106,7 +105,7 @@ func (n *Pattern) PValue(ref *Reference) float64 {
 	}
 
 	n.pvalue = stats.HypergeometricSplit(
-		counts[0], counts[1], 
+		counts[0], counts[1],
 		ref.Groupings[0], ref.Groupings[1])
 	return n.pvalue
 }

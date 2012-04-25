@@ -41,7 +41,7 @@ const baseConfiguration = `{
 
 type Conf struct {
 	Data struct {
-		Input      string
+		Input     string
 		Reference string
 	}
 	Alphabet struct {

@@ -61,7 +61,7 @@ func RunParallel(s Setup, routines int) {
 			Run(s)
 		}()
 	}
-	
+
 	for i := 0; i < routines; i += 1 {
 		<-stop
 	}

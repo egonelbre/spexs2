@@ -1,11 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
 	"sort"
-	"flag"
 )
 
 func PrintHelp(conf Conf) {
