@@ -52,17 +52,19 @@ func Run(s Setup) {
 	}
 }
 
-func RunParallel(s Setup, routines int) {
+func Parallel(f func(), routines int){
 	stop := make(chan int, routines)
-
 	for i := 0; i < routines; i += 1 {
-		go func(s Setup) {
+		go func() {
 			defer func() { stop <- 1 }()
-			Run(s)
-		}(s)
+			f()
+		}()
 	}
-
 	for i := 0; i < routines; i += 1 {
 		<-stop
 	}
+}
+
+func RunParallel(s Setup, routines int) {
+	Parallel(func(){Run(s)}, routines)
 }

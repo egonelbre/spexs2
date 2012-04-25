@@ -9,6 +9,7 @@ import (
 )
 
 type printerArgs struct{
+	Str string
 	Regexp string
 	Fitness float64
 	Length int
@@ -30,6 +31,7 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		}
 
 		node := printerArgs{
+			Str : pat.String(),
 			Regexp : setup.Ref.ReplaceGroups(pat.String()),
 			PValue : pat.PValue(ref),
 			Fitness : setup.Fitness(pat),

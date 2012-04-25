@@ -14,6 +14,7 @@ type Pattern struct {
 	length     int
 	complexity int
 	pvalue     float64
+	ng int
 }
 
 func NewPattern(char Char, parent *Pattern) *Pattern {
@@ -27,6 +28,7 @@ func NewPattern(char Char, parent *Pattern) *Pattern {
 	}
 	p.IsGroup = false
 	p.IsStar = false
+	p.ng = -1
 	p.length = -1
 	p.complexity = -1
 	p.pvalue = -1
@@ -59,6 +61,22 @@ func (n *Pattern) Len() int {
 	}
 	return 0
 }
+
+func (n *Pattern) NG() int {
+	if n.Parent != nil {
+		if n.ng < 0 {
+			if n.IsGroup || n.IsStar {
+				n.ng = n.Parent.NG()
+			} else {
+				n.ng = 1 + n.Parent.NG()
+			}
+			
+		}
+		return n.ng
+	}
+	return 0
+}
+
 
 func (n *Pattern) Complexity() int {
 	if n.Parent != nil {

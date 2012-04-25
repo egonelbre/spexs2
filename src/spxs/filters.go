@@ -21,6 +21,11 @@ var Filters = map[string]filterCreator{
 			return float64(p.Len())
 		}, conf)
 	},
+	"ng": func(conf filterConf) FilterFunc {
+		return genericFilter(func(p *Pattern, ref *Reference) float64 {
+			return float64(p.NG())
+		}, conf)
+	},
 	"count": func(conf filterConf) FilterFunc {
 		return genericFilter(func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Pos.Len()) / float64(ref.Groupings[0])

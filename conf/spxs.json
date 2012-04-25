@@ -5,33 +5,32 @@
 	},
 
 	"alphabet" : {
-		"characters" : "ACGT",
+		"characters" : "ACDEFGHIKLMNPRQSTVWY",
 		"groups" : {
-			"M": {"group":"AC"},
-			"R": {"group":"AG"},
-			"W": {"group":"AT"},
-			"S": {"group":"CG"},
-			"Y": {"group":"CT"},
-			"K": {"group":"GT"}
+			".": {"group":"ACDEFGHIKLMNPRQSTVWY"}
 		}
 	},
 
 	"extension" : {
-		"method" : "group",
-		"args" : {"group":{}},
+		"method" : "regexp",
+		"args" : {"star":{ "max-gap": 3}},
 		"filter" : {
-			"length" : {"max":7},
-			"count" : {"min":0.1}
+			"ng" : {"min":1},
+			"length" : {"min":0, "max":10},
+			"count" : {"min":0.5}
 		}
 	},
 	"output" : {
-		"order" : "len",
+		"order" : "p-value",
 		"sort" : "asc",
 		"args" : {"p-value":{}},
 		"filter" : {
-			"length" : {"min":2, "max":7}
+			"ng" : {"min":3},
+			"length" : {"min":4, "max":10},
+			"count" : {"min":0.8}
 		},
-		"count": 10
+		"count": 60,
+		"format": "{{.Str}} {{.Fitness}} {{.Length}} {{.Count}} {{.PValue}}\n"
 	},
 	"aliases" : {
 		"inp" : {"desc":"input file",            "modify":["data.input"]},
