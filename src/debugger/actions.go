@@ -1,8 +1,8 @@
 package debugger
 
 import (
-	"os"
 	"fmt"
+	"os"
 )
 
 type Action interface {
@@ -13,12 +13,12 @@ type Nop struct{}
 type Continue struct{}
 type Watch struct{}
 type Disable struct{}
-type Quit struct {}
+type Quit struct{}
 
-type Skip struct{
+type Skip struct {
 	Count int
 }
-type Msg struct{
+type Msg struct {
 	Msg string
 }
 type Err struct {
@@ -30,40 +30,40 @@ func (n Nop) Exec(d *Debugger) {}
 func (c Continue) Exec(d *Debugger) {
 	d.control <- cBreak
 	select {
-		case <-d.Watch:
-		default:
-	}	
+	case <-d.Watch:
+	default:
+	}
 }
 
-func (s Skip) Exec(d *Debugger){
+func (s Skip) Exec(d *Debugger) {
 	d.control <- cBreak
 	count := s.Count
-	if count > 100 { 
-		count = 100 
+	if count > 100 {
+		count = 100
 	}
 	for i := 0; i < count; i += 1 {
 		d.control <- cBreak
 	}
 }
 
-func (s Watch) Exec(d *Debugger){
+func (s Watch) Exec(d *Debugger) {
 	d.Watch <- 1
 	d.control <- cBreak
 }
 
-func (s Disable) Exec(d *Debugger){
+func (s Disable) Exec(d *Debugger) {
 	d.Enabled = false
 	d.control <- cBreak
 }
 
-func (q Quit) Exec(d *Debugger){
+func (q Quit) Exec(d *Debugger) {
 	os.Exit(130)
 }
 
-func (e Err) Exec(d *Debugger){
+func (e Err) Exec(d *Debugger) {
 	fmt.Fprintf(d.Logout, "err: %v\n", e.Msg)
 }
 
-func (m Msg) Exec(d *Debugger){
+func (m Msg) Exec(d *Debugger) {
 	fmt.Fprintf(d.Logout, "%v\n", m.Msg)
 }

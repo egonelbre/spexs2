@@ -3,8 +3,8 @@ package debugger
 import (
 	"io"
 	"os"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -13,17 +13,17 @@ const (
 
 type Handler func(d *Debugger, cmd string, params []string) Action
 
-type Debugger struct{
+type Debugger struct {
 	Commands chan string
 
 	Enabled bool
-	Watch chan int
+	Watch   chan int
 	Timeout int
 	Handler Handler
-	Logout io.Writer
+	Logout  io.Writer
 
 	control chan int
-	lock chan int
+	lock    chan int
 }
 
 func New() *Debugger {
@@ -42,7 +42,7 @@ func New() *Debugger {
 	return d
 }
 
-func (d *Debugger) Break( output func() ){
+func (d *Debugger) Break(output func()) {
 	if !d.Enabled {
 		return
 	}
@@ -57,24 +57,25 @@ func (d *Debugger) Break( output func() ){
 	d.lock <- 1
 }
 
-func (d *Debugger) HandleCommands(){
-	handling: for {
+func (d *Debugger) HandleCommands() {
+handling:
+	for {
 		select {
 		case ctrl := <-d.control:
 			switch ctrl {
-			case cBreak: break handling
+			case cBreak:
+				break handling
 			}
 		case cmd := <-d.Commands:
 			tokens := strings.Split(cmd, " ")
 			action := d.Handler(d, tokens[0], tokens[1:len(tokens)])
 			action.Exec(d)
-		case <-d.Watch: 
+		case <-d.Watch:
 			d.Watch <- 1
 			break handling
 		}
 	}
 }
-
 
 const defaultHandlerHelp = `
   enter, c, continue: proceed to next step
@@ -87,9 +88,10 @@ const defaultHandlerHelp = `
   h, help: this help
 `
 
-func DefaultHandler(d *Debugger, cmd string, params []string ) Action {
+func DefaultHandler(d *Debugger, cmd string, params []string) Action {
 	switch cmd {
-	case "disable", "d": return Disable{}
+	case "disable", "d":
+		return Disable{}
 	case "skip", "s":
 		if len(params) > 0 {
 			timeout, err := strconv.Atoi(params[0])
@@ -101,10 +103,14 @@ func DefaultHandler(d *Debugger, cmd string, params []string ) Action {
 		} else {
 			return Err{"Requires skip count parameter."}
 		}
-	case "watch", "w": return Watch{}
-	case "continue", "c", "": return Continue{}
-	case "quit", "q" : return Quit{}
-	case "help", "h" : return Msg{defaultHandlerHelp}
+	case "watch", "w":
+		return Watch{}
+	case "continue", "c", "":
+		return Continue{}
+	case "quit", "q":
+		return Quit{}
+	case "help", "h":
+		return Msg{defaultHandlerHelp}
 	}
 	return Nop{}
 }
