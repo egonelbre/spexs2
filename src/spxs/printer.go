@@ -1,26 +1,41 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	. "spexs/trie"
 	"text/template"
+	"regexp"
 )
 
-type printerArgs struct {
-	Str     string
-	Regexp  string
-	Fitness float64
-	Length  int
-	Count   int
-	PValue  float64
-}
-
 func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
-	tmpl, err := template.New("").Parse(conf.Output.Format)
+	format := conf.Output.Format
+
+	regExtract, _ := regexp.Compile(`\{([a-zA-Z0-9\-]+)\}`)
+	regFixName, _ := regexp.Compile(`-`)
+
+	fixedNames := make(map[string]string)
+
+	formatStrs := regExtract.FindAllStringSubmatch(format, -1)
+	for _, tokens := range formatStrs {
+		name := tokens[1]
+		_, valid := Features[name]
+		_, validStr := StrFeatures[name]
+		if !(valid || validStr) {
+			log.Fatal(errors.New("No valid format parameter: " + name))
+		}
+
+		fixedNames[name] = regFixName.ReplaceAllString(name, "")
+	}
+
+	format = regExtract.ReplaceAllString(format, `{{.$1}}`)
+	format = regFixName.ReplaceAllString(format, "")
+
+	tmpl, err := template.New("").Parse(format)
 	if err != nil {
-		log.Println("Unable to create template based on output format.")
+		log.Println("Unable to create template based on output format. ", format)
 		log.Fatal(err)
 	}
 
@@ -32,12 +47,26 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 
 		values := make(map[string]interface{})
 		
+		for name, fixName := range fixedNames {
+			f, valid := Features[name]
+			if valid {
+				values[fixName] = f.Func(pat, ref)
+			}
+			fstr, valid := StrFeatures[name]
+			if valid {
+				values[fixName] = fstr.Func(pat, ref)
+			}
+		}
+		/*
 		for name, f := range Features {
-			values[name] = f.Func(pat, ref)
+			fixName := fixedNames[name]
+			values[fixName] = f.Func(pat, ref)
 		}
 
-		values["str"] = pat.String()
-		values["regexp"] = setup.Ref.ReplaceGroups(pat.String())
+		for name, f := range StrFeatures {
+			fixName := fixedNames[name]
+			values[fixName] = f.Func(pat, ref)
+		}*/
 
 		err = tmpl.Execute(out, values)
 		if err != nil {

@@ -10,7 +10,13 @@ type Feature struct {
 	Func FeatureFunc
 }
 
+type StrFeature struct {
+	Desc string
+	Func StrFeatureFunc
+}
+
 type FeatureFunc func(*Pattern, *Reference) float64
+type StrFeatureFunc func(*Pattern, *Reference) string
 
 var Features = map[string]Feature{
 	"query-seqs": {
@@ -126,5 +132,19 @@ var Features = map[string]Feature{
 				p = p.Parent
 			}
 			return float64(t)
+		}},
+}
+
+
+var StrFeatures = map[string]StrFeature{
+	"pat": {
+		"representation of the pattern",
+		func(p *Pattern, ref *Reference) string {
+			return p.String()
+		}},
+	"pat-regexp": {
+		"representation of the pattern with group symbols replaced",
+		func(p *Pattern, ref *Reference) string {
+			return ref.ReplaceGroups(p.String())
 		}},
 }

@@ -15,22 +15,18 @@
 		"method" : "regexp",
 		"args" : {"star":{ "max-gap": 3}},
 		"filter" : {
-			"ng" : {"min":1},
-			"length" : {"min":0, "max":10},
-			"count" : {"min":0.5}
+			"query-match-seqs-prop" : {"min":0.9}
 		}
 	},
 	"output" : {
-		"order" : "p-value",
+		"order" : "match-hyper-up-pvalue",
 		"sort" : "asc",
 		"args" : {"p-value":{}},
 		"filter" : {
-			"ng" : {"min":3},
-			"length" : {"min":4, "max":10},
-			"count" : {"min":0.8}
+			"query-match-seqs-prop" : {"min":0.9}
 		},
 		"count": 60,
-		"format": "{{.Str}} {{.Fitness}} {{.Length}} {{.Count}} {{.PValue}}\n"
+		"format": "{pat} {pat-regexp} {pat-chars}\n"
 	},
 	"aliases" : {
 		"inp" : {"desc":"input file",            "modify":["data.input"]},
