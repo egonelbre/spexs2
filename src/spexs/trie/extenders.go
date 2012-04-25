@@ -9,7 +9,6 @@ func output(out Patterns, patterns map[Char]*Pattern) {
 }
 
 func simpleExtend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
-
 	for idx, mpos := range node.Pos.Iter() {
 		plen := byte(len(ref.Seqs[idx].Pat))
 		var k byte
