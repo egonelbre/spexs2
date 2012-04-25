@@ -37,10 +37,10 @@ func CreateReference(conf Conf) *Reference {
 		log.Fatal("Data file not defined")
 	}
 
-	addPatternsFromFile(ref, conf.Data.Input, 0)
+	addSeqsFromFile(ref, conf.Data.Input, 0)
 
 	if conf.Data.Reference != "" {
-		addPatternsFromFile(ref, conf.Data.Reference, 1)
+		addSeqsFromFile(ref, conf.Data.Reference, 1)
 	}
 
 	return ref
@@ -58,12 +58,13 @@ func seq(data string, group int) Sequence {
 	p := Sequence{}
 	b := bytes.NewBufferString(data)
 	p.Pat = b.Bytes()
-	p.Count = utf8.RuneCount(p.Pat)
+	p.Len = utf8.RuneCount(p.Pat)
+	p.Count = 1
 	p.Group = group
 	return p
 }
 
-func addPatternsFromFile(ref *Reference, filename string, group int) {
+func addSeqsFromFile(ref *Reference, filename string, group int) {
 	var (
 		file   *os.File
 		reader *bufio.Reader

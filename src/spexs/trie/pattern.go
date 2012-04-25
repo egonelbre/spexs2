@@ -2,7 +2,6 @@ package trie
 
 import (
 	"spexs"
-	"stats"
 )
 
 type Pattern struct {
@@ -11,10 +10,8 @@ type Pattern struct {
 	Pos        spexs.Set
 	IsGroup    bool
 	IsStar     bool
+	count      []int
 	length     int
-	complexity int
-	pvalue     float64
-	ng         int
 }
 
 func NewPattern(char Char, parent *Pattern) *Pattern {
@@ -28,10 +25,9 @@ func NewPattern(char Char, parent *Pattern) *Pattern {
 	}
 	p.IsGroup = false
 	p.IsStar = false
-	p.ng = -1
+	p.count = make([]int, 0)
+
 	p.length = -1
-	p.complexity = -1
-	p.pvalue = -1
 	return p
 }
 
@@ -62,50 +58,14 @@ func (n *Pattern) Len() int {
 	return 0
 }
 
-func (n *Pattern) NG() int {
-	if n.Parent != nil {
-		if n.ng < 0 {
-			if n.IsGroup || n.IsStar {
-				n.ng = n.Parent.NG()
-			} else {
-				n.ng = 1 + n.Parent.NG()
-			}
+func (n *Pattern) Count(ref *Reference) []int {
+	if len(n.count) <= 0 {
+		n.count = make([]int, len(ref.Groupings))
 
+		for idx := range n.Pos.Iter() {
+			seq := ref.Seqs[idx]
+			n.count[seq.Group] += seq.Count
 		}
-		return n.ng
-	}
-	return 0
-}
-
-func (n *Pattern) Complexity() int {
-	if n.Parent != nil {
-		if n.complexity < 0 {
-			if n.IsStar {
-				n.complexity = n.Parent.Complexity() + 4
-			} else if n.IsGroup {
-				n.complexity = n.Parent.Complexity() + 2
-			} else {
-				n.complexity = n.Parent.Complexity() + 1
-			}
-		}
-		return n.complexity
-	}
-	return 0
-}
-
-func (n *Pattern) PValue(ref *Reference) float64 {
-	if n.pvalue >= 0 {
-		return n.pvalue
-	}
-
-	counts := make([]int, len(ref.Groupings))
-
-	for idx := range n.Pos.Iter() {
-		counts[ref.Seqs[idx].Group] += 1
-	}
-
-	n.pvalue = stats.HypergeometricSplit(
-		counts[0], counts[1],
-		ref.Groupings[0], ref.Groupings[1])
-	return n.pvalue
+	}	
+	return n.count
 }

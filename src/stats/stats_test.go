@@ -17,10 +17,6 @@ func benchGamma(b *testing.B, fn gammaFunc) {
 	}
 }
 
-func BenchmarkLogGamma(b *testing.B) {
-	benchGamma(b, HypergeometricSplitLog)
-}
-
 func BenchmarkGamma(b *testing.B) {
 	benchGamma(b, HypergeometricSplit)
 }
