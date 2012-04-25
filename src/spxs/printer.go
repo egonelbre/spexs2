@@ -30,16 +30,16 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 			return
 		}
 
-		node := printerArgs{
-			Str:     pat.String(),
-			Regexp:  setup.Ref.ReplaceGroups(pat.String()),
-			PValue:  Features["match-hyper-up-pvalue"].Func(pat, ref),
-			Fitness: setup.Fitness(pat),
-			Length:  pat.Len(),
-			Count:   pat.Pos.Len(),
+		values := make(map[string]interface{})
+		
+		for name, f := range Features {
+			values[name] = f.Func(pat, ref)
 		}
 
-		err = tmpl.Execute(out, node)
+		values["str"] = pat.String()
+		values["regexp"] = setup.Ref.ReplaceGroups(pat.String())
+
+		err = tmpl.Execute(out, values)
 		if err != nil {
 			log.Println("Unable to output pattern.")
 			log.Fatal(err)

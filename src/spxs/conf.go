@@ -21,12 +21,12 @@ const baseConfiguration = `{
 		"groups" : {}
 	},
 	"extension" : {
-		"method" : "simple",
+		"method" : "",
 		"args" : {},
 		"filter" : {}
 	},
 	"output" : {
-		"order" : "p-value",
+		"order" : "",
 		"sort" : "desc",
 		"args" : {},
 		"filter" : {},
@@ -34,8 +34,6 @@ const baseConfiguration = `{
 		"format": "{{.Regexp}} {{.Fitness}} {{.Length}} {{.Count}} {{.PValue}}\n"
 	},
 	"aliases" : {
-		"inp" : {"desc":"input file", "modify":["data.input"]},
-		"ref" : {"desc":"validation file", "modify":["data.validation"]}
 	}
 }`
 

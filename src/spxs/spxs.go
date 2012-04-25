@@ -11,21 +11,9 @@ import (
 	"runtime/pprof"
 )
 
-/*
-	p-value binom
-
-	flexibility wildcards
-	[-max_gap_nr nr]		- How many flexible gaps at most
- 	[-min_gap nr] 			- minimum length of a gap
- 	[-max_gap nr] 			- maximum length of a gap
- 	[-no_gap_len nr] 		- require at least so many positions gap-less
- 	[-init_gap_len nr] 		- Initiate that value (can require longer/shorter first motif...)
- 	[-only_print_if_gap_allowed]	- only report motif if gap could be allowed at that pos
-
-*/
-
 var (
 	configs          *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
+	//printConf        *bool   = flag.Bool("printConf", "print the configuration file")
 	details          *bool   = flag.Bool("details", false, "detailed help")
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
 	verbose          *bool   = flag.Bool("verbose", false, "print extended debug info")
