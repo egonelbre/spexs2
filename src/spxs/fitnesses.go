@@ -40,6 +40,6 @@ func makeFloatFitness(f FeatureFunc) fitnessCreator {
 
 func initFitnesses() {
 	for name, f := range Features {
-		Fitnesses[name] = makeFloatFitness(f)
+		Fitnesses[name] = makeFloatFitness(f.Func)
 	}
 }

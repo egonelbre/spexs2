@@ -76,7 +76,7 @@ func makeFloatFilter(feature FeatureFunc, config interface{}) FilterFunc {
 func initFilters() {
 	for name, f := range Features {
 		Filters[name] = func(conf filterConf) FilterFunc {
-			return makeFloatFilter(f, conf)
+			return makeFloatFilter(f.Func, conf)
 		}
 	}
 }

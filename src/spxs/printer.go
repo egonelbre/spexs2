@@ -33,7 +33,7 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		node := printerArgs{
 			Str:     pat.String(),
 			Regexp:  setup.Ref.ReplaceGroups(pat.String()),
-			PValue:  Features["p-value"](pat, ref),
+			PValue:  Features["match-hyper-up-pvalue"].Func(pat, ref),
 			Fitness: setup.Fitness(pat),
 			Length:  pat.Len(),
 			Count:   pat.Pos.Len(),
