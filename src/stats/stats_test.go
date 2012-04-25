@@ -34,23 +34,22 @@ func testGamma(t *testing.T, fn gammaFunc) {
 	// verification result was calculated with
 	// binomial(O, o) * binomial(R, r)/binomial(O+R, o+r)
 
+	//o, O, R, o + r
 	tests := [...]gammaTest{
-		{2, 5, 2, 10, 30.0 / 91.0},
-		{2, 45, 9, 40, 71632.0 / 5645577.0},
+		{2, 41, 9, 40, 0.9969428},
+		{2, 47, 9, 40, 0.9984949},
+		{2, 45, 10, 30, 0.9999026},
+		{1, 30, 9, 50, 0.9937611},
+		{9, 45, 2, 40, 0.03885435},
 	}
 
 	for i, test := range tests {
 		p := fn(test.o, test.r, test.O, test.R)
-		p2 := fn(test.r, test.o, test.R, test.O) // since the test must be symmetric
 
-		if math.Abs(p-test.result) > epsilon || math.Abs(p2-test.result) > epsilon {
-			t.Errorf("fail %v: got (%v, %v), expected %v, \nerr=(%v,%v)", i, p, p2, test.result, math.Abs(p-test.result), math.Abs(p2-test.result))
+		if math.Abs(p-test.result) > epsilon {
+			t.Errorf("fail %v: got %v, expected %v, \nerr=%v", i, p, test.result, math.Abs(p-test.result))
 		}
 	}
-}
-
-func TestLogGamma(t *testing.T) {
-	testGamma(t, HypergeometricSplitLog)
 }
 
 func TestGamma(t *testing.T) {

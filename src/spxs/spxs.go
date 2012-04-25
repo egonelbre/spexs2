@@ -26,10 +26,12 @@ import (
 */
 
 var (
+	SPXS_VERSION = "0.1"
 	configs *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
 	details *bool   = flag.Bool("details", false, "detailed help")
 	interactiveDebug *bool  = flag.Bool("debug", false, "attach step-by-step debugger")
 	verbose    *bool   = flag.Bool("verbose", false, "print extended debug info")
+	version    *bool   = flag.Bool("version", false, "print version")
 
 	procs      *int    = flag.Int("procs", 4, "processors to use")
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
@@ -59,6 +61,10 @@ func PrintHelp(conf Conf) {
 	fmt.Fprintf(os.Stderr, "  spxs -procs=4 ref=data.dna val=random.dna\n")
 
 	fmt.Fprintf(os.Stderr, "\n")
+}
+
+func PrintVersion(conf Conf) {
+	fmt.Fprintf(os.Stderr, "%v\n", SPXS_VERSION)
 }
 
 func setupRuntime() {
@@ -95,6 +101,11 @@ func main() {
 
 	if *details {
 		PrintHelp(conf)
+		os.Exit(0)
+	}
+
+	if *version {
+		PrintVersion(conf)
 		os.Exit(0)
 	}
 

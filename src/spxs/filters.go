@@ -9,33 +9,13 @@ import (
 type filterConf map[string]interface{}
 type filterCreator func(filterConf) FilterFunc
 
-type genericFilterConf struct{ Min, Max float64 }
+type floatFilterConf struct{ Min, Max float64 }
 
 func trueFilter(p *Pattern, ref *Reference) bool {
 	return true
 }
 
-var Filters = map[string]filterCreator{
-	"length": func(conf filterConf) FilterFunc {
-		return genericFilter(func(p *Pattern, ref *Reference) float64 {
-			return float64(p.Len())
-		}, conf)
-	},
-	"ng": func(conf filterConf) FilterFunc {
-		return genericFilter(func(p *Pattern, ref *Reference) float64 {
-			return float64(p.NG())
-		}, conf)
-	},
-	"count": func(conf filterConf) FilterFunc {
-		return genericFilter(func(p *Pattern, ref *Reference) float64 {
-			return float64(p.Pos.Len()) / float64(ref.Groupings[0])
-		}, conf)
-	},
-	"p-value": func(conf filterConf) FilterFunc {
-		return genericFilter(func(p *Pattern, ref *Reference) float64 {
-			return p.PValue(ref)
-		}, conf)
-	},
+var Filters = map[string]filterCreator {
 }
 
 func CreateFilter(conf map[string]map[string]interface{}, setup AppSetup) FilterFunc {
@@ -66,10 +46,8 @@ func CreateFilter(conf map[string]map[string]interface{}, setup AppSetup) Filter
 	}
 }
 
-type valueFunc func(*Pattern, *Reference) float64
-
-func genericFilter(value valueFunc, config interface{}) FilterFunc {
-	var conf genericFilterConf
+func makeFloatFilter(feature FeatureFunc, config interface{}) FilterFunc {
+	var conf floatFilterConf
 	conf.Min = math.NaN()
 	conf.Max = math.NaN()
 
@@ -80,18 +58,26 @@ func genericFilter(value valueFunc, config interface{}) FilterFunc {
 
 	if low && high {
 		return func(p *Pattern, ref *Reference) bool {
-			return (value(p, ref) <= max) && (value(p, ref) >= min)
+			return (feature(p, ref) <= max) && (feature(p, ref) >= min)
 		}
 	} else if low {
 		return func(p *Pattern, ref *Reference) bool {
-			return value(p, ref) >= min
+			return feature(p, ref) >= min
 		}
 	} else if high {
 		return func(p *Pattern, ref *Reference) bool {
-			return value(p, ref) <= max
+			return feature(p, ref) <= max
 		}
 	}
 
 	log.Fatal("Neither min or max was defined for filter.")
 	return trueFilter
+}
+
+func initFilters() {
+	for name, f := range Features {
+		Filters[name] = func(conf filterConf) FilterFunc {
+			return makeFloatFilter(f, conf)
+		}
+	}
 }

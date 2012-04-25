@@ -105,6 +105,8 @@ func (n *Pattern) PValue(ref *Reference) float64 {
 		counts[ref.Pats[idx].Group] += 1
 	}
 
-	n.pvalue = stats.HypergeometricSplitLog(counts[0], counts[1], ref.Groupings[0], ref.Groupings[1])
+	n.pvalue = stats.HypergeometricSplit(
+		counts[0], counts[1], 
+		ref.Groupings[0], ref.Groupings[1])
 	return n.pvalue
 }

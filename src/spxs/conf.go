@@ -34,8 +34,8 @@ const baseConfiguration = `{
 		"format": "{{.Regexp}} {{.Fitness}} {{.Length}} {{.Count}} {{.PValue}}\n"
 	},
 	"aliases" : {
-		"ref" : {"desc":"input file", "modify":["data.input"]},
-		"val" : {"desc":"validation file", "modify":["data.validation"]}
+		"inp" : {"desc":"input file", "modify":["data.input"]},
+		"ref" : {"desc":"validation file", "modify":["data.validation"]}
 	}
 }`
 

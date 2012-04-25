@@ -12,23 +12,16 @@ func gamma(v int) float64 {
 }
 
 // returns probability of split of
-// o - observed in set , r - observed in validation set
-// O - total observed in validation, r - total items in validation set
+// o - observed in input , r - observed in validation set
+// O - total items in input, R - total items in validation set
 // using logarithmic gamma function
-func HypergeometricSplitLog(o int, r int, O int, R int) float64 {
+func HypergeometricSplit(o int, r int, O int, R int) float64 {
 	nom := lnG(O+1) + lnG(R+1) + lnG(o+r+1) + lnG(O+R-o-r+1)
 	denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lnG(O+R+1)
+	if r > 0 {
+		return math.Exp(nom - denom) + HypergeometricSplit(o+1, r-1, O, R)
+	}
 	return math.Exp(nom - denom)
-}
-
-// returns probability of split of
-// o - observed in set , r - observed in validation set
-// O - total observed in validation, r - total items in validation set
-// using regular gamma function to approximate factorial
-func HypergeometricSplit(o int, r int, O int, R int) float64 {
-	nom := gamma(O+1) * gamma(R+1) * gamma(o+r+1) * gamma(O+R-o-r+1)
-	denom := gamma(o+1) * gamma(O-o+1) * gamma(r+1) * gamma(R-r+1) * gamma(O+R+1)
-	return nom / denom
 }
 
 // returns probability of split of

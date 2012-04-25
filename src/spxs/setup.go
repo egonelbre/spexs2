@@ -54,3 +54,9 @@ func CreateSetup(conf Conf) AppSetup {
 
 	return s
 }
+
+
+func Init(){
+	initFitnesses()
+	initFilters()
+}
