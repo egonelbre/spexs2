@@ -54,7 +54,7 @@ func chars(s string) []Char {
 	return a
 }
 
-func pattern(data string, group int) Sequence {
+func seq(data string, group int) Sequence {
 	p := Sequence{}
 	b := bytes.NewBufferString(data)
 	p.Pat = b.Bytes()
@@ -88,7 +88,7 @@ func addPatternsFromFile(ref *Reference, filename string, group int) {
 			continue
 		}
 
-		p := pattern(line, group)
-		ref.AddPattern(p)
+		p := seq(line, group)
+		ref.AddSequence(p)
 	}
 }

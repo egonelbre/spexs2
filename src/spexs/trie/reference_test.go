@@ -14,7 +14,7 @@ func chars(s string) []Char {
 	return a
 }
 
-func pattern(data string) Sequence {
+func seq(data string) Sequence {
 	p := Sequence{}
 	b := bytes.NewBufferString(data)
 	p.Pat = b.Bytes()
@@ -34,10 +34,10 @@ func createTestReference() *Reference {
 	u.AddGroup(*NewGroup("[CT]", '5', chars("CT")))
 	u.AddGroup(*NewGroup("[GT]", '6', chars("GT")))
 
-	u.AddPattern(pattern("ACGTACGG"))
-	u.AddPattern(pattern("CAGTCCG"))
-	u.AddPattern(pattern("ACGGCTA"))
-	u.AddPattern(pattern("GGTCAACTG"))
+	u.AddSequence(seq("ACGTACGG"))
+	u.AddSequence(seq("CAGTCCG"))
+	u.AddSequence(seq("ACGGCTA"))
+	u.AddSequence(seq("GGTCAACTG"))
 
 	return u
 }

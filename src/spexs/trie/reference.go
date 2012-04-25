@@ -62,7 +62,7 @@ func (ref *Reference) AddGroup(group Group) {
 	ref.Groups[group.Id] = group
 }
 
-func (ref *Reference) AddPattern(pat Sequence) {
+func (ref *Reference) AddSequence(pat Sequence) {
 	ref.Seqs = append(ref.Seqs, pat)
 	ref.Groupings[pat.Group] += 1
 }
