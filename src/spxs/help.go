@@ -29,13 +29,15 @@ func PrintHelp(conf Conf) {
 		fmt.Fprintf(os.Stderr, "  %s : %s\n", name, args.Desc)
 	}
 
+	fmt.Fprintf(os.Stderr, "\nSTRING FEATURES: \n")
+	PrintStrFeatures(os.Stderr)
 	fmt.Fprintf(os.Stderr, "\nFEATURES: \n")
 	PrintFeatures(os.Stderr)
 	fmt.Fprintf(os.Stderr, "\nFITNESSES: \n")
-	fmt.Fprintf(os.Stderr, "  [+all features]\n")
+	fmt.Fprintf(os.Stderr, "  +[FEATURES]\n")
 	PrintFitnesses(os.Stderr)
 	fmt.Fprintf(os.Stderr, "\nFILTERS: \n")
-	fmt.Fprintf(os.Stderr, "  [+all features]\n")
+	fmt.Fprintf(os.Stderr, "  +[FEATURES]\n")
 	PrintFilters(os.Stderr)
 	fmt.Fprintf(os.Stderr, "\nEXTENDERS: \n")
 	PrintExtenders(os.Stderr)	
@@ -47,6 +49,12 @@ func PrintHelp(conf Conf) {
 
 func PrintVersion() {
 	fmt.Fprintf(os.Stderr, "%v\n", theVersion)
+}
+
+func PrintStrFeatures(out io.Writer) {
+	for name, f := range StrFeatures {
+		fmt.Fprintf(out, "  %s : %s\n", name, f.Desc)
+	}
 }
 
 func PrintFeatures(out io.Writer) {
