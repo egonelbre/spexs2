@@ -73,10 +73,14 @@ func makeFloatFilter(feature FeatureFunc, config interface{}) FilterFunc {
 	return trueFilter
 }
 
+func makeFilter(f FeatureFunc) filterCreator {
+	return func(conf filterConf) FilterFunc {
+		return makeFloatFilter(f, conf)
+	}
+}
+
 func initFilters() {
 	for name, f := range Features {
-		Filters[name] = func(conf filterConf) FilterFunc {
-			return makeFloatFilter(f.Func, conf)
-		}
+		Filters[name] = makeFilter(f.Func)
 	}
 }
