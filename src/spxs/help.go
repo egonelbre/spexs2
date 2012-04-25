@@ -11,9 +11,10 @@ import (
 func PrintHelp(conf Conf) {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "spxs [FLAGS] [OPTIONS]\n\n")
+	PrintVersion()
 	fmt.Fprintf(os.Stderr, "FLAGS: \n")
 	flag.PrintDefaults()
-	fmt.Fprintf(os.Stderr, "\nOPTIONS: \n")
+	fmt.Fprintf(os.Stderr, "\nALIASES: \n")
 
 	keys := make([]string, len(conf.Aliases))
 	i := 0
@@ -28,25 +29,29 @@ func PrintHelp(conf Conf) {
 		fmt.Fprintf(os.Stderr, "  %s : %s\n", name, args.Desc)
 	}
 
+	fmt.Fprintf(os.Stderr, "\nFEATURES: \n")
+	PrintFeatures(os.Stderr)
 	fmt.Fprintf(os.Stderr, "\nFITNESSES: \n")
+	fmt.Fprintf(os.Stderr, "  [+all features]\n")
 	PrintFitnesses(os.Stderr)
-	fmt.Fprintf(os.Stderr, "\nEXTENDERS: \n")
-	PrintExtenders(os.Stderr)
 	fmt.Fprintf(os.Stderr, "\nFILTERS: \n")
+	fmt.Fprintf(os.Stderr, "  [+all features]\n")
 	PrintFilters(os.Stderr)
+	fmt.Fprintf(os.Stderr, "\nEXTENDERS: \n")
+	PrintExtenders(os.Stderr)	
 	fmt.Fprintf(os.Stderr, "\nEXAMPLES: \n")
 	fmt.Fprintf(os.Stderr, "  spxs -procs=4 inp=data.dna ref=random.dna\n")
 
 	fmt.Fprintf(os.Stderr, "\n")
 }
 
-func PrintVersion(conf Conf) {
-	fmt.Fprintf(os.Stderr, "%v\n", SPXS_VERSION)
+func PrintVersion() {
+	fmt.Fprintf(os.Stderr, "%v\n", theVersion)
 }
 
 func PrintFeatures(out io.Writer) {
-	for name, _ := range Features {
-		fmt.Fprintf(out, "  %s\n", name)
+	for name, f := range Features {
+		fmt.Fprintf(out, "  %s : %s\n", name, f.Desc)
 	}
 }
 

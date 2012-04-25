@@ -25,7 +25,6 @@ import (
 */
 
 var (
-	SPXS_VERSION             = "0.1"
 	configs          *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
 	details          *bool   = flag.Bool("details", false, "detailed help")
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
@@ -68,17 +67,17 @@ func main() {
 
 	conf := ReadConfiguration(*configs)
 
-	initSetup()
 	if *details {
 		PrintHelp(conf)
 		os.Exit(0)
 	}
 
 	if *version {
-		PrintVersion(conf)
+		PrintVersion()
 		os.Exit(0)
 	}
 
+	initSetup()
 	setup := CreateSetup(conf)
 
 	setupRuntime()
