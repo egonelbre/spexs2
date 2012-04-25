@@ -14,7 +14,7 @@ func simpleExtender(f ExtenderFunc) extenderCreator {
 	}
 }
 
-var extenders = map[string]extenderCreator{
+var Extenders = map[string]extenderCreator{
 	"simple": simpleExtender(SimpleExtender),
 	"group":  simpleExtender(GroupExtender),
 	"star":   simpleExtender(StarExtender),
@@ -26,7 +26,7 @@ func CreateExtender(conf Conf, setup AppSetup) ExtenderFunc {
 		log.Fatal("Extender not defined!")
 	}
 
-	extenderCreate, valid := extenders[conf.Extension.Method]
+	extenderCreate, valid := Extenders[conf.Extension.Method]
 	if !valid {
 		log.Fatal("No extender named: ", conf.Extension.Method)
 	}

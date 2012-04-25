@@ -56,7 +56,7 @@ func CreateSetup(conf Conf) AppSetup {
 }
 
 
-func Init(){
+func initSetup(){
 	initFitnesses()
 	initFilters()
 }
