@@ -87,7 +87,7 @@ var Features = map[string]Feature{
 	"pat-length": {
 		"length of the pattern",
 		func(p *Pattern, ref *Reference) float64 {
-			t := 0
+			t := -1 // because first "" is also a char
 			for p != nil {
 				t += 1
 				if p.IsStar {
@@ -100,7 +100,7 @@ var Features = map[string]Feature{
 	"pat-chars": {
 		"count of characters in pattern",
 		func(p *Pattern, ref *Reference) float64 {
-			t := 0
+			t := -1 // because first "" is also a char
 			for p != nil {
 				if !p.IsGroup {
 					t += 1
