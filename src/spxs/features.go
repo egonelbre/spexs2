@@ -52,12 +52,12 @@ var Features = map[string]Feature{
 	"query-match-seqs-prop": {
 		"percentage of matching sequences in query",
 		func(p *Pattern, ref *Reference) float64 {
-			return float64(p.Count(ref, 0) / ref.Groupings[0])
+			return float64(p.Count(ref, 0)) / float64(ref.Groupings[0])
 		}},
 	"back-match-seqs-prop": {
 		"percentage of matching sequences in background",
 		func(p *Pattern, ref *Reference) float64 {
-			return float64(p.Count(ref, 1) / ref.Groupings[1])
+			return float64(p.Count(ref, 1)) / float64(ref.Groupings[1])
 		}},
 
 	"match-hyper-up-pvalue": {
@@ -81,7 +81,7 @@ var Features = map[string]Feature{
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
 			back := p.Count(ref, 1)
-			return float64((query + 1) / (back + 1))
+			return float64(query + 1) / float64(back + 1)
 		}},
 
 	"pat-length": {
