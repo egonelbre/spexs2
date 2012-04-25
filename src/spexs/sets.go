@@ -4,15 +4,15 @@ type Set interface {
 	Add(idx int, pos byte)
 	Contains(idx int, pos byte) bool
 	Len() int
-	Iter() map[int]int
+	Iter() map[int]uint
 }
 
 type HashSet struct {
-	data map[int]int
+	data map[int]uint
 }
 
 func NewHashSet(size int) *HashSet {
-	return &HashSet{make(map[int]int, size)}
+	return &HashSet{make(map[int]uint, size)}
 }
 
 func (hs *HashSet) Add(idx int, pos byte) {
@@ -32,7 +32,7 @@ func (hs *HashSet) Len() int {
 	return len(hs.data)
 }
 
-func (hs *HashSet) Iter() map[int]int {
+func (hs *HashSet) Iter() map[int]uint {
 	return hs.data
 }
 

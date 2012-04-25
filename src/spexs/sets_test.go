@@ -3,7 +3,7 @@ package spexs
 import "testing"
 
 type p struct {
-	idx int
+	idx uint
 	pos byte
 }
 

@@ -2,6 +2,7 @@ package trie
 
 import (
 	"spexs"
+	"stats"
 )
 
 type Pattern struct {
@@ -11,6 +12,7 @@ type Pattern struct {
 	IsGroup bool
 	IsStar  bool
 	count   []int
+	occs    []int
 	length  int
 }
 
@@ -26,6 +28,7 @@ func NewPattern(char Char, parent *Pattern) *Pattern {
 	p.IsGroup = false
 	p.IsStar = false
 	p.count = make([]int, 0)
+	p.occs = make([]int, 0)
 
 	p.length = -1
 	return p
@@ -68,4 +71,17 @@ func (n *Pattern) Count(ref *Reference) []int {
 		}
 	}
 	return n.count
+}
+
+func (n *Pattern) Occs(ref *Reference) []int {
+	if len(n.occs) <= 0 {
+		n.occs = make([]int, len(ref.Groupings))
+
+		for idx, mpos := range n.Pos.Iter() {
+			seq := ref.Seqs[idx]
+			ocs := stats.BitCount(mpos)
+			n.occs[seq.Group] += seq.Count * ocs
+		}
+	}
+	return n.occs
 }

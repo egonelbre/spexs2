@@ -21,8 +21,8 @@ func (f *FullSet) Len() int {
 	return f.Count
 }
 
-func (f *FullSet) Iter() map[int]int {
-	result := make(map[int]int, len(f.Ref.Seqs))
+func (f *FullSet) Iter() map[int]uint {
+	result := make(map[int]uint, len(f.Ref.Seqs))
 
 	for idx, pat := range f.Ref.Seqs {
 		result[idx] = 2<<byte(len(pat.Pat)) - 1
