@@ -61,7 +61,7 @@ func (n *Pattern) Len() int {
 	return 0
 }
 
-func (n *Pattern) Count(ref *Reference) []int {
+func (n *Pattern) Count(ref *Reference, group int) int {
 	if len(n.count) <= 0 {
 		n.count = make([]int, len(ref.Groupings))
 
@@ -70,10 +70,10 @@ func (n *Pattern) Count(ref *Reference) []int {
 			n.count[seq.Group] += seq.Count
 		}
 	}
-	return n.count
+	return n.count[group]
 }
 
-func (n *Pattern) Occs(ref *Reference) []int {
+func (n *Pattern) Occs(ref *Reference, group int) int {
 	if len(n.occs) <= 0 {
 		n.occs = make([]int, len(ref.Groupings))
 
@@ -83,5 +83,5 @@ func (n *Pattern) Occs(ref *Reference) []int {
 			n.occs[seq.Group] += seq.Count * ocs
 		}
 	}
-	return n.occs
+	return n.occs[group]
 }

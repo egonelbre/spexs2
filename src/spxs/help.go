@@ -44,20 +44,26 @@ func PrintVersion(conf Conf) {
 	fmt.Fprintf(os.Stderr, "%v\n", SPXS_VERSION)
 }
 
+func PrintFeatures(out io.Writer) {
+	for name, _ := range Features {
+		fmt.Fprintf(out, "  %s\n", name)
+	}
+}
+
 func PrintFitnesses(out io.Writer) {
 	for name, _ := range Fitnesses {
-		fmt.Fprintf(out, "  %s", name)
+		fmt.Fprintf(out, "  %s\n", name)
 	}
 }
 
 func PrintFilters(out io.Writer) {
 	for name, _ := range Filters {
-		fmt.Fprintf(out, "  %s", name)
+		fmt.Fprintf(out, "  %s\n", name)
 	}
 }
 
 func PrintExtenders(out io.Writer) {
 	for name, _ := range Extenders {
-		fmt.Fprintf(out, "  %s", name)
+		fmt.Fprintf(out, "  %s\n", name)
 	}
 }
