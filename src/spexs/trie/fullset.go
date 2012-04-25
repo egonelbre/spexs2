@@ -7,14 +7,14 @@ type FullSet struct {
 
 func NewFullSet(ref *Reference) *FullSet {
 	f := &FullSet{ref, 0}
-	f.Count = len(ref.Pats)
+	f.Count = len(ref.Seqs)
 	return f
 }
 
 func (f *FullSet) Add(idx int, pos byte) {}
 
 func (f *FullSet) Contains(idx int, pos byte) bool {
-	return idx < len(f.Ref.Pats) && int(pos) < len(f.Ref.Pats[idx].Pat)
+	return idx < len(f.Ref.Seqs) && int(pos) < len(f.Ref.Seqs[idx].Pat)
 }
 
 func (f *FullSet) Len() int {
@@ -22,9 +22,9 @@ func (f *FullSet) Len() int {
 }
 
 func (f *FullSet) Iter() map[int]int {
-	result := make(map[int]int, len(f.Ref.Pats))
+	result := make(map[int]int, len(f.Ref.Seqs))
 
-	for idx, pat := range f.Ref.Pats {
+	for idx, pat := range f.Ref.Seqs {
 		result[idx] = 2<<byte(len(pat.Pat)) - 1
 	}
 

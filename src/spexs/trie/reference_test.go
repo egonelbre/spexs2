@@ -14,8 +14,8 @@ func chars(s string) []Char {
 	return a
 }
 
-func pattern(data string) ReferencePattern {
-	p := ReferencePattern{}
+func pattern(data string) Sequence {
+	p := Sequence{}
 	b := bytes.NewBufferString(data)
 	p.Pat = b.Bytes()
 	p.Count = utf8.RuneCount(p.Pat)

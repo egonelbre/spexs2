@@ -22,7 +22,7 @@ type Sequence struct {
 }
 
 type Reference struct {
-	Pats      []Sequence
+	Seqs      []Sequence
 	Alphabet  []Char
 	Groups    map[Char]Group
 	Groupings []int
@@ -30,7 +30,7 @@ type Reference struct {
 
 func NewReference(size int) *Reference {
 	ref := &Reference{}
-	ref.Pats = make([]Sequence, 0, size)
+	ref.Seqs = make([]Sequence, 0, size)
 	ref.Alphabet = make([]Char, 0, 8)
 	ref.Groups = make(map[Char]Group)
 	ref.Groupings = make([]int, 2) // fix use multiple
@@ -38,11 +38,11 @@ func NewReference(size int) *Reference {
 }
 
 func (ref *Reference) Next(idx int, pos byte) (Char, byte, bool) {
-	if int(pos) >= len(ref.Pats[idx].Pat) {
+	if int(pos) >= len(ref.Seqs[idx].Pat) {
 		return 0, 0, false
 	}
 
-	rune, width := utf8.DecodeRune(ref.Pats[idx].Pat[pos:])
+	rune, width := utf8.DecodeRune(ref.Seqs[idx].Pat[pos:])
 	return Char(rune), byte(pos + byte(width)), true
 }
 
@@ -63,6 +63,6 @@ func (ref *Reference) AddGroup(group Group) {
 }
 
 func (ref *Reference) AddPattern(pat Sequence) {
-	ref.Pats = append(ref.Pats, pat)
+	ref.Seqs = append(ref.Seqs, pat)
 	ref.Groupings[pat.Group] += 1
 }

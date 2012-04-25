@@ -11,7 +11,7 @@ func output(out Patterns, patterns map[Char]*Pattern) {
 func simpleExtend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
 
 	for idx, mpos := range node.Pos.Iter() {
-		plen := byte(len(ref.Pats[idx].Pat))
+		plen := byte(len(ref.Seqs[idx].Pat))
 		var k byte
 		for k = 0; (k < plen) && (mpos > 0); k += 1 {
 			if mpos&(1<<k) == 0 {
@@ -73,7 +73,7 @@ func GroupExtender(node *Pattern, ref *Reference) Patterns {
 
 func trieStarExtend(node *Pattern, ref *Reference, stars map[Char]*Pattern) {
 	for idx, mpos := range node.Pos.Iter() {
-		plen := byte(len(ref.Pats[idx].Pat))
+		plen := byte(len(ref.Seqs[idx].Pat))
 		if mpos == 0 {
 			continue
 		}

@@ -34,7 +34,7 @@ func TestPriorityPool(t *testing.T) {
 	lenFitness := func(p *Pattern) float64 {
 		return float64(len(p.String()))
 	}
-	p := NewPriorityPool(lenFitness, 100)
+	p := NewPriorityPool(lenFitness, 100, true)
 
 	p.Put(pat("bc"))
 	p.Put(pat("defg"))

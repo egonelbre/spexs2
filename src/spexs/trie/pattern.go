@@ -102,7 +102,7 @@ func (n *Pattern) PValue(ref *Reference) float64 {
 	counts := make([]int, len(ref.Groupings))
 
 	for idx := range n.Pos.Iter() {
-		counts[ref.Pats[idx].Group] += 1
+		counts[ref.Seqs[idx].Group] += 1
 	}
 
 	n.pvalue = stats.HypergeometricSplit(
