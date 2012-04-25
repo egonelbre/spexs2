@@ -17,7 +17,7 @@ func NewGroup(name string, id Char, chars []Char) *Group {
 
 type Sequence struct {
 	Pat   []byte
-	Len int // this refers to rune count in Pat
+	Len   int // this refers to rune count in Pat
 	Group int // validation or reference group
 	Count int
 }

@@ -10,8 +10,8 @@ const epsilon = 0.000001
 type gammaFunc func(o int, r int, O int, R int) float64
 
 func benchGamma(b *testing.B, fn gammaFunc) {
-	for v := 0; v < 1000; v += 1 {
-		for r := 0; r < 1000; r += 1 {
+	for v := 0; v < 100; v += 1 {
+		for r := 0; r < 100; r += 1 {
 			fn(v, r, 13000, 13000)
 		}
 	}

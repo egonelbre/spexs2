@@ -5,13 +5,13 @@ import (
 )
 
 type Pattern struct {
-	Char       Char
-	Parent     *Pattern
-	Pos        spexs.Set
-	IsGroup    bool
-	IsStar     bool
-	count      []int
-	length     int
+	Char    Char
+	Parent  *Pattern
+	Pos     spexs.Set
+	IsGroup bool
+	IsStar  bool
+	count   []int
+	length  int
 }
 
 func NewPattern(char Char, parent *Pattern) *Pattern {
@@ -66,6 +66,6 @@ func (n *Pattern) Count(ref *Reference) []int {
 			seq := ref.Seqs[idx]
 			n.count[seq.Group] += seq.Count
 		}
-	}	
+	}
 	return n.count
 }

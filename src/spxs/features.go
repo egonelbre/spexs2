@@ -1,8 +1,8 @@
 package main
 
 import (
-	"stats"
 	. "spexs/trie"
+	"stats"
 )
 
 type FeatureFunc func(*Pattern, *Reference) float64
@@ -14,7 +14,7 @@ var Features = map[string]FeatureFunc{
 	"ng": func(p *Pattern, ref *Reference) float64 {
 		t := 0
 		for p != nil {
-			if ! (p.IsGroup || p.IsStar) {
+			if !(p.IsGroup || p.IsStar) {
 				t += 1
 			}
 			p = p.Parent
