@@ -9,11 +9,14 @@ import (
 	"log"
 	"os"
 	"runtime/pprof"
+	"time"
+	"errors"
 )
 
 var (
 	configs          *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
 	//printConf        *bool   = flag.Bool("printConf", "print the configuration file")
+	memoryLimit      *int    = flag.Int("mem", 1024, "memory limit in MB")
 	details          *bool   = flag.Bool("details", false, "detailed help")
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
 	verbose          *bool   = flag.Bool("verbose", false, "print extended debug info")
@@ -77,6 +80,22 @@ func main() {
 	if *interactiveDebug {
 		AttachDebugger(&setup)
 	}
+
+	go func(){
+		m := new(runtime.MemStats)
+		gb := uint64(1024*1024)
+		for {
+			runtime.ReadMemStats(m)
+			fmt.Printf("%v\t%v\t%v\n", runtime.NumGoroutine(), m.Alloc/gb, m.Lookups)
+			time.Sleep(500 * time.Millisecond)
+
+			if m.Alloc/gb > uint64(*memoryLimit) {
+				panic(errors.New("MEMORY LIMIT EXCEEDED!"))
+			}
+		}
+		
+	}()
+
 
 	if *procs <= 1 {
 		Run(&setup.Setup)

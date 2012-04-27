@@ -15,7 +15,7 @@
 		"method" : "regexp",
 		"args" : {"star":{ "max-gap": 3}},
 		"filter" : {
-			"query-match-seqs-prop" : {"min":0.9}
+			"query-match-seqs-prop" : {"min":0.1}
 		}
 	},
 	"output" : {
@@ -23,10 +23,10 @@
 		"sort" : "asc",
 		"args" : {"p-value":{}},
 		"filter" : {
-			"query-match-seqs-prop" : {"min":0.9}
+			"query-match-seqs-prop" : {"min":0.3}
 		},
 		"count": 60,
-		"format": "{pat} {pat-regexp} {pat-chars}\n"
+		"format": "{pat}\t{pat-chars}\t{match-hyper-up-pvalue}\n"
 	},
 	"aliases" : {
 		"inp" : {"desc":"input file",            "modify":["data.input"]},
