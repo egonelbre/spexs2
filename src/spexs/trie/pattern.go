@@ -79,7 +79,7 @@ func (n *Pattern) Occs(ref *Reference, group int) int {
 
 		for idx, mpos := range n.Pos.Iter() {
 			seq := ref.Seqs[idx]
-			ocs := stats.BitCount(mpos)
+			ocs := stats.BitCount64(mpos)
 			n.occs[seq.Group] += seq.Count * ocs
 		}
 	}
