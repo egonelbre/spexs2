@@ -134,7 +134,7 @@ func ReadConfiguration(configs string) Conf {
 		f, err := os.Open(configFile)
 		if err != nil {
 			log.Println("Unable to read configuration file: ", configFile)
-			log.Fatal(err)
+			continue
 		}
 
 		dec := json.NewDecoder(f)
