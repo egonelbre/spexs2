@@ -9,6 +9,7 @@ type Set interface {
 	Contains(idx int, pos int) bool
 	Len() int
 	Iter() Positions
+	Clear()
 }
 
 type HashSet struct {
@@ -39,6 +40,10 @@ func (hs *HashSet) Len() int {
 
 func (hs *HashSet) Iter() Positions {
 	return hs.data
+}
+
+func (hs *HashSet) Clear() {
+	hs.data = nil
 }
 
 func SetAddSet(h Set, g Set) {

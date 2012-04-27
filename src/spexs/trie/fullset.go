@@ -26,6 +26,9 @@ func (f *FullSet) Len() int {
 	return f.Count
 }
 
+func (hs *FullSet) Clear() {
+}
+
 func (f *FullSet) Iter() Positions {
 	result := make(Positions, len(f.Ref.Seqs))
 
