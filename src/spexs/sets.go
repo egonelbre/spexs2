@@ -47,9 +47,11 @@ func SetAddSet(h Set, g Set) {
 		for gidx, gval := range g.(*HashSet).data {
 			hval, exists := h.(*HashSet).data[gidx]
 			if exists {
-				h.(*HashSet).data[gidx].Or(gval, hval)
+				h.(*HashSet).data[gidx].Or(hval, gval)
 			} else {
-				h.(*HashSet).data[gidx].Set(gval)
+				hval = big.NewInt(0)
+				hval.Set(gval)
+				h.(*HashSet).data[gidx] = hval
 			}
 		}
 	default:
