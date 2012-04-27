@@ -77,31 +77,32 @@ func RunParallel2(s *Setup, routines int) {
 }
 
 func RunParallel(s *Setup, routines int) {
-	start := 0
-	stop := make(chan int)
-
 	p, valid := s.In.Take()
 	if !valid {
 		return
 	}
+
+	RunX(p, s)
+}
+
+func RunX(p *Pattern, s *Setup) {
+	start := 0
+	stop := make(chan int)
+
 	extensions := s.Extender(p, s.Ref)
 	for extended := range extensions {
 		if s.Extendable(extended, s.Ref) {
-			s.In.Put(extended)
+			//s.In.Put(extended)
 			start += 1
-			go func(){
-				RunParallel(s, routines)
+			go func(p *Pattern, s *Setup){
+				RunX(p, s)
 				stop <- 1
-			}()
+			}(extended, s)
 		}
 		if s.Outputtable(extended, s.Ref) {
 			s.Out.Put(extended)
 		}
 	}
-
-	//if s.PostProcess(p, s) != nil {
-		//break
-	//}
 
 	for i := 0; i < start; i += 1 {
 		<-stop
