@@ -22,9 +22,6 @@ concurrency:
 
 	fix priority queue to be lock-free
 
-sequence lengths
 breaking
 binary
-
-
-matches sha
+matches crc32
