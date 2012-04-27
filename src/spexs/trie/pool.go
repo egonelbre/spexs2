@@ -45,7 +45,7 @@ type PriorityPool struct {
 	items     []*Pattern
 	Fitness   FitnessFunc
 	limit     int
-	ascending int
+	ascending bool
 }
 
 func NewPriorityPool(fitness FitnessFunc, limit int, ascending bool) *PriorityPool {
@@ -55,12 +55,7 @@ func NewPriorityPool(fitness FitnessFunc, limit int, ascending bool) *PriorityPo
 	p.limit = limit
 	p.Fitness = fitness
 	p.token <- 1
-
-	if ascending {
-		p.ascending = 1
-	} else {
-		p.ascending = -1
-	}
+	p.ascending = ascending
 
 	heap.Init(p)
 	return p
@@ -102,6 +97,9 @@ func (p *PriorityPool) Swap(i, j int) {
 }
 
 func (p *PriorityPool) Less(i, j int) bool {
+	if p.ascending {
+		return p.Fitness(p.items[i]) > p.Fitness(p.items[j])
+	}
 	return p.Fitness(p.items[i]) < p.Fitness(p.items[j])
 }
 
