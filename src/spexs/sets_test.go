@@ -3,8 +3,8 @@ package spexs
 import "testing"
 
 type p struct {
-	idx uint
-	pos byte
+	idx int
+	pos int
 }
 
 func TestHashSet(t *testing.T) {
@@ -17,6 +17,8 @@ func TestHashSet(t *testing.T) {
 		p{1025235, 3}: true,
 		p{2000, 15}:   true,
 		p{200000, 30}: true,
+		p{200000, 100}: true,
+		p{200000, 3000}: true,
 	}
 
 	for pos := range good {
@@ -48,7 +50,7 @@ func TestHashSet(t *testing.T) {
 func InsertAndIterate(s Set, patterns int, positions int) {
 	for idx := 0; idx < patterns; idx += 1 {
 		for pos := 0; pos < positions; pos += 1 {
-			s.Add(idx, byte(pos))
+			s.Add(idx, pos)
 		}
 	}
 

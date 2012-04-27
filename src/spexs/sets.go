@@ -23,13 +23,14 @@ func (hs *HashSet) Add(idx int, pos int) {
 	val, exists := hs.data[idx]
 	if !exists {
 		val = big.NewInt(0)
+		hs.data[idx] = val
 	}
-	val.SetBit(val, idx, 1)
+	val.SetBit(val, pos, 1)
 }
 
 func (hs *HashSet) Contains(idx int, pos int) bool {
 	val, exists := hs.data[idx]
-	return exists && (val.Bit(pos) == 1)
+	return exists && (val.Bit(pos) > 0)
 }
 
 func (hs *HashSet) Len() int {
