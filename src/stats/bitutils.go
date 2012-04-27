@@ -1,5 +1,7 @@
 package stats
 
+import "math/big"
+
 const (
 	m1  = 0x5555555555555555 //binary: 0101...
 	m2  = 0x3333333333333333 //binary: 00110011..
@@ -34,4 +36,21 @@ func BitCount(x uint) int {
 	x = (x & ms8) + ((x >> 8) & ms8)
 	x = (x & ms16) + ((x >> 16) & ms16)
 	return int(x)
+}
+
+func BitCountInt(x *big.Int) int {
+	total := 0
+	for _, w := range x.Bits() {
+		total += BitCount64(uint64(w))
+	}
+	return total
+}
+
+func BitScanLeft(x *big.Int) int {
+	for k := 0; k < x.BitLen(); k += 1 {
+		if x.Bit(k) != 0 {
+			return k;
+		}
+	}
+	return -1
 }

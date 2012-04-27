@@ -1,38 +1,42 @@
 package spexs
 
+import "math/big"
+
+type Positions map[int]*big.Int
+
 type Set interface {
-	Add(idx int, pos byte)
-	Contains(idx int, pos byte) bool
+	Add(idx int, pos int)
+	Contains(idx int, pos int) bool
 	Len() int
-	Iter() map[int]uint64
+	Iter() Positions
 }
 
 type HashSet struct {
-	data map[int]uint64
+	data map[int]*big.Int
 }
 
 func NewHashSet(size int) *HashSet {
-	return &HashSet{make(map[int]uint64, size)}
+	return &HashSet{make(Positions, size)}
 }
 
-func (hs *HashSet) Add(idx int, pos byte) {
+func (hs *HashSet) Add(idx int, pos int) {
 	val, exists := hs.data[idx]
 	if !exists {
-		val = 0
+		val = big.NewInt(0)
 	}
-	hs.data[idx] = val | (1 << pos)
+	val.SetBit(val, idx, 1)
 }
 
-func (hs *HashSet) Contains(idx int, pos byte) bool {
+func (hs *HashSet) Contains(idx int, pos int) bool {
 	val, exists := hs.data[idx]
-	return exists && (val&(1<<pos) != 0)
+	return exists && (val.Bit(pos) == 1)
 }
 
 func (hs *HashSet) Len() int {
 	return len(hs.data)
 }
 
-func (hs *HashSet) Iter() map[int]uint64 {
+func (hs *HashSet) Iter() Positions {
 	return hs.data
 }
 
@@ -42,9 +46,9 @@ func SetAddSet(h Set, g Set) {
 		for gidx, gval := range g.(*HashSet).data {
 			hval, exists := h.(*HashSet).data[gidx]
 			if exists {
-				h.(*HashSet).data[gidx] = gval | hval
+				h.(*HashSet).data[gidx].Or(gval, hval)
 			} else {
-				h.(*HashSet).data[gidx] = gval
+				h.(*HashSet).data[gidx].Set(gval)
 			}
 		}
 	default:

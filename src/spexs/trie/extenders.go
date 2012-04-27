@@ -1,6 +1,10 @@
 package trie
 
-import "spexs"
+import (
+	"spexs"
+	"stats"
+	"math/big"
+)
 
 func output(out Patterns, patterns map[Char]*Pattern) {
 	for _, node := range patterns {
@@ -9,14 +13,16 @@ func output(out Patterns, patterns map[Char]*Pattern) {
 }
 
 func simpleExtend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
-	for idx, mpos := range node.Pos.Iter() {
-		plen := byte(len(ref.Seqs[idx].Pat))
-		var k byte
-		for k = 0; (k < plen) && (mpos > 0); k += 1 {
-			if mpos&(1<<k) == 0 {
+	mpos := big.NewInt(0)
+	for idx, ipos := range node.Pos.Iter() {
+		plen := len(ref.Seqs[idx].Pat)
+		mpos.Set(ipos)
+		bits := stats.BitCountInt(mpos)
+		for k := 0; (k < plen) && (bits > 0); k += 1 {
+			if mpos.Bit(k) == 0 {
 				continue
 			}
-			mpos &^= 1 << k
+			bits -= 1
 
 			char, next, valid := ref.Next(idx, k)
 			if !valid {
@@ -72,18 +78,10 @@ func GroupExtender(node *Pattern, ref *Reference) Patterns {
 
 func trieStarExtend(node *Pattern, ref *Reference, stars map[Char]*Pattern) {
 	for idx, mpos := range node.Pos.Iter() {
-		plen := byte(len(ref.Seqs[idx].Pat))
-		if mpos == 0 {
+		k := stats.BitScanLeft(mpos)
+		if k < 0 { 
 			continue
 		}
-
-		var k byte
-		for k = 0; k < plen; k += 1 {
-			if mpos&(1<<k) != 0 {
-				break
-			}
-		}
-
 		char, next, valid := ref.Next(idx, k)
 		for valid {
 			pat, exists := stars[char]
