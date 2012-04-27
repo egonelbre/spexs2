@@ -87,7 +87,7 @@ func main() {
 		for {
 			runtime.ReadMemStats(m)
 			fmt.Printf("%v\t%v\t%v\n", runtime.NumGoroutine(), m.Alloc/gb, m.Lookups)
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(200 * time.Millisecond)
 
 			if m.Alloc/gb > uint64(*memoryLimit) {
 				panic(errors.New("MEMORY LIMIT EXCEEDED!"))

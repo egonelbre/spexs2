@@ -15,7 +15,7 @@
 		"method" : "regexp",
 		"args" : {"star":{ "max-gap": 3}},
 		"filter" : {
-			"query-match-seqs-prop" : {"min":0.1}
+			"query-match-seqs-prop" : {"min":0.3}
 		}
 	},
 	"output" : {
