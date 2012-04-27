@@ -79,9 +79,9 @@ func main() {
 	}
 
 	if *procs <= 1 {
-		Run(setup.Setup)
+		Run(&setup.Setup)
 	} else {
-		RunParallel(setup.Setup, *procs)
+		RunParallel(&setup.Setup, *procs)
 	}
 
 	setup.Printer(os.Stdout, nil, setup.Ref)

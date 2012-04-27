@@ -17,6 +17,7 @@ type Pooler interface {
 type ExtenderFunc func(p *Pattern, ref *Reference) Patterns
 type FilterFunc func(p *Pattern, ref *Reference) bool
 type FitnessFunc func(p *Pattern) float64
+type PostProcessFunc func(p *Pattern, s *Setup) error
 
 type Setup struct {
 	Ref *Reference
@@ -27,13 +28,15 @@ type Setup struct {
 
 	Extendable  FilterFunc
 	Outputtable FilterFunc
+
+	PostProcess PostProcessFunc
 }
 
 func NewPatterns() Patterns {
 	return make(Patterns, patternsBufferSize)
 }
 
-func Run(s Setup) {
+func Run(s *Setup) {
 	for {
 		p, valid := s.In.Take()
 		if !valid {
@@ -48,6 +51,10 @@ func Run(s Setup) {
 			if s.Outputtable(extended, s.Ref) {
 				s.Out.Put(extended)
 			}
+		}
+
+		if s.PostProcess(p, s) != nil {
+			break
 		}
 	}
 }
@@ -65,6 +72,6 @@ func Parallel(f func(), routines int) {
 	}
 }
 
-func RunParallel(s Setup, routines int) {
+func RunParallel(s *Setup, routines int) {
 	Parallel(func() { Run(s) }, routines)
 }

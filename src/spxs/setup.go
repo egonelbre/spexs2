@@ -50,6 +50,10 @@ func CreateSetup(conf Conf) AppSetup {
 	s.Extendable = CreateFilter(conf.Extension.Filter, s)
 	s.Outputtable = CreateFilter(conf.Output.Filter, s)
 
+	s.PostProcess = func(p *Pattern, s *Setup) error {
+		return nil
+	}
+
 	s.Printer = CreatePrinter(conf, s)
 
 	return s

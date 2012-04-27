@@ -84,7 +84,7 @@ func (p *PriorityPool) Take() (*Pattern, bool) {
 func (p *PriorityPool) Put(pat *Pattern) {
 	<-p.token
 	heap.Push(p, pat)
-	if p.Len() > p.limit {
+	if p.limit > 0 && p.Len() > p.limit {
 		heap.Pop(p)
 	}
 	p.token <- 1

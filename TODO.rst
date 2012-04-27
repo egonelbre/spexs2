@@ -11,3 +11,13 @@ millised outputi filtrid rakendada extensionile?
 sequence set
 alphabet
 groups
+
+
+
+fitnesses:
+
+multiple ordering
+
+concurrency:
+
+fix priority queue to be lock-free
