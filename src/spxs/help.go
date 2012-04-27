@@ -49,6 +49,7 @@ func PrintHelp(conf Conf) {
 
 func PrintVersion() {
 	fmt.Fprintf(os.Stderr, "%v\n", theVersion)
+	fmt.Fprintf(os.Stderr, "%v\n", theBuildTime)
 }
 
 func PrintStrFeatures(out io.Writer) {
