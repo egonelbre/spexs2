@@ -2,7 +2,7 @@ package spexs
 
 import "math/big"
 
-type Positions map[int]*big.Int
+type Positions map[int]big.Int
 
 type Set interface {
 	Add(idx int, pos int)
