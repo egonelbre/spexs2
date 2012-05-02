@@ -2,7 +2,7 @@ package spexs
 
 import "math/big"
 
-type Positions map[int]big.Int
+type Positions map[int]*big.Int
 
 type Set interface {
 	Add(idx int, pos int)
@@ -13,7 +13,7 @@ type Set interface {
 }
 
 type HashSet struct {
-	data map[int]*big.Int
+	data Positions
 }
 
 func NewHashSet(size int) *HashSet {
@@ -43,6 +43,9 @@ func (hs *HashSet) Iter() Positions {
 }
 
 func (hs *HashSet) Clear() {
+	for idx, _ := range hs.data {
+		delete(hs.data, idx)
+	}
 	hs.data = nil
 }
 
