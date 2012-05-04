@@ -48,7 +48,7 @@ func TestReferenceNext(t *testing.T) {
 	testStr := func(idx int, str string) {
 		var x Char
 		var ok bool
-		idx, pos := idx, byte(0)
+		idx, pos := idx, 0
 		for _, c := range str {
 			x, pos, ok = u.Next(idx, pos)
 			if !ok {

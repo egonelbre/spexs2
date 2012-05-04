@@ -62,9 +62,9 @@ func (p *PriorityPool) Swap(i, j int) {
 
 func (p *PriorityPool) Less(i, j int) bool {
 	if p.ascending {
-		return p.Fitness(p.items[i]) > p.Fitness(p.items[j])
+		return p.Fitness(p.items[i]) < p.Fitness(p.items[j])
 	}
-	return p.Fitness(p.items[i]) < p.Fitness(p.items[j])
+	return p.Fitness(p.items[i]) > p.Fitness(p.items[j])
 }
 
 // heap.Interface
