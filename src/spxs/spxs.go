@@ -83,7 +83,8 @@ func main() {
 
 	var counter uint64 = 0
 
-	go func(){
+	if *verbose {
+		go func(){
 		m := new(runtime.MemStats)
 		gb := uint64(1024*1024)
 		for {
@@ -94,14 +95,14 @@ func main() {
 			if m.Alloc/gb > uint64(*memoryLimit) {
 				panic(errors.New("MEMORY LIMIT EXCEEDED!"))
 			}
-		}
-	}()
-
-	ext := setup.Extender
-
-	setup.Extender = func(p *Pattern, ref *Reference) Patterns {
-		counter += 1
-		return ext(p, ref)
+			}
+		}()
+		
+		ext := setup.Extender
+		setup.Extender = func(p *Pattern, ref *Reference) Patterns {
+			counter += 1
+			return ext(p, ref)
+		}		
 	}
 
 	if *procs <= 1 {
