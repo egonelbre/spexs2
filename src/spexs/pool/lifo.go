@@ -6,6 +6,8 @@ import (
 	"unsafe"
 )
 
+// based on https://github.com/fmstephe/lfqueue
+
 type node struct {
 	val *spexs.Pattern
 	nxt unsafe.Pointer
