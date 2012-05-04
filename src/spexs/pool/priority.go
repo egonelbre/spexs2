@@ -46,9 +46,9 @@ func (p *Priority) Take() (*Pattern, bool) {
 func (p *Priority) Put(pat *Pattern) {
 	<-p.token
 	heap.Push(p, pat)
-	if p.limit > 0 && p.Len() > p.limit {
-		heap.Pop(p)
-	}
+	//if p.limit > 0 && p.Len() > p.limit {
+	//	heap.Pop(p)
+	//}
 	p.token <- 1
 }
 
@@ -71,7 +71,7 @@ func (p *Priority) Less(i, j int) bool {
 // heap.Interface
 func (p *Priority) Push(x interface{}) {
 	if p.length + 1 > len(p.items) {
-		tmp := make([]*Pattern, len(p.items) + 1000)
+		tmp := make([]*Pattern, len(p.items) + 50000)
 		copy(tmp, p.items)
 		p.items = tmp
 	}

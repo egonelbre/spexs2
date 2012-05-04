@@ -15,7 +15,7 @@
 		"method" : "regexp",
 		"args" : {"star":{ "max-gap": 3}},
 		"filter" : {
-			"query-match-seqs-prop" : {"min":0.1}
+			"query-match-seqs-prop" : {"min":0.8}
 		}
 	},
 	"output" : {
@@ -23,7 +23,7 @@
 		"sort" : "desc",
 		"args" : {"p-value":{}},
 		"filter" : {
-			"query-match-seqs-prop" : {"min":0.1}
+			"query-match-seqs-prop" : {"min":0.8}
 		},
 		"count": 100,
 		"format": "{pat}\t{pat-chars}\t{match-hyper-up-pvalue}\n"

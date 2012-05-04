@@ -125,6 +125,13 @@ func main() {
 
 	setup.Printer(os.Stdout, nil, setup.Ref)
 
+	limit := conf.Output.Count
+	if limit > 0 {
+		for setup.Out.Len() > limit {
+			setup.Out.Take()
+		}
+	}
+
 	node, ok := setup.Out.Take()
 	for ok {
 		setup.Printer(os.Stdout, node, setup.Ref)
