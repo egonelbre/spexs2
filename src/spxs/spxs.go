@@ -21,6 +21,7 @@ var (
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
 	verbose          *bool   = flag.Bool("verbose", false, "print extended debug info")
 	version          *bool   = flag.Bool("version", false, "print version")
+	live             *bool   = flag.Bool("live", false, "print output live")
 
 	procs      *int    = flag.Int("procs", 4, "processors to use")
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
@@ -102,7 +103,18 @@ func main() {
 		setup.Extender = func(p *Pattern, ref *Reference) Patterns {
 			counter += 1
 			return ext(p, ref)
-		}		
+		}
+	}
+
+	if *live {
+		out := setup.Outputtable
+		setup.Outputtable = func(p *Pattern, ref *Reference) bool {
+			result := out(p, ref)
+			if result {
+				setup.Printer(os.Stderr, p, ref)
+			}
+			return result
+		}
 	}
 
 	if *procs <= 1 {
