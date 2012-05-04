@@ -4,7 +4,7 @@ const (
 	patternsBufferSize = 128
 )
 
-type Char rune
+type Char byte
 
 type Patterns chan *Pattern
 

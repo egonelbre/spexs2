@@ -11,8 +11,8 @@ type Pattern struct {
 	Pos     spexs.Set
 	IsGroup bool
 	IsStar  bool
-	count   []int
-	occs    []int
+	count   [2]int
+	occs    [2]int
 	length  int
 }
 
@@ -27,9 +27,10 @@ func NewPattern(char Char, parent *Pattern) *Pattern {
 	}
 	p.IsGroup = false
 	p.IsStar = false
-	p.count = make([]int, 0)
-	p.occs = make([]int, 0)
-
+	p.count[0] = -1
+	p.count[1] = -1
+	p.occs[0] = -1
+	p.occs[1] = -1
 	p.length = -1
 	return p
 }
@@ -62,9 +63,10 @@ func (n *Pattern) Len() int {
 }
 
 func (n *Pattern) Count(ref *Reference, group int) int {
-	if len(n.count) <= 0 {
-		n.count = make([]int, len(ref.Groupings))
-
+	if n.count[0] < 0 {
+		n.count[0] = 0
+		n.count[1] = 0
+		
 		for idx := range n.Pos.Iter() {
 			seq := ref.Seqs[idx]
 			n.count[seq.Group] += seq.Count
@@ -74,8 +76,9 @@ func (n *Pattern) Count(ref *Reference, group int) int {
 }
 
 func (n *Pattern) Occs(ref *Reference, group int) int {
-	if len(n.occs) <= 0 {
-		n.occs = make([]int, len(ref.Groupings))
+	if n.occs[0] < 0 {
+		n.occs[0] = 0
+		n.occs[1] = 0
 
 		for idx, mpos := range n.Pos.Iter() {
 			seq := ref.Seqs[idx]

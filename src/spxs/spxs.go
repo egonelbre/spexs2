@@ -81,21 +81,28 @@ func main() {
 		AttachDebugger(&setup)
 	}
 
+	var counter uint64 = 0
+
 	go func(){
 		m := new(runtime.MemStats)
 		gb := uint64(1024*1024)
 		for {
 			runtime.ReadMemStats(m)
-			fmt.Printf("%v\t%v\t%v\n", runtime.NumGoroutine(), m.Alloc/gb, m.Lookups)
+			fmt.Printf("%v\t%v\t%v\t%v\n", runtime.NumGoroutine(), m.Alloc/gb, m.TotalAlloc/gb, counter)
 			time.Sleep(200 * time.Millisecond)
 
 			if m.Alloc/gb > uint64(*memoryLimit) {
 				panic(errors.New("MEMORY LIMIT EXCEEDED!"))
 			}
 		}
-		
 	}()
 
+	ext := setup.Extender
+
+	setup.Extender = func(p *Pattern, ref *Reference) Patterns {
+		counter += 1
+		return ext(p, ref)
+	}
 
 	if *procs <= 1 {
 		Run(&setup.Setup)
