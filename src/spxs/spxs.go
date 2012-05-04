@@ -4,20 +4,24 @@ import (
 	"flag"
 	"fmt"
 	"runtime"
-	. "spexs/trie"
+	. "spexs"
 
 	"log"
 	"os"
 	"runtime/pprof"
+	"time"
+	"errors"
 )
 
 var (
 	configs          *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
 	//printConf        *bool   = flag.Bool("printConf", "print the configuration file")
+	memoryLimit      *int    = flag.Int("mem", 1024, "memory limit in MB")
 	details          *bool   = flag.Bool("details", false, "detailed help")
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
 	verbose          *bool   = flag.Bool("verbose", false, "print extended debug info")
 	version          *bool   = flag.Bool("version", false, "print version")
+	live             *bool   = flag.Bool("live", false, "print output live")
 
 	procs      *int    = flag.Int("procs", 4, "processors to use")
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
@@ -76,6 +80,41 @@ func main() {
 
 	if *interactiveDebug {
 		AttachDebugger(&setup)
+	}
+
+	var counter uint64 = 0
+
+	if *verbose {
+		go func(){
+		m := new(runtime.MemStats)
+		gb := uint64(1024*1024)
+		for {
+			runtime.ReadMemStats(m)
+			fmt.Printf("%v\t%v\t%v\t%v\n", runtime.NumGoroutine(), m.Alloc/gb, m.TotalAlloc/gb, counter)
+			time.Sleep(200 * time.Millisecond)
+
+			if m.Alloc/gb > uint64(*memoryLimit) {
+				panic(errors.New("MEMORY LIMIT EXCEEDED!"))
+			}
+			}
+		}()
+		
+		ext := setup.Extender
+		setup.Extender = func(p *Pattern, ref *Reference) Patterns {
+			counter += 1
+			return ext(p, ref)
+		}
+	}
+
+	if *live {
+		out := setup.Outputtable
+		setup.Outputtable = func(p *Pattern, ref *Reference) bool {
+			result := out(p, ref)
+			if result {
+				setup.Printer(os.Stderr, p, ref)
+			}
+			return result
+		}
 	}
 
 	if *procs <= 1 {

@@ -1,7 +1,6 @@
-package trie
+package spexs
 
 import (
-	"spexs"
 	"stats"
 	"math/big"
 )
@@ -58,7 +57,7 @@ func groupCombine(node *Pattern, ref *Reference, patterns map[Char]*Pattern, sta
 		patterns[g.Id] = pat
 		for _, char := range g.Chars {
 			if _, exists := patterns[char]; exists {
-				spexs.SetAddSet(patterns[g.Id].Pos, patterns[char].Pos)
+				patterns[g.Id].Pos.AddSet(patterns[char].Pos)
 			}
 		}
 	}

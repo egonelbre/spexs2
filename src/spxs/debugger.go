@@ -3,7 +3,7 @@ package main
 import (
 	"debugger"
 	"fmt"
-	. "spexs/trie"
+	. "spexs"
 )
 
 var dbg = debugger.New()

@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "spexs/trie"
+	. "spexs"
 	"stats"
 )
 

@@ -1,44 +1,8 @@
-package trie
+package spexs
 
 import (
 	"container/heap"
-	"container/list"
 )
-
-type FifoPool struct {
-	token chan int
-	list  *list.List
-}
-
-func NewFifoPool() *FifoPool {
-	p := &FifoPool{}
-	p.token = make(chan int, 1)
-	p.list = list.New()
-	p.token <- 1
-	return p
-}
-
-func (p *FifoPool) Take() (*Pattern, bool) {
-	<-p.token
-	if p.list.Len() == 0 {
-		p.token <- 1
-		return nil, false
-	}
-	tmp := p.list.Front()
-	p.list.Remove(tmp)
-	p.token <- 1
-	return tmp.Value.(*Pattern), true
-}
-
-func (p *FifoPool) Put(pat *Pattern) {
-	<-p.token
-	p.list.PushBack(pat)
-	p.token <- 1
-}
-
-func (p *FifoPool) Len() int {
-	return p.list.Len()
-}
 
 type PriorityPool struct {
 	token     chan int
@@ -98,9 +62,9 @@ func (p *PriorityPool) Swap(i, j int) {
 
 func (p *PriorityPool) Less(i, j int) bool {
 	if p.ascending {
-		return p.Fitness(p.items[i]) > p.Fitness(p.items[j])
+		return p.Fitness(p.items[i]) < p.Fitness(p.items[j])
 	}
-	return p.Fitness(p.items[i]) < p.Fitness(p.items[j])
+	return p.Fitness(p.items[i]) > p.Fitness(p.items[j])
 }
 
 // heap.Interface

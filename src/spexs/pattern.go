@@ -1,18 +1,17 @@
-package trie
+package spexs
 
 import (
-	"spexs"
 	"stats"
 )
 
 type Pattern struct {
 	Char    Char
 	Parent  *Pattern
-	Pos     spexs.Set
+	Pos     HashSet
 	IsGroup bool
 	IsStar  bool
-	count   []int
-	occs    []int
+	count   [2]int
+	occs    [2]int
 	length  int
 }
 
@@ -21,22 +20,27 @@ func NewPattern(char Char, parent *Pattern) *Pattern {
 	p.Char = char
 	p.Parent = parent
 	if parent != nil {
-		p.Pos = spexs.NewHashSet(parent.Pos.Len() / 2)
+		p.Pos = *NewHashSet(parent.Pos.Len() / 2)
 	} else {
-		p.Pos = spexs.NewHashSet(0)
+		p.Pos = *NewHashSet(0)
 	}
 	p.IsGroup = false
 	p.IsStar = false
-	p.count = make([]int, 0)
-	p.occs = make([]int, 0)
-
+	p.count[0] = -1
+	p.count[1] = -1
+	p.occs[0] = -1
+	p.occs[1] = -1
 	p.length = -1
 	return p
 }
 
 func NewFullPattern(ref *Reference) *Pattern {
 	p := NewPattern(0, nil)
-	p.Pos = NewFullSet(ref)
+	for idx, pat := range ref.Seqs {
+		for i, _ := range pat.Pat {
+			p.Pos.Add(idx, i)
+		}
+	}
 	return p
 }
 
@@ -62,9 +66,10 @@ func (n *Pattern) Len() int {
 }
 
 func (n *Pattern) Count(ref *Reference, group int) int {
-	if len(n.count) <= 0 {
-		n.count = make([]int, len(ref.Groupings))
-
+	if n.count[0] < 0 {
+		n.count[0] = 0
+		n.count[1] = 0
+		
 		for idx := range n.Pos.Iter() {
 			seq := ref.Seqs[idx]
 			n.count[seq.Group] += seq.Count
@@ -74,8 +79,9 @@ func (n *Pattern) Count(ref *Reference, group int) int {
 }
 
 func (n *Pattern) Occs(ref *Reference, group int) int {
-	if len(n.occs) <= 0 {
-		n.occs = make([]int, len(ref.Groupings))
+	if n.occs[0] < 0 {
+		n.occs[0] = 0
+		n.occs[1] = 0
 
 		for idx, mpos := range n.Pos.Iter() {
 			seq := ref.Seqs[idx]

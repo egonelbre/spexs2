@@ -6,7 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
-	. "spexs/trie"
+	. "spexs"
 	"strings"
 	"unicode/utf8"
 )

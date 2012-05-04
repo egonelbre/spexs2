@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	. "spexs/trie"
+	. "spexs"
 )
 
 type fitnessConf map[string]interface{}

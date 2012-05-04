@@ -2,7 +2,7 @@ package main
 
 import (
 	"io"
-	. "spexs/trie"
+	. "spexs"
 )
 
 const MAX_POOL_SIZE = 1024 * 1024 * 1024
@@ -25,7 +25,8 @@ func lengthFitness(p *Pattern) float64 {
 type PatternFilterCreator func(limit int) FilterFunc
 
 func CreateInput(conf Conf, setup AppSetup) Pooler {
-	in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE, true)
+	//in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE, true)
+	in := NewLifoPool()
 	in.Put(NewFullPattern(setup.Ref))
 	return in
 }
@@ -51,6 +52,7 @@ func CreateSetup(conf Conf) AppSetup {
 	s.Outputtable = CreateFilter(conf.Output.Filter, s)
 
 	s.PostProcess = func(p *Pattern, s *Setup) error {
+		p.Pos.Clear()
 		return nil
 	}
 

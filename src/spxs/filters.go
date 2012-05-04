@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"math"
-	. "spexs/trie"
+	. "spexs"
 )
 
 type filterConf map[string]interface{}

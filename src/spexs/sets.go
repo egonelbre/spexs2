@@ -9,10 +9,11 @@ type Set interface {
 	Contains(idx int, pos int) bool
 	Len() int
 	Iter() Positions
+	Clear()
 }
 
 type HashSet struct {
-	data map[int]*big.Int
+	data Positions
 }
 
 func NewHashSet(size int) *HashSet {
@@ -41,19 +42,19 @@ func (hs *HashSet) Iter() Positions {
 	return hs.data
 }
 
-func SetAddSet(h Set, g Set) {
-	switch h.(type) {
-	case *HashSet:
-		for gidx, gval := range g.(*HashSet).data {
-			hval, exists := h.(*HashSet).data[gidx]
-			if exists {
-				h.(*HashSet).data[gidx].Or(hval, gval)
-			} else {
-				hval = big.NewInt(0)
-				hval.Set(gval)
-				h.(*HashSet).data[gidx] = hval
-			}
+func (hs *HashSet) Clear() {
+	hs.data = nil
+}
+
+func (hs *HashSet) AddSet(g HashSet) {
+	for gidx, gval := range g.data {
+		hval, exists := hs.data[gidx]
+		if exists {
+			hs.data[gidx].Or(hval, gval)
+		} else {
+			hval = big.NewInt(0)
+			hval.Set(gval)
+			hs.data[gidx] = hval
 		}
-	default:
 	}
 }
