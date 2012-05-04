@@ -125,10 +125,15 @@ func main() {
 
 	setup.Printer(os.Stdout, nil, setup.Ref)
 
+	limit := conf.Output.Count
 	node, ok := setup.Out.Take()
 	for ok {
 		setup.Printer(os.Stdout, node, setup.Ref)
 		node, ok = setup.Out.Take()
+		limit -= 1
+		if limit < 0 {
+			break
+		}
 	}
 
 	fmt.Printf("\n")

@@ -44,9 +44,10 @@ func (p *Priority) Take() (*spexs.Pattern, bool) {
 func (p *Priority) Put(pat *spexs.Pattern) {
 	<-p.token
 	heap.Push(p, pat)
+	/* removed as it makes things really, really slow
 	if p.limit > 0 && p.Len() > p.limit {
 		heap.Pop(p)
-	}
+	}*/
 	p.token <- 1
 }
 
