@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	. "spexs"
+	pool "spexs/pool"
 )
 
 const MAX_POOL_SIZE = 1024 * 1024 * 1024
@@ -26,7 +27,7 @@ type PatternFilterCreator func(limit int) FilterFunc
 
 func CreateInput(conf Conf, setup AppSetup) Pooler {
 	//in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE, true)
-	in := NewLifoPool()
+	in := pool.NewLifo()
 	in.Put(NewFullPattern(setup.Ref))
 	return in
 }
@@ -36,7 +37,7 @@ func CreateOutput(conf Conf, setup AppSetup, f FitnessFunc) Pooler {
 	if size < 0 {
 		size = MAX_POOL_SIZE
 	}
-	return NewPriorityPool(f, size, conf.Output.Sort == "asc")
+	return pool.NewPriority(f, size, conf.Output.Sort == "asc")
 }
 
 func CreateSetup(conf Conf) AppSetup {

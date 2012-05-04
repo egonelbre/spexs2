@@ -1,30 +1,30 @@
-package spexs
+package pool
 
 import (
-	"container/list"
+	"spexs"
 	"sync/atomic"
 	"unsafe"
 )
 
 type node struct {
-	val *Pattern
+	val *spexs.Pattern
 	nxt unsafe.Pointer
 }
 
-type LifoPool struct {
+type Lifo struct {
 	head unsafe.Pointer
 	tail unsafe.Pointer
 }
 
-func NewLifoPool() (q *LifoPool) {
-	q = new(LifoPool)
+func NewLifo() (q *Lifo) {
+	q = new(Lifo)
 	n := unsafe.Pointer(new(node))
 	q.head = n
 	q.tail = n
 	return
 }
 
-func (q *LifoPool) Take() (val *Pattern, success bool) {
+func (q *Lifo) Take() (val *spexs.Pattern, success bool) {
 	var h, t, n unsafe.Pointer
 	for {
 		h = q.head
@@ -46,7 +46,7 @@ func (q *LifoPool) Take() (val *Pattern, success bool) {
 	panic("Unreachable")
 }
 
-func (q *LifoPool) Put(val *Pattern) {
+func (q *Lifo) Put(val *spexs.Pattern) {
 	var t, n unsafe.Pointer
 	n = unsafe.Pointer(&node{val: val, nxt: nil})
 	for {
@@ -61,41 +61,6 @@ func (q *LifoPool) Put(val *Pattern) {
 	atomic.CompareAndSwapPointer(&q.tail, t, n)
 }
 
-func (p *LifoPool) Len() int {
+func (p *Lifo) Len() int {
 	return 1
-}
-
-type FifoPool struct {
-	token chan int
-	list  *list.List
-}
-
-func NewFifoPool() *FifoPool {
-	p := &FifoPool{}
-	p.token = make(chan int, 1)
-	p.list = list.New()
-	p.token <- 1
-	return p
-}
-
-func (p *FifoPool) Take() (*Pattern, bool) {
-	<-p.token
-	if p.list.Len() == 0 {
-		p.token <- 1
-		return nil, false
-	}
-	tmp := p.list.Front()
-	p.list.Remove(tmp)
-	p.token <- 1
-	return tmp.Value.(*Pattern), true
-}
-
-func (p *FifoPool) Put(pat *Pattern) {
-	<-p.token
-	p.list.PushBack(pat)
-	p.token <- 1
-}
-
-func (p *FifoPool) Len() int {
-	return p.list.Len()
 }

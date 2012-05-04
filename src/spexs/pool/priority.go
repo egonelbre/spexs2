@@ -1,21 +1,22 @@
-package spexs
+package pool
 
 import (
+	"spexs"
 	"container/heap"
 )
 
-type PriorityPool struct {
+type Priority struct {
 	token     chan int
-	items     []*Pattern
-	Fitness   FitnessFunc
+	items     []*spexs.Pattern
+	Fitness   spexs.FitnessFunc
 	limit     int
 	ascending bool
 }
 
-func NewPriorityPool(fitness FitnessFunc, limit int, ascending bool) *PriorityPool {
-	p := &PriorityPool{}
+func NewPriority(fitness spexs.FitnessFunc, limit int, ascending bool) *Priority {
+	p := &Priority{}
 	p.token = make(chan int, 1)
-	p.items = make([]*Pattern, 0)
+	p.items = make([]*spexs.Pattern, 0)
 	p.limit = limit
 	p.Fitness = fitness
 	p.token <- 1
@@ -25,11 +26,11 @@ func NewPriorityPool(fitness FitnessFunc, limit int, ascending bool) *PriorityPo
 	return p
 }
 
-func (p *PriorityPool) IsEmpty() bool {
+func (p *Priority) IsEmpty() bool {
 	return len(p.items) == 0
 }
 
-func (p *PriorityPool) Take() (*Pattern, bool) {
+func (p *Priority) Take() (*spexs.Pattern, bool) {
 	<-p.token
 	if p.IsEmpty() {
 		p.token <- 1
@@ -37,10 +38,10 @@ func (p *PriorityPool) Take() (*Pattern, bool) {
 	}
 	v := heap.Pop(p)
 	p.token <- 1
-	return v.(*Pattern), true
+	return v.(*spexs.Pattern), true
 }
 
-func (p *PriorityPool) Put(pat *Pattern) {
+func (p *Priority) Put(pat *spexs.Pattern) {
 	<-p.token
 	heap.Push(p, pat)
 	if p.limit > 0 && p.Len() > p.limit {
@@ -50,17 +51,17 @@ func (p *PriorityPool) Put(pat *Pattern) {
 }
 
 // sort.Interface
-func (p *PriorityPool) Len() int {
+func (p *Priority) Len() int {
 	return len(p.items)
 }
 
-func (p *PriorityPool) Swap(i, j int) {
+func (p *Priority) Swap(i, j int) {
 	temp := p.items[i]
 	p.items[i] = p.items[j]
 	p.items[j] = temp
 }
 
-func (p *PriorityPool) Less(i, j int) bool {
+func (p *Priority) Less(i, j int) bool {
 	if p.ascending {
 		return p.Fitness(p.items[i]) < p.Fitness(p.items[j])
 	}
@@ -68,11 +69,11 @@ func (p *PriorityPool) Less(i, j int) bool {
 }
 
 // heap.Interface
-func (p *PriorityPool) Push(x interface{}) {
-	p.items = append(p.items, x.(*Pattern))
+func (p *Priority) Push(x interface{}) {
+	p.items = append(p.items, x.(*spexs.Pattern))
 }
 
-func (p *PriorityPool) Pop() interface{} {
+func (p *Priority) Pop() interface{} {
 	r := p.items[len(p.items)-1]
 	p.items = p.items[0 : len(p.items)-1]
 	return r
