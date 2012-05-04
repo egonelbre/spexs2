@@ -20,7 +20,7 @@
 	},
 	"output" : {
 		"order" : "match-hyper-up-pvalue",
-		"sort" : "asc",
+		"sort" : "desc",
 		"args" : {"p-value":{}},
 		"filter" : {
 			"query-match-seqs-prop" : {"min":0.8}
