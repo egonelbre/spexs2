@@ -25,7 +25,7 @@
 		"filter" : {
 			"query-match-seqs-prop" : {"min":0.8}
 		},
-		"count": 100,
+		"count": 10000,
 		"format": "{pat}\t{pat-chars}\t{match-hyper-up-pvalue}\n"
 	},
 	"aliases" : {

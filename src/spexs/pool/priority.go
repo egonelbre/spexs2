@@ -17,7 +17,7 @@ type Priority struct {
 func NewPriority(fitness spexs.FitnessFunc, limit int, ascending bool) *Priority {
 	p := &Priority{}
 	p.token = make(chan int, 1)
-	p.items = make([]*spexs.Pattern, limit+10)
+	p.items = make([]*spexs.Pattern, limit+100)
 	p.length = 0
 	p.limit = limit
 	p.Fitness = fitness
@@ -58,10 +58,7 @@ func (p *Priority) Len() int {
 }
 
 func (p *Priority) Swap(i, j int) {
-	temp := p.items[i]
-	p.items[i] = p.items[j]
-	p.items[j] = temp
-	//p.items[i], p.items[j] = p.items[j], p.items[i]
+	p.items[i], p.items[j] = p.items[j], p.items[i]
 }
 
 func (p *Priority) Less(i, j int) bool {
@@ -73,12 +70,14 @@ func (p *Priority) Less(i, j int) bool {
 
 // heap.Interface
 func (p *Priority) Push(x interface{}) {
-	if len(p.items) > p.length + 1 {
-		p.items[p.length] = x.(*spexs.Pattern)
-		p.length += 1
-	} else {
-		p.items = append(p.items, x.(*spexs.Pattern))
+	if p.length + 1 > len(p.items) {
+		tmp := make([]*spexs.Pattern, len(p.items) + 1000)
+		copy(tmp, p.items)
+		p.items = tmp
 	}
+
+	p.items[p.length] = x.(*spexs.Pattern)
+	p.length += 1
 }
 
 func (p *Priority) Pop() interface{} {
