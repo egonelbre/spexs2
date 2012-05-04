@@ -75,35 +75,3 @@ func Parallel(f func(), routines int) {
 func RunParallel(s *Setup, routines int) {
 	Parallel(func() { Run(s) }, routines)
 }
-
-func RunParallel2(s *Setup, routines int) {
-	start := 0
-	stop := make(chan int)
-
-	p, valid := s.In.Take()
-	if !valid {
-		return
-	}
-	extensions := s.Extender(p, s.Ref)
-	for extended := range extensions {
-		if s.Extendable(extended, s.Ref) {
-			s.In.Put(extended)
-			start += 1
-			go func(){
-				RunParallel(s, routines)
-				stop <- 1
-			}()
-		}
-		if s.Outputtable(extended, s.Ref) {
-			s.Out.Put(extended)
-		}
-	}
-
-	//if s.PostProcess(p, s) != nil {
-		//break
-	//}
-
-	for i := 0; i < start; i += 1 {
-		<-stop
-	}
-}
