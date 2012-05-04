@@ -1,14 +1,13 @@
-package trie
+package spexs
 
 import (
-	"spexs"
 	"stats"
 )
 
 type Pattern struct {
 	Char    Char
 	Parent  *Pattern
-	Pos     spexs.HashSet
+	Pos     HashSet
 	IsGroup bool
 	IsStar  bool
 	count   [2]int
@@ -21,9 +20,9 @@ func NewPattern(char Char, parent *Pattern) *Pattern {
 	p.Char = char
 	p.Parent = parent
 	if parent != nil {
-		p.Pos = *spexs.NewHashSet(parent.Pos.Len() / 2)
+		p.Pos = *NewHashSet(parent.Pos.Len() / 2)
 	} else {
-		p.Pos = *spexs.NewHashSet(0)
+		p.Pos = *NewHashSet(0)
 	}
 	p.IsGroup = false
 	p.IsStar = false

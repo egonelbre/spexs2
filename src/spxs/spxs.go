@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"runtime"
-	. "spexs/trie"
+	. "spexs"
 
 	"log"
 	"os"

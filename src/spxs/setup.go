@@ -2,7 +2,7 @@ package main
 
 import (
 	"io"
-	. "spexs/trie"
+	. "spexs"
 )
 
 const MAX_POOL_SIZE = 1024 * 1024 * 1024

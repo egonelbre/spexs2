@@ -1,4 +1,4 @@
-package trie
+package spexs
 
 const (
 	patternsBufferSize = 128

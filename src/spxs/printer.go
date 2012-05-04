@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
-	. "spexs/trie"
+	. "spexs"
 	"text/template"
 	"regexp"
 )
