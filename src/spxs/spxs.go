@@ -85,6 +85,7 @@ func main() {
 	}
 
 	var counter uint64 = 0
+	var seq string = ""
 
 	if *verbose {
 		go func(){
@@ -92,7 +93,7 @@ func main() {
 		gb := uint64(1024*1024)
 		for {
 			runtime.ReadMemStats(m)
-			fmt.Printf("%v\t%v\t%v\t%v\n", runtime.NumGoroutine(), m.Alloc/gb, m.TotalAlloc/gb, counter)
+			fmt.Printf("%v\t%v\t%v\t%v\t%s\n", runtime.NumGoroutine(), m.Alloc/gb, m.TotalAlloc/gb, counter, seq)
 			time.Sleep(200 * time.Millisecond)
 
 			if m.Alloc/gb > uint64(*memoryLimit) {
@@ -103,6 +104,7 @@ func main() {
 		
 		ext := setup.Extender
 		setup.Extender = func(p *Pattern, ref *Reference) Patterns {
+			seq = p.String()
 			counter += 1
 			return ext(p, ref)
 		}
@@ -129,12 +131,16 @@ func main() {
 
 	setup.Printer(os.Stdout, nil, setup.Ref)
 
+	fmt.Fprintf(os.Stderr, "throwing away bad results\n")
+
 	limit := conf.Output.Count
 	if limit > 0 {
 		for setup.Out.Len() > limit {
 			setup.Out.Take()
 		}
 	}
+
+	fmt.Fprintf(os.Stderr, "printing results\n")
 
 	node, ok := setup.Out.Take()
 	for ok {

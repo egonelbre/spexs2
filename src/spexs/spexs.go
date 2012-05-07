@@ -1,5 +1,7 @@
 package spexs
 
+import "time"
+
 const (
 	patternsBufferSize = 128
 )
@@ -73,5 +75,51 @@ func Parallel(f func(), routines int) {
 }
 
 func RunParallel(s *Setup, routines int) {
-	Parallel(func() { Run(s) }, routines)
+	quit := make(chan int, routines)
+	counter := make(chan int, routines)
+
+	for i := 0; i < routines; i += 1 {
+		go func(rtn int){
+				main:for {
+					p, valid := s.In.Take()
+					for !valid {
+						p, valid = s.In.Take()
+						if valid {
+							break
+						}
+						counter <- -1
+						select {
+						case <-time.After(100*time.Millisecond):
+						case <-quit: 
+							break main
+						}
+						counter <- 1
+					}
+
+					extensions := s.Extender(p, s.Ref)
+					for extended := range extensions {
+						if s.Extendable(extended, s.Ref) {
+							s.In.Put(extended)
+						}
+						if s.Outputtable(extended, s.Ref) {
+							s.Out.Put(extended)
+						}
+					}
+
+					if s.PostProcess(p, s) != nil {
+						break
+					}
+				}
+		}(i)
+	}
+
+	count := routines
+	for count > 0 {
+		value := <- counter
+		count += value
+	}
+
+	for i := 0; i < routines; i += 1 {
+		quit <- 1
+	}
 }
