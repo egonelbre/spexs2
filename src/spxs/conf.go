@@ -31,7 +31,8 @@ const baseConfiguration = `{
 		"args" : {},
 		"filter" : {},
 		"count": -1,
-		"format": "{{.Regexp}} {{.Fitness}} {{.Length}} {{.Count}} {{.PValue}}\n"
+		"format": "{{.Regexp}} {{.Fitness}} {{.Length}} {{.Count}} {{.PValue}}\n",
+		"queue" : ""
 	},
 	"aliases" : {
 	}
@@ -60,6 +61,7 @@ type Conf struct {
 		Filter map[string]map[string]interface{}
 		Count  int
 		Format string
+		Queue string
 	}
 	Aliases map[string]struct {
 		Desc   string

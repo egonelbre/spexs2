@@ -33,6 +33,9 @@ func CreateInput(conf Conf, setup AppSetup) Pooler {
 }
 
 func CreateOutput(conf Conf, setup AppSetup, f FitnessFunc) Pooler {
+	if conf.Output.Queue == "lifo" {
+		return pool.NewLifo()
+	}
 	size := conf.Output.Count
 	if size < 0 {
 		size = MAX_POOL_SIZE

@@ -131,15 +131,17 @@ func main() {
 
 	setup.Printer(os.Stdout, nil, setup.Ref)
 
-	fmt.Fprintf(os.Stderr, "throwing away bad results\n")
+	if conf.Output.Queue != "lifo"  {
+		fmt.Fprintf(os.Stderr, "throwing away bad results\n")
 
-	limit := conf.Output.Count
-	if limit > 0 {
-		for setup.Out.Len() > limit {
-			setup.Out.Take()
+		limit := conf.Output.Count
+		if limit > 0 {
+			for setup.Out.Len() > limit {
+				setup.Out.Take()
+			}
 		}
 	}
-
+	
 	fmt.Fprintf(os.Stderr, "printing results\n")
 
 	node, ok := setup.Out.Take()
@@ -147,6 +149,6 @@ func main() {
 		setup.Printer(os.Stdout, node, setup.Ref)
 		node, ok = setup.Out.Take()
 	}
-	
+
 	fmt.Printf("\n")
 }

@@ -29,7 +29,8 @@
 			"match-hyper-up-pvalue" : {"max":1e-3}
 		},
 		"count": 100,
-		"format": "{pat}\t{pat-length}\t{pat-groups}\t{pat-chars}\t{query-match-seqs}\t{back-match-seqs}\t{match-ratio}\t{match-hyper-up-pvalue}\n"
+		"format": "{pat}\t{pat-length}\t{pat-groups}\t{pat-chars}\t{query-match-seqs}\t{back-match-seqs}\t{match-ratio}\t{match-hyper-up-pvalue}\n",
+		"queue": "lifo"
 	},
 	"aliases" : {
 		"inp" : {"desc":"input file",            "modify":["data.input"]},
