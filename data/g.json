@@ -1,0 +1,40 @@
+{
+	"data" : {
+		"input" : "",
+		"reference" : ""
+	},
+
+	"alphabet" : {
+		"characters" : "ACDEFGHIKLMNPRQSTVWY",
+		"groups" : {
+			".": {"group":"ACDEFGHIKLMNPRQSTVWY"}
+		}
+	},
+
+	"extension" : {
+		"method" : "group",
+		"args" : {"star":{ "max-gap": 3}},
+		"filter" : {
+			"pat-groups" : {"max":3},
+			"pat-length" : {"max":6},
+			"query-match-seqs" : {"min":20}
+		}
+	},
+	"output" : {
+		"order" : "match-hyper-up-pvalue",
+		"sort" : "desc",
+		"args" : {"p-value":{}},
+		"filter" : {
+			"match-ratio" : {"min":2},
+			"match-hyper-up-pvalue" : {"max":1e-3}
+		},
+		"count": 100,
+		"format": "{pat}\t{pat-length}\t{pat-groups}\t{pat-chars}\t{query-match-seqs}\t{back-match-seqs}\t{match-ratio}\t{match-hyper-up-pvalue}\n"
+	},
+	"aliases" : {
+		"inp" : {"desc":"input file",            "modify":["data.input"]},
+		"ref" : {"desc":"reference file",        "modify":["data.reference"]},
+		"p-min" : {"desc":"minimum for p-value", "modify":["output.filter.p-value.min"]},
+		"p-max" : {"desc":"maximum for p-value", "modify":["output.filter.p-value.max"]}
+	}
+}
