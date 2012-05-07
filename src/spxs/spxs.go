@@ -69,8 +69,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Printf(os.Stderr, "reading input\n")
-	
+	fmt.Fprintf(os.Stderr, "reading input\n")
+
 	initSetup()
 	setup := CreateSetup(conf)
 
@@ -119,7 +119,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf(os.Stderr, "running spexs\n")
+	fmt.Fprintf(os.Stderr, "running spexs\n")
 
 	if *procs <= 1 {
 		Run(&setup.Setup)
