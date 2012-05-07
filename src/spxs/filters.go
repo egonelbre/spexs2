@@ -15,7 +15,19 @@ func trueFilter(p *Pattern, ref *Reference) bool {
 	return true
 }
 
-var Filters = map[string]filterCreator{}
+var Filters = map[string]filterCreator{
+	"no-starting-group" : func(conf filterConf){
+		return func(p *Pattern, ref *Reference) bool {
+			for p != nil {
+				if p.IsGroup && (p.Parent != nil) && (p.Parent.Parent = nil) {
+					return false
+				}
+				p = p.Parent
+			}
+			return true
+		}
+	}
+}
 
 func CreateFilter(conf map[string]map[string]interface{}, setup AppSetup) FilterFunc {
 	filters := make([]FilterFunc, 0)
