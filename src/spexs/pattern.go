@@ -38,7 +38,7 @@ func NewFullPattern(ref *Reference) *Pattern {
 	p := NewPattern(0, nil)
 	for idx, pat := range ref.Seqs {
 		for i, _ := range pat.Pat {
-			p.Pos.Add(idx, i)
+			p.Pos.Add(idx, uint(i))
 		}
 	}
 	return p
@@ -85,7 +85,7 @@ func (n *Pattern) Occs(ref *Reference, group int) int {
 
 		for idx, mpos := range n.Pos.Iter() {
 			seq := ref.Seqs[idx]
-			ocs := stats.BitCountInt(mpos)
+			ocs := stats.BitCount64(uint64(mpos))
 			n.occs[seq.Group] += seq.Count * ocs
 		}
 	}

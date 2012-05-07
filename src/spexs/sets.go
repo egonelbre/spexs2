@@ -1,12 +1,11 @@
 package spexs
 
-import "math/big"
-
-type Positions map[int]*big.Int
+type BitVector uint16
+type Positions map[int]BitVector
 
 type Set interface {
-	Add(idx int, pos int)
-	Contains(idx int, pos int) bool
+	Add(idx int, pos uint)
+	Contains(idx int, pos uint) bool
 	Len() int
 	Iter() Positions
 	Clear()
@@ -20,18 +19,19 @@ func NewHashSet(size int) *HashSet {
 	return &HashSet{make(Positions, size)}
 }
 
-func (hs *HashSet) Add(idx int, pos int) {
+func (hs *HashSet) Add(idx int, pos uint) {
 	val, exists := hs.data[idx]
 	if !exists {
-		val = big.NewInt(0)
-		hs.data[idx] = val
+		val = 0
+		hs.data[idx] = 0
 	}
-	val.SetBit(val, pos, 1)
+	val |= 1 << pos
+	hs.data[idx] = val
 }
 
-func (hs *HashSet) Contains(idx int, pos int) bool {
+func (hs *HashSet) Contains(idx int, pos uint) bool {
 	val, exists := hs.data[idx]
-	return exists && (val.Bit(pos) > 0)
+	return exists && (val & (1 << pos) != BitVector(0))
 }
 
 func (hs *HashSet) Len() int {
@@ -50,11 +50,9 @@ func (hs *HashSet) AddSet(g HashSet) {
 	for gidx, gval := range g.data {
 		hval, exists := hs.data[gidx]
 		if exists {
-			hs.data[gidx].Or(hval, gval)
+			hs.data[gidx] = hval | gval
 		} else {
-			hval = big.NewInt(0)
-			hval.Set(gval)
-			hs.data[gidx] = hval
+			hs.data[gidx] = gval
 		}
 	}
 }

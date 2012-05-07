@@ -2,7 +2,6 @@ package spexs
 
 import (
 	"stats"
-	"math/big"
 )
 
 func output(out Patterns, patterns map[Char]*Pattern) {
@@ -12,13 +11,13 @@ func output(out Patterns, patterns map[Char]*Pattern) {
 }
 
 func simpleExtend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
-	mpos := big.NewInt(0)
+	mpos := BitVector(0)
 	for idx, ipos := range node.Pos.Iter() {
-		plen := len(ref.Seqs[idx].Pat)
-		mpos.Set(ipos)
-		bits := stats.BitCountInt(mpos)
-		for k := 0; (k < plen) && (bits > 0); k += 1 {
-			if mpos.Bit(k) == 0 {
+		plen := uint(len(ref.Seqs[idx].Pat))
+		mpos = ipos
+		bits := stats.BitCount64(uint64(mpos))
+		for k := uint(0); (k < plen) && (bits > 0); k += 1 {
+			if (mpos >> k & 1) == 0 {
 				continue
 			}
 			bits -= 1
@@ -77,11 +76,11 @@ func GroupExtender(node *Pattern, ref *Reference) Patterns {
 
 func trieStarExtend(node *Pattern, ref *Reference, stars map[Char]*Pattern) {
 	for idx, mpos := range node.Pos.Iter() {
-		k := stats.BitScanLeft(mpos)
+		k := stats.BitScanLeft64(uint64(mpos))
 		if k < 0 { 
 			continue
 		}
-		char, next, valid := ref.Next(idx, k)
+		char, next, valid := ref.Next(idx, uint(k))
 		for valid {
 			pat, exists := stars[char]
 			if !exists {

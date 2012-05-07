@@ -38,13 +38,13 @@ func NewReference(size int) *Reference {
 	return ref
 }
 
-func (ref *Reference) Next(idx int, pos int) (Char, int, bool) {
+func (ref *Reference) Next(idx int, pos uint) (Char, uint, bool) {
 	if int(pos) >= len(ref.Seqs[idx].Pat) {
 		return 0, 0, false
 	}
 
-	rune, width := utf8.DecodeRune(ref.Seqs[idx].Pat[pos:])
-	return Char(rune), pos + width, true
+	rune, width := utf8.DecodeRune(ref.Seqs[int(idx)].Pat[pos:])
+	return Char(rune), pos + uint(width), true
 }
 
 func (ref *Reference) ReplaceGroups(pat string) string {
