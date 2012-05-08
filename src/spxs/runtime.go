@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -10,6 +9,9 @@ import (
 	. "spexs"
 	"time"
 )
+
+
+var lg = log.New(os.Stderr, "", log.Ltime)
 
 const mb = 1024 * 1024
 
@@ -62,7 +64,7 @@ func runStats(setup *AppSetup) {
 			}
 
 			runtime.ReadMemStats(m)
-			fmt.Fprintf(os.Stderr, "%v\t%v\t%v\t%v\t%s\n", runtime.NumGoroutine(), m.Alloc/mb, m.TotalAlloc/mb, counter, seq)
+			lg.Printf("%v\t%v\t%v\t%v\n", m.Alloc/mb, m.TotalAlloc/mb, counter, seq)
 		}
 	}()
 

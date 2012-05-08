@@ -41,7 +41,7 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 
 	f := func(out io.Writer, pat *Pattern, ref *Reference) {
 		if pat == nil {
-			fmt.Println(conf.Output.Format)
+			fmt.Print(conf.Output.Format)
 			return
 		}
 
@@ -57,16 +57,6 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 				values[fixName] = fstr.Func(pat, ref)
 			}
 		}
-		/*
-			for name, f := range Features {
-				fixName := fixedNames[name]
-				values[fixName] = f.Func(pat, ref)
-			}
-
-			for name, f := range StrFeatures {
-				fixName := fixedNames[name]
-				values[fixName] = f.Func(pat, ref)
-			}*/
 
 		err = tmpl.Execute(out, values)
 		if err != nil {
