@@ -1,7 +1,7 @@
 package spexs
 
 import (
-	"stats"
+	"utils"
 )
 
 func output(out Patterns, patterns map[Char]*Pattern) {
@@ -15,7 +15,7 @@ func simpleExtend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
 	for idx, ipos := range node.Pos.Iter() {
 		plen := uint(len(ref.Seqs[idx].Pat))
 		mpos = ipos
-		bits := stats.BitCount64(uint64(mpos))
+		bits := utils.BitCount64(uint64(mpos))
 		for k := uint(0); (k < plen) && (bits > 0); k += 1 {
 			if (mpos >> k & 1) == 0 {
 				continue
@@ -76,8 +76,8 @@ func GroupExtender(node *Pattern, ref *Reference) Patterns {
 
 func trieStarExtend(node *Pattern, ref *Reference, stars map[Char]*Pattern) {
 	for idx, mpos := range node.Pos.Iter() {
-		k := stats.BitScanLeft64(uint64(mpos))
-		if k < 0 { 
+		k := utils.BitScanLeft64(uint64(mpos))
+		if k < 0 {
 			continue
 		}
 		char, next, valid := ref.Next(idx, uint(k))

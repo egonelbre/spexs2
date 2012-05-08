@@ -25,3 +25,6 @@ concurrency:
 breaking
 binary
 matches crc32
+
+
+rename input -> query

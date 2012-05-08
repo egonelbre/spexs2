@@ -1,4 +1,4 @@
-package stats
+package utils
 
 import "math/big"
 
@@ -48,8 +48,8 @@ func BitCountInt(x *big.Int) int {
 
 func BitScanLeft(x uint) int {
 	for k := byte(0); k < 32; k += 1 {
-		if x & (1 << k) != 0 {
-			return int(k);
+		if x&(1<<k) != 0 {
+			return int(k)
 		}
 	}
 	return -1
@@ -57,8 +57,8 @@ func BitScanLeft(x uint) int {
 
 func BitScanLeft64(x uint64) int {
 	for k := byte(0); k < 64; k += 1 {
-		if x & (1 << k) != 0 {
-			return int(k);
+		if x&(1<<k) != 0 {
+			return int(k)
 		}
 	}
 	return -1
@@ -67,7 +67,7 @@ func BitScanLeft64(x uint64) int {
 func BitScanLeftInt(x *big.Int) int {
 	for k := 0; k < x.BitLen(); k += 1 {
 		if x.Bit(k) != 0 {
-			return k;
+			return k
 		}
 	}
 	return -1

@@ -8,14 +8,14 @@ import (
 
 var dbg = debugger.New()
 
-func AttachDebugger(s *AppSetup) {
+func attachDebugger(s *AppSetup) {
 	debugger.RunShell(dbg)
 	f := s.Extender
 	s.Extender = func(p *Pattern, ref *Reference) Patterns {
 		tmp := f(p, ref)
 		result := NewPatterns()
 		dbg.Break(func() {
-			fmt.Fprintf(dbg.Logout, "extending: %v\n", ref.ReplaceGroups(p.String()))
+			fmt.Fprintf(dbg.Logout, "extending: %v\n", p.String())
 			for extended := range tmp {
 				result <- extended
 				fmt.Fprintf(dbg.Logout, "  | %v\n", ref.ReplaceGroups(extended.String()))

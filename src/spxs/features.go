@@ -2,7 +2,7 @@ package main
 
 import (
 	. "spexs"
-	"stats"
+	"utils"
 )
 
 type Feature struct {
@@ -65,7 +65,7 @@ var Features = map[string]Feature{
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
 			back := p.Count(ref, 1)
-			pvalue := stats.HypergeometricSplit(query, back, ref.Groupings[0], ref.Groupings[1])
+			pvalue := utils.HypergeometricSplit(query, back, ref.Groupings[0], ref.Groupings[1])
 			return pvalue
 		}},
 	"match-hyper-down-pvalue": {
@@ -73,7 +73,7 @@ var Features = map[string]Feature{
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
 			back := p.Count(ref, 1)
-			pvalue := stats.HypergeometricSplitDown(query, back, ref.Groupings[0], ref.Groupings[1])
+			pvalue := utils.HypergeometricSplitDown(query, back, ref.Groupings[0], ref.Groupings[1])
 			return pvalue
 		}},
 	"match-ratio": {
@@ -81,7 +81,7 @@ var Features = map[string]Feature{
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
 			back := p.Count(ref, 1)
-			return float64(query + 1) / float64(back + 1)
+			return float64(query+1) / float64(back+1)
 		}},
 
 	"pat-length": {
@@ -134,7 +134,6 @@ var Features = map[string]Feature{
 			return float64(t)
 		}},
 }
-
 
 var StrFeatures = map[string]StrFeature{
 	"pat": {

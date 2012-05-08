@@ -31,7 +31,7 @@ func (hs *HashSet) Add(idx int, pos uint) {
 
 func (hs *HashSet) Contains(idx int, pos uint) bool {
 	val, exists := hs.data[idx]
-	return exists && (val & (1 << pos) != BitVector(0))
+	return exists && (val&(1<<pos) != BitVector(0))
 }
 
 func (hs *HashSet) Len() int {

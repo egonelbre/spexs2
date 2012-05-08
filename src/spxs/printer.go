@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"regexp"
 	. "spexs"
 	"text/template"
-	"regexp"
 )
 
 func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
@@ -46,7 +46,7 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		}
 
 		values := make(map[string]interface{})
-		
+
 		for name, fixName := range fixedNames {
 			f, valid := Features[name]
 			if valid {
@@ -58,15 +58,15 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 			}
 		}
 		/*
-		for name, f := range Features {
-			fixName := fixedNames[name]
-			values[fixName] = f.Func(pat, ref)
-		}
+			for name, f := range Features {
+				fixName := fixedNames[name]
+				values[fixName] = f.Func(pat, ref)
+			}
 
-		for name, f := range StrFeatures {
-			fixName := fixedNames[name]
-			values[fixName] = f.Func(pat, ref)
-		}*/
+			for name, f := range StrFeatures {
+				fixName := fixedNames[name]
+				values[fixName] = f.Func(pat, ref)
+			}*/
 
 		err = tmpl.Execute(out, values)
 		if err != nil {

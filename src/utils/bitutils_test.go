@@ -1,8 +1,8 @@
-package stats
+package utils
 
 import (
-	"testing"
 	"math/big"
+	"testing"
 )
 
 var bitCountTests = []struct {
@@ -52,7 +52,7 @@ var largeBitCountTests = []struct {
 	{0x811, 3},
 	{0xfff, 12},
 	{0xfff << 32, 12},
-	{0xfff << 50 + 3, 14},
+	{0xfff<<50 + 3, 14},
 }
 
 func TestBitCountInt(t *testing.T) {

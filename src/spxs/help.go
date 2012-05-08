@@ -40,7 +40,7 @@ func PrintHelp(conf Conf) {
 	fmt.Fprintf(os.Stderr, "  +[FEATURES]\n")
 	PrintFilters(os.Stderr)
 	fmt.Fprintf(os.Stderr, "\nEXTENDERS: \n")
-	PrintExtenders(os.Stderr)	
+	PrintExtenders(os.Stderr)
 	fmt.Fprintf(os.Stderr, "\nEXAMPLES: \n")
 	fmt.Fprintf(os.Stderr, "  spxs -procs=4 inp=data.dna ref=random.dna\n")
 

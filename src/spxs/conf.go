@@ -61,7 +61,7 @@ type Conf struct {
 		Filter map[string]map[string]interface{}
 		Count  int
 		Format string
-		Queue string
+		Queue  string
 	}
 	Aliases map[string]struct {
 		Desc   string

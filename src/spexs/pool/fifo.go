@@ -1,8 +1,8 @@
 package pool
 
 import (
-	"spexs"
 	"container/list"
+	"spexs"
 )
 
 type Fifo struct {

@@ -1,8 +1,8 @@
 package pool
 
 import (
-	. "spexs"
 	"container/heap"
+	. "spexs"
 )
 
 type Priority struct {
@@ -70,8 +70,8 @@ func (p *Priority) Less(i, j int) bool {
 
 // heap.Interface
 func (p *Priority) Push(x interface{}) {
-	if p.length + 1 > len(p.items) {
-		tmp := make([]*Pattern, len(p.items) + 50000)
+	if p.length+1 > len(p.items) {
+		tmp := make([]*Pattern, len(p.items)+50000)
 		copy(tmp, p.items)
 		p.items = tmp
 	}

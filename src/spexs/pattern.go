@@ -1,7 +1,7 @@
 package spexs
 
 import (
-	"stats"
+	"utils"
 )
 
 type Pattern struct {
@@ -12,7 +12,6 @@ type Pattern struct {
 	IsStar  bool
 	count   [2]int
 	occs    [2]int
-	length  int
 }
 
 func NewPattern(char Char, parent *Pattern) *Pattern {
@@ -30,7 +29,6 @@ func NewPattern(char Char, parent *Pattern) *Pattern {
 	p.count[1] = -1
 	p.occs[0] = -1
 	p.occs[1] = -1
-	p.length = -1
 	return p
 }
 
@@ -57,10 +55,7 @@ func (n *Pattern) String() string {
 
 func (n *Pattern) Len() int {
 	if n.Parent != nil {
-		if n.length < 0 {
-			n.length = n.Parent.Len() + 1
-		}
-		return n.length
+		return n.Parent.Len() + 1
 	}
 	return 0
 }
@@ -69,7 +64,7 @@ func (n *Pattern) Count(ref *Reference, group int) int {
 	if n.count[0] < 0 {
 		n.count[0] = 0
 		n.count[1] = 0
-		
+
 		for idx := range n.Pos.Iter() {
 			seq := ref.Seqs[idx]
 			n.count[seq.Group] += seq.Count
@@ -85,7 +80,7 @@ func (n *Pattern) Occs(ref *Reference, group int) int {
 
 		for idx, mpos := range n.Pos.Iter() {
 			seq := ref.Seqs[idx]
-			ocs := stats.BitCount64(uint64(mpos))
+			ocs := utils.BitCount64(uint64(mpos))
 			n.occs[seq.Group] += seq.Count * ocs
 		}
 	}

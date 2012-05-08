@@ -4,6 +4,7 @@ import (
 	"log"
 	"math"
 	. "spexs"
+	"utils"
 )
 
 type filterConf map[string]interface{}
@@ -16,7 +17,7 @@ func trueFilter(p *Pattern, ref *Reference) bool {
 }
 
 var Filters = map[string]filterCreator{
-	"no-starting-group" : func(conf filterConf) FilterFunc {
+	"no-starting-group": func(conf filterConf) FilterFunc {
 		return func(p *Pattern, ref *Reference) bool {
 			for p != nil {
 				if (p.IsGroup || p.IsStar) && (p.Parent != nil) && (p.Parent.Parent == nil) {
@@ -27,7 +28,7 @@ var Filters = map[string]filterCreator{
 			return true
 		}
 	},
-	"no-ending-group" : func(conf filterConf) FilterFunc {
+	"no-ending-group": func(conf filterConf) FilterFunc {
 		return func(p *Pattern, ref *Reference) bool {
 			return !p.IsGroup
 		}
@@ -67,7 +68,7 @@ func makeFloatFilter(feature FeatureFunc, config interface{}) FilterFunc {
 	conf.Min = math.NaN()
 	conf.Max = math.NaN()
 
-	ApplyObject(&config, &conf)
+	utils.ApplyObject(&config, &conf)
 
 	min, max := conf.Min, conf.Max
 	low, high := !math.IsNaN(conf.Min), !math.IsNaN(conf.Max)
