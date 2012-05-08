@@ -10,9 +10,6 @@ import (
 	"time"
 )
 
-
-var lg = log.New(os.Stderr, "", log.Ltime)
-
 const mb = 1024 * 1024
 
 func setupRuntime() {

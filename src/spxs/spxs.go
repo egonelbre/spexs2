@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	. "spexs"
-
+	"log"
 	"os"
+	. "spexs"
 )
 
 var (
@@ -23,6 +23,9 @@ var (
 	memoryLimit *int  = flag.Int("mem", -1, "memory limit in MB")
 
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
+
+	// logging to stderr
+	lg = log.New(os.Stderr, "", log.Ltime)
 )
 
 func info(v ...interface{}) {
