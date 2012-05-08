@@ -56,6 +56,7 @@ func main() {
 	initSetup()
 	setup := CreateSetup(conf)
 
+	// defined in runtime.go
 	setupRuntime()
 
 	if startProfiler(*cpuprofile) {
@@ -71,14 +72,7 @@ func main() {
 	}
 
 	if *live {
-		out := setup.Outputtable
-		setup.Outputtable = func(p *Pattern, ref *Reference) bool {
-			result := out(p, ref)
-			if result {
-				setup.Printer(os.Stderr, p, ref)
-			}
-			return result
-		}
+		setupLiveView(&setup)
 	}
 
 	info("running spexs")

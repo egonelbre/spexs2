@@ -77,3 +77,14 @@ func runStats(setup *AppSetup) {
 func endStats() {
 	quitStats <- 1
 }
+
+func setupLiveView(setup *AppSetup) {
+	out := setup.Outputtable
+	setup.Outputtable = func(p *Pattern, ref *Reference) bool {
+		result := out(p, ref)
+		if result {
+			setup.Printer(os.Stderr, p, ref)
+		}
+		return result
+	}
+}
