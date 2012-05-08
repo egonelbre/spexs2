@@ -29,7 +29,7 @@ var Filters = map[string]filterCreator{
 	},
 	"no-ending-group" : func(conf filterConf) FilterFunc {
 		return func(p *Pattern, ref *Reference) bool {
-			return !(p.IsGroup || p.IsStar)
+			return !p.IsGroup
 		}
 	},
 }

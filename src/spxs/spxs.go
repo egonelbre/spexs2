@@ -29,7 +29,7 @@ var (
 
 func setupRuntime() {
 	if *procs > 0 {
-		runtime.GOMAXPROCS(*procs)
+		runtime.GOMAXPROCS(*procs + 2)
 	}
 }
 
@@ -93,7 +93,7 @@ func main() {
 		gb := uint64(1024*1024)
 		for {
 			runtime.ReadMemStats(m)
-			fmt.Printf("%v\t%v\t%v\t%v\t%s\n", runtime.NumGoroutine(), m.Alloc/gb, m.TotalAlloc/gb, counter, seq)
+			fmt.Fprintf(os.Stderr, "%v\t%v\t%v\t%v\t%s\n", runtime.NumGoroutine(), m.Alloc/gb, m.TotalAlloc/gb, counter, seq)
 			time.Sleep(200 * time.Millisecond)
 
 			if m.Alloc/gb > uint64(*memoryLimit) {
