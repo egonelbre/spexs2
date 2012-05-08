@@ -15,7 +15,7 @@ var (
 	verbose *bool = flag.Bool("verbose", false, "print extended info")
 
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
-	live             *bool   = flag.Bool("live", false, "print output live")
+	live             *bool   = flag.Bool("live", false, "print live output")
 	configs          *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
 
 	stats       *bool = flag.Bool("stats", false, "print memory/extension statistics")
@@ -73,6 +73,10 @@ func main() {
 
 	if *live {
 		setupLiveView(&setup)
+	}
+
+	if *memoryLimit > 0 {
+		setMemLimit(&setup, uint64(*memoryLimit))
 	}
 
 	info("running spexs")
