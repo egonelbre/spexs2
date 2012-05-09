@@ -45,11 +45,16 @@ func setMemLimit(setup *AppSetup, memLimit uint64) {
 	}
 }
 
-var quitStats = make(chan int)
+var (
+	quitStats = make(chan int)
+	statsStarted = false
+)
+
 
 func runStats(setup *AppSetup) {
 	var counter uint64 = 0
 	var seq string = ""
+	statsStarted = true
 
 	go func() {
 		m := new(runtime.MemStats)
@@ -74,7 +79,9 @@ func runStats(setup *AppSetup) {
 }
 
 func endStats() {
-	quitStats <- 1
+	if statsStarted {
+		quitStats <- 1
+	}
 }
 
 func setupLiveView(setup *AppSetup) {
