@@ -11,7 +11,13 @@ import (
 )
 
 func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
+	
 	format := conf.Output.Format
+	header := conf.Output.Header
+	if header == "" {
+		regHdr, _ := regexp.Compile(`[\{\}]`)
+		header = regHdr.ReplaceAllString(format, "")
+	}
 
 	regExtract, _ := regexp.Compile(`\{([a-zA-Z0-9\-]+)\}`)
 	regFixName, _ := regexp.Compile(`-`)
@@ -41,7 +47,7 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 
 	f := func(out io.Writer, pat *Pattern, ref *Reference) {
 		if pat == nil {
-			fmt.Print(conf.Output.Format)
+			fmt.Print(header)
 			return
 		}
 
