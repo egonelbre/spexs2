@@ -25,6 +25,10 @@ func HypergeometricSplit(o int, r int, O int, R int) float64 {
 		denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lOR
 		add := math.Exp(nom - denom)
 		total += add
+		// add will first increase then decrease
+		// this means add must go through the maximum point of the distribution
+		// if add < total/1e10 we must be already decreasing
+		// and therefore total/1e10 means up to 10 digits precision
 		if add < total/1e10 {
 			break
 		}
