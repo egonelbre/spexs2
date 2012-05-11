@@ -51,7 +51,7 @@ func TestHypergeometricSplit(t *testing.T) {
 	testHyper(t, HypergeometricSplit)
 }
 
-func TestHypergeometricSplit(t *testing.T) {
+func TestHypergeometricSplitApprox(t *testing.T) {
 	testHyper(t, HypergeometricSplitApprox)
 }
 
