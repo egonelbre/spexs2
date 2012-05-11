@@ -25,17 +25,17 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 	regFixName, _ := regexp.Compile(`-`)
 
 	fixedNames := make(map[string]string)
-	
+
 	feats := make(map[string]features.Func)
 	strFeats := make(map[string]features.StrFunc)
 
 	formatStrs := regExtract.FindAllStringSubmatch(format, -1)
 	for _, tokens := range formatStrs {
 		name := tokens[1]
-		
+
 		f, valid := features.Get(name)
 		fs, validStr := features.GetStr(name)
-		
+
 		if !(valid || validStr) {
 			log.Fatal(errors.New("No valid format parameter: " + name))
 		}

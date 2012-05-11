@@ -1,4 +1,4 @@
-package spexs
+package sets
 
 import "testing"
 

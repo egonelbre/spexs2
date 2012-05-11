@@ -1,8 +1,8 @@
 package filters
 
 import (
-	. "spexs"
 	"errors"
+	. "spexs"
 )
 
 func trueFilter(p *Pattern, ref *Reference) bool {
@@ -17,7 +17,7 @@ func Compose(conf map[string]Conf) (Func, error) {
 		if !valid {
 			return nil, errors.New("No filter named: " + name)
 		}
-		
+
 		f, err := filter.Create(args)
 		if err != nil {
 			return nil, err

@@ -6,9 +6,9 @@ import (
 	"os"
 	"sort"
 
-	"spexs/filters"
 	"spexs/extenders"
 	"spexs/features"
+	"spexs/filters"
 	"spexs/fitnesses"
 )
 

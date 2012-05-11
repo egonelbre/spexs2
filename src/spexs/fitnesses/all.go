@@ -1,8 +1,7 @@
 package fitnesses
 
 import (
-	//. "spexs"
+//. "spexs"
 )
 
-var All = [...]Desc{
-}
+var All = [...]Desc{}

@@ -1,11 +1,11 @@
 package filters
 
 import (
+	"errors"
+	"math"
 	. "spexs"
 	"spexs/features"
-	"math"
 	"utils"
-	"errors"
 )
 
 type floatConf struct{ Min, Max float64 }

@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"spexs/filters"
 	"spexs/extenders"
+	"spexs/filters"
 )
 
 const baseConfiguration = `{

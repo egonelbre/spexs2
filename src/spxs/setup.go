@@ -2,13 +2,13 @@ package main
 
 import (
 	"io"
-	. "spexs"
 	"log"
-	
-	"spexs/pool"
+	. "spexs"
+
 	"spexs/extenders"
 	"spexs/filters"
 	"spexs/fitnesses"
+	"spexs/pool"
 )
 
 const MAX_POOL_SIZE = 1024 * 1024 * 1024
@@ -114,7 +114,7 @@ func CreateFitness(conf Conf, setup AppSetup) FitnessFunc {
 		log.Fatal(err)
 	}
 
-	return func(p *Pattern) float64{
+	return func(p *Pattern) float64 {
 		return fit(p, setup.Ref)
 	}
 }

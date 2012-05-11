@@ -2,6 +2,7 @@ package extenders
 
 import (
 	. "spexs"
+	"spexs/sets"
 	"utils"
 )
 
@@ -12,7 +13,7 @@ func output(out Patterns, patterns map[Char]*Pattern) {
 }
 
 func extend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
-	mpos := BitVector(0)
+	mpos := sets.BitVector(0)
 	for idx, ipos := range node.Pos.Iter() {
 		plen := uint(len(ref.Seqs[idx].Pat))
 		mpos = ipos

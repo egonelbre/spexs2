@@ -85,7 +85,7 @@ func main() {
 	}
 
 	endStats()
-	
+
 	if conf.Output.Queue != "lifo" {
 		info("sorting results")
 

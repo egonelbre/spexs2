@@ -10,9 +10,9 @@ var All = [...]Desc{
 		func(conf Conf) (Func, error) {
 			return func(p *Pattern, ref *Reference) bool {
 				for p != nil {
-					if (p.IsGroup || p.IsStar) && 
-					   (p.Parent != nil) && 
-					   (p.Parent.Parent == nil) {
+					if (p.IsGroup || p.IsStar) &&
+						(p.Parent != nil) &&
+						(p.Parent.Parent == nil) {
 						return false
 					}
 					p = p.Parent
@@ -20,7 +20,7 @@ var All = [...]Desc{
 				return true
 			}, nil
 		}},
-	{"no-ending-group", 
+	{"no-ending-group",
 		"does not allow pattern to end with group",
 		func(conf Conf) (Func, error) {
 			return func(p *Pattern, ref *Reference) bool {

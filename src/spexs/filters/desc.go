@@ -10,8 +10,8 @@ type Conf map[string]interface{}
 type CreateFunc func(Conf) (Func, error)
 
 type Desc struct {
-	Name string
-	Desc string
+	Name   string
+	Desc   string
 	Create CreateFunc
 }
 

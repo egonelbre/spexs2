@@ -129,5 +129,3 @@ var All = [...]Desc{
 			return float64(t)
 		}},
 }
-
-	
