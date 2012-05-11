@@ -59,13 +59,21 @@ var Features = map[string]Feature{
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Count(ref, 1)) / float64(ref.Groupings[1])
 		}},
-
+	
 	"match-hyper-up-pvalue": {
 		"hypergeometric split p-value",
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
 			back := p.Count(ref, 1)
 			pvalue := utils.HypergeometricSplit(query, back, ref.Groupings[0], ref.Groupings[1])
+			return pvalue
+		}},
+	"match-hyper-up-pvalue-approx": {
+		"hypergeometric split p-value approx",
+		func(p *Pattern, ref *Reference) float64 {
+			query := p.Count(ref, 0)
+			back := p.Count(ref, 1)
+			pvalue := utils.HypergeometricSplitApprox(query, back, ref.Groupings[0], ref.Groupings[1])
 			return pvalue
 		}},
 	"match-hyper-down-pvalue": {

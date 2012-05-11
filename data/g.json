@@ -26,7 +26,7 @@
 		"args" : {"p-value":{}},
 		"filter" : {
 			"match-ratio" : {"min":2},
-			"match-hyper-up-pvalue" : {"max":1e-3}
+			"match-hyper-up-pvalue-approx" : {"max":1e-3}
 		},
 		"count": 100,
 		"format": "{pat}\t{pat-length}\t{pat-groups}\t{pat-chars}\t{query-match-seqs}\t{back-match-seqs}\t{match-ratio}\t{match-hyper-up-pvalue}\n",

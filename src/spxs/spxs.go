@@ -92,6 +92,7 @@ func main() {
 
 	endStats()
 
+/*
 	if conf.Output.Queue != "lifo" {
 		info("sorting results")
 
@@ -111,6 +112,6 @@ func main() {
 		setup.Printer(os.Stdout, node, setup.Ref)
 		node, ok = setup.Out.Take()
 	}
-
+*/
 	fmt.Printf("\n")
 }

@@ -51,6 +51,10 @@ func TestHypergeometricSplit(t *testing.T) {
 	testHyper(t, HypergeometricSplit)
 }
 
+func TestHypergeometricSplit(t *testing.T) {
+	testHyper(t, HypergeometricSplitApprox)
+}
+
 type binomTest struct {
 	x, N   int
 	p      float64
