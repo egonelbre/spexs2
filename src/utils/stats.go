@@ -1,14 +1,16 @@
 package utils
 
-import "math"
+import (
+	"math"
+)
 
 func lnG(v int) float64 {
-	r, _ := math.Lgamma(float64(v))
+	r, _ := Lgamma(float64(v))
 	return r
 }
 
 func gamma(v int) float64 {
-	return math.Gamma(float64(v))
+	return Gamma(float64(v))
 }
 
 // returns probability of split of
