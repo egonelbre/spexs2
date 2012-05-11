@@ -1,6 +1,27 @@
 package pool
 
-import "testing"
+import (
+	"testing"
+	. "spexs"
+	"unicode/utf8"
+)
+
+func pat(s string) *Pattern {
+	r := NewPattern(0, nil)
+	return add(r, s)
+}
+
+func add(base *Pattern, s string) *Pattern {
+	if len(s) <= 0 {
+		return base
+	}
+	rune, size := utf8.DecodeRuneInString(s)
+	n := NewPattern(Char(rune), base)
+	if rune == 'X' {
+		n.IsStar = true
+	}
+	return add(n, s[size:])
+}
 
 func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
 	val, ok := p.Take()
@@ -12,8 +33,8 @@ func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
 	}
 }
 
-func TestFifoPool(t *testing.T) {
-	p := NewFifoPool()
+func TestFifo(t *testing.T) {
+	p := NewFifo()
 
 	p.Put(pat("alpha"))
 	p.Put(pat("beta"))
@@ -30,11 +51,11 @@ func TestFifoPool(t *testing.T) {
 	testTake(t, p, "", false)
 }
 
-func TestPriorityPool(t *testing.T) {
+func TestPriority(t *testing.T) {
 	lenFitness := func(p *Pattern) float64 {
 		return float64(len(p.String()))
 	}
-	p := NewPriorityPool(lenFitness, 100, true)
+	p := NewPriority(lenFitness, 100, true)
 
 	p.Put(pat("bc"))
 	p.Put(pat("defg"))
