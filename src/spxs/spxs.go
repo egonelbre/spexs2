@@ -66,21 +66,16 @@ func main() {
 		defer stopProfiler()
 	}
 
-	if *interactiveDebug {
-		attachDebugger(&setup)
+	ifthen := func(val bool, f func(*AppSetup)){
+		if val {
+			f(&setup)
+		}
 	}
 
-	if *stats {
-		runStats(&setup)
-	}
-
-	if *live {
-		setupLiveView(&setup)
-	}
-
-	if *memoryLimit > 0 {
-		setMemLimit(&setup, uint64(*memoryLimit))
-	}
+	ifthen(*interactiveDebug, attachDebugger)
+	ifthen(*stats, runStats)
+	ifthen(*live, setupLiveView)
+	ifthen(*memoryLimit>0, setMemLimit)
 
 	info("running spexs")
 

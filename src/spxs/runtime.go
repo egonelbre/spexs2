@@ -32,7 +32,8 @@ func stopProfiler() {
 	pprof.StopCPUProfile()
 }
 
-func setMemLimit(setup *AppSetup, memLimit uint64) {
+func setMemLimit(setup *AppSetup) {
+	memLimit := uint64(*memoryLimit)
 	ext := setup.Extender
 	m := new(runtime.MemStats)
 
