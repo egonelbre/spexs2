@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-const epsilon = 0.000001
-
 type gammaFunc func(o int, r int, O int, R int) float64
 
 func benchHyper(b *testing.B, fn gammaFunc) {
@@ -34,7 +32,7 @@ type gammaTest struct {
 	result     float64
 }
 
-func testHyper(t *testing.T, fn gammaFunc) {
+func testHyper(t *testing.T, fn gammaFunc, epsilon float64) {
 	// verification result was calculated with R
 	// phyper(o-1, O, R, o+r, lower.tail = F, log.p = F)
 	tests := [...]gammaTest{
@@ -44,6 +42,7 @@ func testHyper(t *testing.T, fn gammaFunc) {
 		{1, 30, 9, 50, 0.9937611},
 		{9, 45, 2, 40, 0.03885435},
 		{1700, 1000000, 5000, 3000000, 0.244143},
+		{1700, 1000000, 3000, 3000000, 6.340578e-65},
 	}
 
 	for i, test := range tests {
@@ -56,15 +55,15 @@ func testHyper(t *testing.T, fn gammaFunc) {
 }
 
 func TestHypergeometricSplit(t *testing.T) {
-	testHyper(t, HypergeometricSplit)
+	testHyper(t, HypergeometricSplit, 1e-6)
 }
 
 func TestHypergeometricSplitSlow(t *testing.T) {
-	testHyper(t, HypergeometricSplitSlow)
+	testHyper(t, HypergeometricSplitSlow, 1e-6)
 }
 
 func TestHypergeometricSplitApprox(t *testing.T) {
-	testHyper(t, HypergeometricSplitApprox)
+	testHyper(t, HypergeometricSplitApprox, 1e-5)
 }
 
 type binomTest struct {
@@ -86,7 +85,7 @@ func TestBinomial(t *testing.T) {
 	for i, test := range tests {
 		p := BinomialProb(test.x, test.N, test.p)
 
-		if math.Abs(p-test.result) > epsilon {
+		if math.Abs(p-test.result) > 1e-6 {
 			t.Errorf("fail %v: got %v, expected %v, \nerr=%v", i, p, test.result, math.Abs(p-test.result))
 		}
 	}
