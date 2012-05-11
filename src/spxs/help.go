@@ -12,24 +12,10 @@ var lgh = log.New(os.Stderr, "", 0)
 func PrintHelp(conf Conf) {
 	lgh.Printf("Usage of %s:\n", os.Args[0])
 	lgh.Printf("spxs [FLAGS] [OPTIONS]\n\n")
-	PrintVersion()
 	lgh.Printf("FLAGS: \n")
 	flag.PrintDefaults()
-	lgh.Printf("\nALIASES: \n")
 
-	keys := make([]string, len(conf.Aliases))
-	i := 0
-	for key := range conf.Aliases {
-		keys[i] = key
-		i += 1
-	}
-	sort.Strings(keys)
-
-	for _, name := range keys {
-		args := conf.Aliases[name]
-		lgh.Printf("  %s : %s\n", name, args.Desc)
-	}
-
+	PrintAliases(conf)
 	PrintStrFeatures()
 	PrintFeatures()
 	PrintFitnesses()
@@ -47,39 +33,78 @@ func PrintVersion() {
 	lgh.Printf("%v\n", theBuildTime)
 }
 
-func PrintStrFeatures() {
-	lgh.Printf("\nSTRING FEATURES: \n")
-	for name, f := range StrFeatures {
-		lgh.Printf("  %s : %s\n", name, f.Desc)
+func printSection(caption string, data map[string]string) {
+	
+	i := 0
+	names := make([]string, len(data))
+	for name := range data {
+		names[i] = name
+		i += 1
 	}
+	sort.Strings(names)
+
+	lgh.Printf("\n%s: \n", caption)
+	for _, name := range names {
+		info := data[name]
+		if info != "" {
+			lgh.Printf("  %s : %s\n", name, info)
+		} else {
+			lgh.Printf("  %s\n", name)
+		}
+	}
+}
+
+func PrintAliases(conf Conf){
+	info := make(map[string]string)
+	for name, data := range conf.Aliases {
+		info[name] = data.Desc
+	}
+
+	printSection("Aliases", info)
+}
+
+func PrintStrFeatures() {
+	info := make(map[string]string)
+	for name, data := range StrFeatures {
+		info[name] = data.Desc
+	}
+
+	printSection("String Features", info)
 }
 
 func PrintFeatures() {
-	lgh.Printf("\nFEATURES: \n")
-	for name, f := range Features {
-		lgh.Printf("  %s : %s\n", name, f.Desc)
+	info := make(map[string]string)
+	for name, data := range Features {
+		info[name] = data.Desc
 	}
+
+	printSection("Features", info)
 }
 
 func PrintFitnesses() {
-	lgh.Printf("\nFITNESSES: \n")
-	lgh.Printf("  +[FEATURES]\n")
+	info := make(map[string]string)
 	for name, _ := range Fitnesses {
-		lgh.Printf("  %s\n", name)
+		info[name] = ""
 	}
+	info["+[FEATURES]"] = ""
+
+	printSection("Fitnesses", info)
 }
 
 func PrintFilters() {
-	lgh.Printf("\nFILTERS: \n")
-	lgh.Printf("  +[FEATURES]\n")
+	info := make(map[string]string)
 	for name, _ := range Filters {
-		lgh.Printf("  %s\n", name)
+		info[name] = ""
 	}
+	info["+[FEATURES]"] = ""
+
+	printSection("Filters", info)
 }
 
 func PrintExtenders() {
-	lgh.Printf("\nEXTENDERS: \n")
+	info := make(map[string]string)
 	for name, _ := range Extenders {
-		lgh.Printf("  %s\n", name)
+		info[name] = ""
 	}
+	printSection("Extenders", info)
 }
