@@ -56,6 +56,8 @@ func CreateSetup(conf Conf) AppSetup {
 	s.Outputtable = CreateFilter(conf.Output.Filter, s)
 
 	s.PostProcess = func(p *Pattern, s *Setup) error {
+		p.Occs()
+		p.Count()
 		p.Pos.Clear()
 		return nil
 	}

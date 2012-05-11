@@ -9,7 +9,7 @@ const epsilon = 0.000001
 
 type gammaFunc func(o int, r int, O int, R int) float64
 
-func benchGamma(b *testing.B, fn gammaFunc) {
+func benchHyper(b *testing.B, fn gammaFunc) {
 	for v := 0; v < 100; v += 1 {
 		for r := 0; r < 100; r += 1 {
 			fn(v, r, 13000, 13000)
@@ -17,8 +17,8 @@ func benchGamma(b *testing.B, fn gammaFunc) {
 	}
 }
 
-func BenchmarkGamma(b *testing.B) {
-	benchGamma(b, HypergeometricSplit)
+func BenchmarkHyper(b *testing.B) {
+	benchHyper(b, HypergeometricSplit)
 }
 
 type gammaTest struct {
@@ -26,9 +26,8 @@ type gammaTest struct {
 	result     float64
 }
 
-func testGamma(t *testing.T, fn gammaFunc) {
-	// verification result was calculated with
-	// binomial(O, o) * binomial(R, r)/binomial(O+R, o+r)
+func testHyper(t *testing.T, fn gammaFunc) {
+	// verification result was calculated with R
 
 	//o, O, R, o + r
 	tests := [...]gammaTest{
@@ -48,8 +47,8 @@ func testGamma(t *testing.T, fn gammaFunc) {
 	}
 }
 
-func TestGamma(t *testing.T) {
-	testGamma(t, HypergeometricSplit)
+func TestHyper(t *testing.T) {
+	testHyper(t, HypergeometricSplit)
 }
 
 type binomTest struct {
