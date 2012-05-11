@@ -3,14 +3,14 @@ package extenders
 var All = [...]Desc{
 	{"simple",
 		"extends using the alphabet",
-		wrap(SimpleExtender)},
+		wrap(Simplex)},
 	{"group",
 		"extends using the alphabet and group symbols",
-		wrap(GroupExtender)},
+		wrap(Groupex)},
 	{"star",
 		"extends using the alphabet and star extension",
-		wrap(StarExtender)},
+		wrap(Starex)},
 	{"regexp",
 		"extends using the alphabet, group symbols and stars",
-		wrap(GroupStarExtender)},
+		wrap(Regex)},
 }

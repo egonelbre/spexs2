@@ -11,7 +11,7 @@ func output(out Patterns, patterns map[Char]*Pattern) {
 	}
 }
 
-func simpleExtend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
+func extend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
 	mpos := BitVector(0)
 	for idx, ipos := range node.Pos.Iter() {
 		plen := uint(len(ref.Seqs[idx].Pat))
@@ -38,18 +38,18 @@ func simpleExtend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
 	}
 }
 
-func SimpleExtender(node *Pattern, ref *Reference) Patterns {
+func Simplex(node *Pattern, ref *Reference) Patterns {
 	result := NewPatterns()
 	patterns := make(map[Char]*Pattern)
 
-	simpleExtend(node, ref, patterns)
+	extend(node, ref, patterns)
 
 	output(result, patterns)
 	close(result)
 	return result
 }
 
-func groupCombine(node *Pattern, ref *Reference, patterns map[Char]*Pattern, star bool) {
+func combine(node *Pattern, ref *Reference, patterns map[Char]*Pattern, star bool) {
 	for _, g := range ref.Groups {
 		pat := NewPattern(g.Id, node)
 		pat.IsGroup = true
@@ -63,19 +63,19 @@ func groupCombine(node *Pattern, ref *Reference, patterns map[Char]*Pattern, sta
 	}
 }
 
-func GroupExtender(node *Pattern, ref *Reference) Patterns {
+func Groupex(node *Pattern, ref *Reference) Patterns {
 	result := NewPatterns()
 	patterns := make(map[Char]*Pattern)
 
-	simpleExtend(node, ref, patterns)
-	groupCombine(node, ref, patterns, false)
+	extend(node, ref, patterns)
+	combine(node, ref, patterns, false)
 
 	output(result, patterns)
 	close(result)
 	return result
 }
 
-func trieStarExtend(node *Pattern, ref *Reference, stars map[Char]*Pattern) {
+func starExtend(node *Pattern, ref *Reference, stars map[Char]*Pattern) {
 	for idx, mpos := range node.Pos.Iter() {
 		k := utils.BitScanLeft64(uint64(mpos))
 		if k < 0 {
@@ -95,12 +95,12 @@ func trieStarExtend(node *Pattern, ref *Reference, stars map[Char]*Pattern) {
 	}
 }
 
-func StarExtender(node *Pattern, ref *Reference) Patterns {
+func Starex(node *Pattern, ref *Reference) Patterns {
 	result := NewPatterns()
 	patterns := make(map[Char]*Pattern)
 	stars := make(map[Char]*Pattern)
-	simpleExtend(node, ref, patterns)
-	trieStarExtend(node, ref, stars)
+	extend(node, ref, patterns)
+	starExtend(node, ref, stars)
 
 	output(result, patterns)
 	output(result, stars)
@@ -109,15 +109,15 @@ func StarExtender(node *Pattern, ref *Reference) Patterns {
 	return result
 }
 
-func GroupStarExtender(node *Pattern, ref *Reference) Patterns {
+func Regex(node *Pattern, ref *Reference) Patterns {
 	result := NewPatterns()
 	patterns := make(map[Char]*Pattern)
 	stars := make(map[Char]*Pattern)
 
-	simpleExtend(node, ref, patterns)
-	groupCombine(node, ref, patterns, false)
-	trieStarExtend(node, ref, stars)
-	groupCombine(node, ref, stars, true)
+	extend(node, ref, patterns)
+	combine(node, ref, patterns, false)
+	starExtend(node, ref, stars)
+	combine(node, ref, stars, true)
 
 	output(result, patterns)
 	output(result, stars)
