@@ -28,14 +28,14 @@ type gammaTest struct {
 
 func testHyper(t *testing.T, fn gammaFunc) {
 	// verification result was calculated with R
-
-	//o, O, R, o + r
+	// phyper(o-1, O, R, o+r, lower.tail = F, log.p = F)
 	tests := [...]gammaTest{
 		{2, 41, 9, 40, 0.9969428},
 		{2, 47, 9, 40, 0.9984949},
 		{2, 45, 10, 30, 0.9999026},
 		{1, 30, 9, 50, 0.9937611},
 		{9, 45, 2, 40, 0.03885435},
+		{1700, 1000000, 5000, 3000000, 0.244143},
 	}
 
 	for i, test := range tests {
@@ -47,7 +47,7 @@ func testHyper(t *testing.T, fn gammaFunc) {
 	}
 }
 
-func TestHyper(t *testing.T) {
+func TestHypergeometricSplit(t *testing.T) {
 	testHyper(t, HypergeometricSplit)
 }
 

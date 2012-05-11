@@ -3,3 +3,5 @@ temp/**
 doc/**
 pkg/**
 bin/**
+*.sublime-project
+*.sublime-workspace

@@ -19,18 +19,20 @@ func gamma(v int) float64 {
 func HypergeometricSplit(o int, r int, O int, R int) float64 {
 	total := 0.0
 	lSOR := lnG(O+1) + lnG(R+1)
-	lOR := lnG(O+R+1)
+	lOR := lnG(O + R + 1)
 	for r >= 0 {
 		nom := lSOR + lnG(o+r+1) + lnG(O+R-o-r+1)
 		denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lOR
-		total += math.Exp(nom - denom)
-
+		add := math.Exp(nom - denom)
+		total += add
+		if add < total/1e10 {
+			break
+		}
 		r -= 1
 		o += 1
 	}
 	return total
 }
-
 
 // returns probability of split of
 // o - observed in input , r - observed in validation set
@@ -39,7 +41,7 @@ func HypergeometricSplit(o int, r int, O int, R int) float64 {
 func HypergeometricSplitDown(o int, r int, O int, R int) float64 {
 	total := 0.0
 	lSOR := lnG(O+1) + lnG(R+1)
-	lOR := lnG(O+R+1)	
+	lOR := lnG(O + R + 1)
 	for o >= 0 {
 		nom := lSOR + lnG(o+r+1) + lnG(O+R-o-r+1)
 		denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lOR
@@ -59,5 +61,3 @@ func BinomialProb(x int, N int, p float64) float64 {
 	denom := lnG(x+1) + lnG(N-x+1)
 	return math.Exp(nom-denom) * math.Pow(p, float64(x)) * math.Pow(1-p, float64(N-x))
 }
-
-
