@@ -33,8 +33,20 @@ func PrintVersion() {
 	lgh.Printf("%v\n", theBuildTime)
 }
 
+func printCaption(caption string) {
+	lgh.Printf("\n%s: \n", caption)
+}
+
+func printItem(name, info string) {
+	if info != "" {
+		lgh.Printf("  %s : %s\n", name, info)
+	} else {
+		lgh.Printf("  %s\n", name)
+	}
+}
+
 func printSection(caption string, data map[string]string) {
-	
+
 	i := 0
 	names := make([]string, len(data))
 	for name := range data {
@@ -43,18 +55,13 @@ func printSection(caption string, data map[string]string) {
 	}
 	sort.Strings(names)
 
-	lgh.Printf("\n%s: \n", caption)
+	printCaption(caption)
 	for _, name := range names {
-		info := data[name]
-		if info != "" {
-			lgh.Printf("  %s : %s\n", name, info)
-		} else {
-			lgh.Printf("  %s\n", name)
-		}
+		printItem(name, data[name])
 	}
 }
 
-func PrintAliases(conf Conf){
+func PrintAliases(conf Conf) {
 	info := make(map[string]string)
 	for name, data := range conf.Aliases {
 		info[name] = data.Desc
@@ -102,9 +109,8 @@ func PrintFilters() {
 }
 
 func PrintExtenders() {
-	info := make(map[string]string)
-	for name, _ := range Extenders {
-		info[name] = ""
+	printCaption("Extenders")
+	for _, e := range ExtendersList {
+		printItem(e.name, e.desc)
 	}
-	printSection("Extenders", info)
 }

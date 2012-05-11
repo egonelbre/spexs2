@@ -11,7 +11,7 @@ import (
 )
 
 func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
-	
+
 	format := conf.Output.Format
 	header := conf.Output.Header
 	if header == "" {

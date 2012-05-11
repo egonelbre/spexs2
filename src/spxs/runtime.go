@@ -47,10 +47,9 @@ func setMemLimit(setup *AppSetup) {
 }
 
 var (
-	quitStats = make(chan int)
+	quitStats    = make(chan int)
 	statsStarted = false
 )
-
 
 func runStats(setup *AppSetup) {
 	var counter uint64 = 0

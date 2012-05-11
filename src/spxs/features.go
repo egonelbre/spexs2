@@ -59,7 +59,7 @@ var Features = map[string]Feature{
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Count(ref, 1)) / float64(ref.Groupings[1])
 		}},
-	
+
 	"match-hyper-up-pvalue": {
 		"hypergeometric split p-value",
 		func(p *Pattern, ref *Reference) float64 {

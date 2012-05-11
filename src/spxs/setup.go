@@ -56,8 +56,8 @@ func CreateSetup(conf Conf) AppSetup {
 	s.Outputtable = CreateFilter(conf.Output.Filter, s)
 
 	s.PostProcess = func(p *Pattern, s *Setup) error {
-		p.Occs(s.Ref,0)
-		p.Count(s.Ref,0)
+		p.Occs(s.Ref, 0)
+		p.Count(s.Ref, 0)
 		p.Pos.Clear()
 		return nil
 	}
@@ -68,6 +68,7 @@ func CreateSetup(conf Conf) AppSetup {
 }
 
 func initSetup() {
+	initExtenders()
 	initFitnesses()
 	initFilters()
 }
