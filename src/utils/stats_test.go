@@ -21,6 +21,14 @@ func BenchmarkHyper(b *testing.B) {
 	benchHyper(b, HypergeometricSplit)
 }
 
+func BenchmarkHyperApprox(b *testing.B) {
+	benchHyper(b, HypergeometricSplitApprox)
+}
+
+func BenchmarkHyperSlow(b *testing.B) {
+	benchHyper(b, HypergeometricSplitSlow)
+}
+
 type gammaTest struct {
 	o, O, r, R int
 	result     float64
@@ -49,6 +57,10 @@ func testHyper(t *testing.T, fn gammaFunc) {
 
 func TestHypergeometricSplit(t *testing.T) {
 	testHyper(t, HypergeometricSplit)
+}
+
+func TestHypergeometricSplitSlow(t *testing.T) {
+	testHyper(t, HypergeometricSplitSlow)
 }
 
 func TestHypergeometricSplitApprox(t *testing.T) {

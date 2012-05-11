@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"math"
+	. "math"
 )
 
 func lnG(v int) float64 {
@@ -13,19 +13,16 @@ func gamma(v int) float64 {
 	return Gamma(float64(v))
 }
 
-// returns probability of split of
-// o - observed in input , r - observed in validation set
-// O - total items in input, R - total items in validation set
-// using logarithmic gamma function
-// TODO: limits test
-func HypergeometricSplit(o int, r int, O int, R int) float64 {
+// this is for reference
+// as the code below is quite unreadable, but 2x as fast
+func HypergeometricSplitSlow(o int, r int, O int, R int) float64 {
 	total := 0.0
 	lSOR := lnG(O+1) + lnG(R+1)
 	lOR := lnG(O + R + 1)
 	for r >= 0 {
 		nom := lSOR + lnG(o+r+1) + lnG(O+R-o-r+1)
 		denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lOR
-		add := math.Exp(nom - denom)
+		add := Exp(nom - denom)
 		total += add
 		r -= 1
 		o += 1
@@ -38,24 +35,76 @@ func HypergeometricSplit(o int, r int, O int, R int) float64 {
 // O - total items in input, R - total items in validation set
 // using logarithmic gamma function
 // TODO: limits test
-func HypergeometricSplitApprox(o int, r int, O int, R int) float64 {
+func HypergeometricSplit(oi int, ri int, Oi int, Ri int) float64 {
 	total := 0.0
-	lSOR := lnG(O+1) + lnG(R+1)
-	lOR := lnG(O + R + 1)
-	for r >= 0 {
-		nom := lSOR + lnG(o+r+1) + lnG(O+R-o-r+1)
-		denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lOR
-		add := math.Exp(nom - denom)
+	
+	o := float64(oi)
+	r := float64(ri)
+	O := float64(Oi)
+	R := float64(Ri)
+
+	gO, _ := Lgamma(O+1.0)
+	gR, _ := Lgamma(R+1.0)
+	gaOR := gO + gR
+	gOR, _ := Lgamma(O + R + 1.0)
+	for r >= 0.0 {
+		gor, _ := Lgamma(o + r + 1.0)
+		gORor, _ := Lgamma(O + R - o - r + 1)
+		nom := gaOR + gor + gORor
+
+		ga, _ := Lgamma(o + 1.0)
+		gOo, _ := Lgamma(O - o + 1.0)
+		gr, _ := Lgamma(r + 1.0)
+		gRr, _ := Lgamma(R - r + 1.0)
+
+		denom := ga + gOo + gr + gRr + gOR
+		
+		add := Exp(nom - denom)
 		total += add
-		// add will first increase then decrease
-		// this means add must go through the maximum point of the distribution
-		// if add < total/1eN we must be already decreasing
-		// and therefore total/1eN means approximately N digits precision
-		if add < total/1e16 {
+		r -= 1.0
+		o += 1.0
+	}
+	return total
+}
+
+// returns probability of split of
+// o - observed in input , r - observed in validation set
+// O - total items in input, R - total items in validation set
+// using logarithmic gamma function
+// TODO: limits test
+func HypergeometricSplitApprox(oi int, ri int, Oi int, Ri int) float64 {
+	total := 0.0
+	
+	o := float64(oi)
+	r := float64(ri)
+	O := float64(Oi)
+	R := float64(Ri)
+
+	gO, _ := Lgamma(O+1.0)
+	gR, _ := Lgamma(R+1.0)
+	gaOR := gO + gR
+	gOR, _ := Lgamma(O + R + 1.0)
+	for r >= 0.0 {
+		gor, _ := Lgamma(o + r + 1.0)
+		gORor, _ := Lgamma(O + R - o - r + 1)
+		nom := gaOR + gor + gORor
+
+		ga, _ := Lgamma(o + 1.0)
+		gOo, _ := Lgamma(O - o + 1.0)
+		gr, _ := Lgamma(r + 1.0)
+		gRr, _ := Lgamma(R - r + 1.0)
+
+		denom := ga + gOo + gr + gRr + gOR
+		
+		add := Exp(nom - denom)
+		total += add
+
+		if add < total/1e10 {
 			break
 		}
-		r -= 1
-		o += 1
+
+		r -= 1.0
+		o += 1.0
 	}
 	return total
 }
@@ -71,7 +120,7 @@ func HypergeometricSplitDown(o int, r int, O int, R int) float64 {
 	for o >= 0 {
 		nom := lSOR + lnG(o+r+1) + lnG(O+R-o-r+1)
 		denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lOR
-		total += math.Exp(nom - denom)
+		total += Exp(nom - denom)
 
 		r += 1
 		o -= 1
@@ -85,5 +134,5 @@ func HypergeometricSplitDown(o int, r int, O int, R int) float64 {
 func BinomialProb(x int, N int, p float64) float64 {
 	nom := lnG(N + 1)
 	denom := lnG(x+1) + lnG(N-x+1)
-	return math.Exp(nom-denom) * math.Pow(p, float64(x)) * math.Pow(1-p, float64(N-x))
+	return Exp(nom-denom) * Pow(p, float64(x)) * Pow(1-p, float64(N-x))
 }
