@@ -5,7 +5,7 @@ import (
 	. "spexs"
 )
 
-type extenderConf interface{}
+type extenderConf map[string]interface{}
 type extenderCreator func(conf extenderConf, setup AppSetup) ExtenderFunc
 
 type extenderDesc struct {
@@ -14,31 +14,28 @@ type extenderDesc struct {
 	fun  extenderCreator
 }
 
-var ExtendersList = [...]extenderDesc{
+var Extenders = [...]extenderDesc{
 	{"simple",
 		"extends using the alphabet",
-		simpleExtender(SimpleExtender),
-	},
+		simpleExtender(SimpleExtender)},
 	{"group",
 		"extends using the alphabet and group symbols",
-		simpleExtender(GroupExtender),
-	},
+		simpleExtender(GroupExtender)},
 	{"star",
 		"extends using the alphabet and star extension",
-		simpleExtender(StarExtender),
-	},
+		simpleExtender(StarExtender)},
 	{"regexp",
 		"extends using the alphabet, group symbols and stars",
-		simpleExtender(GroupStarExtender),
-	},
+		simpleExtender(GroupStarExtender)},
 }
 
-var Extenders = map[string]extenderCreator{}
-
-func initExtenders() {
-	for _, e := range ExtendersList {
-		Extenders[e.name] = e.fun
+func getExtender(name string) (extenderCreator, bool) {
+	for _, e := range Extenders {
+		if e.name == name {
+			return e.fun, true
+		}
 	}
+	return nil, false
 }
 
 func simpleExtender(f ExtenderFunc) extenderCreator {
@@ -52,12 +49,12 @@ func CreateExtender(conf Conf, setup AppSetup) ExtenderFunc {
 		log.Fatal("Extender not defined!")
 	}
 
-	extenderCreate, valid := Extenders[conf.Extension.Method]
+	create, valid := getExtender(conf.Extension.Method)
 	if !valid {
 		log.Fatal("No extender named: ", conf.Extension.Method)
 	}
 
 	args := conf.Extension.Args[conf.Extension.Method]
 
-	return extenderCreate(args, setup)
+	return create(args, setup)
 }

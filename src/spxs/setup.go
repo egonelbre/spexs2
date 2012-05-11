@@ -68,7 +68,6 @@ func CreateSetup(conf Conf) AppSetup {
 }
 
 func initSetup() {
-	initExtenders()
 	initFitnesses()
 	initFilters()
 }

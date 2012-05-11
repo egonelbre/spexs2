@@ -110,7 +110,7 @@ func PrintFilters() {
 
 func PrintExtenders() {
 	printCaption("Extenders")
-	for _, e := range ExtendersList {
+	for _, e := range Extenders {
 		printItem(e.name, e.desc)
 	}
 }
