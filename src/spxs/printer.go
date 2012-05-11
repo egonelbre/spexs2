@@ -8,6 +8,8 @@ import (
 	"regexp"
 	. "spexs"
 	"text/template"
+
+	"spexs/features"
 )
 
 func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
@@ -23,14 +25,27 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 	regFixName, _ := regexp.Compile(`-`)
 
 	fixedNames := make(map[string]string)
+	
+	feats := make(map[string]features.Func)
+	strFeats := make(map[string]features.StrFunc)
 
 	formatStrs := regExtract.FindAllStringSubmatch(format, -1)
 	for _, tokens := range formatStrs {
 		name := tokens[1]
-		_, valid := Features[name]
-		_, validStr := StrFeatures[name]
+		
+		f, valid := features.Get(name)
+		fs, validStr := features.GetStr(name)
+		
 		if !(valid || validStr) {
 			log.Fatal(errors.New("No valid format parameter: " + name))
+		}
+
+		if valid {
+			feats[name] = f.Func
+		}
+
+		if validStr {
+			strFeats[name] = fs.Func
 		}
 
 		fixedNames[name] = regFixName.ReplaceAllString(name, "")
@@ -54,13 +69,13 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		values := make(map[string]interface{})
 
 		for name, fixName := range fixedNames {
-			f, valid := Features[name]
+			f, valid := feats[name]
 			if valid {
-				values[fixName] = f.Func(pat, ref)
+				values[fixName] = f(pat, ref)
 			}
-			fstr, valid := StrFeatures[name]
+			fstr, valid := strFeats[name]
 			if valid {
-				values[fixName] = fstr.Func(pat, ref)
+				values[fixName] = fstr(pat, ref)
 			}
 		}
 

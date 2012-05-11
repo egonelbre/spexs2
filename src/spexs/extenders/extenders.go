@@ -1,6 +1,7 @@
-package spexs
+package extenders
 
 import (
+	. "spexs"
 	"utils"
 )
 

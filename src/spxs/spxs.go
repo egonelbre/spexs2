@@ -56,7 +56,6 @@ func main() {
 
 	info("reading input")
 
-	initSetup()
 	setup := CreateSetup(conf)
 
 	// defined in runtime.go
@@ -86,7 +85,7 @@ func main() {
 	}
 
 	endStats()
-
+	
 	if conf.Output.Queue != "lifo" {
 		info("sorting results")
 

@@ -9,6 +9,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"spexs/filters"
+	"spexs/extenders"
 )
 
 const baseConfiguration = `{
@@ -52,14 +55,14 @@ type Conf struct {
 	}
 	Extension struct {
 		Method string
-		Args   map[string]map[string]interface{}
-		Filter map[string]map[string]interface{}
+		Args   map[string]extenders.Conf
+		Filter map[string]filters.Conf
 	}
 	Output struct {
 		Order  string
 		Sort   string
 		Args   map[string]map[string]interface{}
-		Filter map[string]map[string]interface{}
+		Filter map[string]filters.Conf
 		Count  int
 		Header string
 		Format string

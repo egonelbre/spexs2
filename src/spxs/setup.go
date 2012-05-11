@@ -3,7 +3,12 @@ package main
 import (
 	"io"
 	. "spexs"
-	pool "spexs/pool"
+	"log"
+	
+	"spexs/pool"
+	"spexs/extenders"
+	"spexs/filters"
+	"spexs/fitnesses"
 )
 
 const MAX_POOL_SIZE = 1024 * 1024 * 1024
@@ -67,7 +72,49 @@ func CreateSetup(conf Conf) AppSetup {
 	return s
 }
 
-func initSetup() {
-	initFitnesses()
-	initFilters()
+func CreateExtender(conf Conf, setup AppSetup) ExtenderFunc {
+	if conf.Extension.Method == "" {
+		log.Fatal("Extender not defined!")
+	}
+
+	extender, valid := extenders.Get(conf.Extension.Method)
+	if !valid {
+		log.Fatal("No extender named: ", conf.Extension.Method)
+	}
+
+	args := conf.Extension.Args[conf.Extension.Method]
+
+	ext, err := extender.Create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return ExtenderFunc(ext)
+}
+
+func CreateFilter(conf map[string]filters.Conf, setup AppSetup) FilterFunc {
+	f, err := filters.Compose(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return FilterFunc(f)
+}
+
+func CreateFitness(conf Conf, setup AppSetup) FitnessFunc {
+	if conf.Output.Order == "" {
+		log.Fatal("Output ordering not defined!")
+	}
+
+	fitness, valid := fitnesses.Get(conf.Output.Order)
+	if !valid {
+		log.Fatal("No ordering/fitness named: ", conf.Output.Order)
+	}
+	args := conf.Output.Args[conf.Output.Order]
+	fit, err := fitness.Create(args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return func(p *Pattern) float64{
+		return fit(p, setup.Ref)
+	}
 }

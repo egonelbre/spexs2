@@ -5,6 +5,11 @@ import (
 	"log"
 	"os"
 	"sort"
+
+	"spexs/filters"
+	"spexs/extenders"
+	"spexs/features"
+	"spexs/fitnesses"
 )
 
 var lgh = log.New(os.Stderr, "", 0)
@@ -71,46 +76,40 @@ func PrintAliases(conf Conf) {
 }
 
 func PrintStrFeatures() {
-	info := make(map[string]string)
-	for name, data := range StrFeatures {
-		info[name] = data.Desc
+	printCaption("Features")
+	for _, e := range features.Str {
+		printItem(e.Name, e.Desc)
 	}
-
-	printSection("String Features", info)
 }
 
 func PrintFeatures() {
-	info := make(map[string]string)
-	for name, data := range Features {
-		info[name] = data.Desc
+	printCaption("Features")
+	for _, e := range features.All {
+		printItem(e.Name, e.Desc)
 	}
-
-	printSection("Features", info)
 }
 
 func PrintFitnesses() {
-	info := make(map[string]string)
-	for name, _ := range Fitnesses {
-		info[name] = ""
-	}
-	info["+[FEATURES]"] = ""
+	printCaption("Fitnesses")
+	printItem("+[FEATURES]", "")
 
-	printSection("Fitnesses", info)
+	for _, e := range fitnesses.All {
+		printItem(e.Name, e.Desc)
+	}
 }
 
 func PrintFilters() {
-	info := make(map[string]string)
-	for name, _ := range Filters {
-		info[name] = ""
-	}
-	info["+[FEATURES]"] = ""
+	printCaption("Filters")
+	printItem("+[FEATURES]", "")
 
-	printSection("Filters", info)
+	for _, e := range filters.All {
+		printItem(e.Name, e.Desc)
+	}
 }
 
 func PrintExtenders() {
 	printCaption("Extenders")
-	for _, e := range Extenders {
-		printItem(e.name, e.desc)
+	for _, e := range extenders.All {
+		printItem(e.Name, e.Desc)
 	}
 }

@@ -1,66 +1,53 @@
-package main
+package features
 
 import (
 	. "spexs"
 	"utils"
 )
 
-type Feature struct {
-	Desc string
-	Func FeatureFunc
-}
-
-type StrFeature struct {
-	Desc string
-	Func StrFeatureFunc
-}
-
-type FeatureFunc func(*Pattern, *Reference) float64
-type StrFeatureFunc func(*Pattern, *Reference) string
-
-var Features = map[string]Feature{
-	"query-seqs": {
+var All = [...]Desc{
+	{"query-seqs",
 		"total number of query sequences",
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(ref.Groupings[0])
 		}},
-	"back-seqs": {
+	{"back-seqs",
 		"total number of background sequences",
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(ref.Groupings[1])
 		}},
-	"query-match-seqs": {
+	{"query-match-seqs",
 		"number of matching query sequences",
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Count(ref, 0))
 		}},
-	"back-match-seqs": {
+	{"back-match-seqs",
 		"number of matching background sequences",
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Count(ref, 1))
 		}},
-	"query-match-occs": {
+	{"query-match-occs",
 		"number of occurences in query",
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Occs(ref, 0))
 		}},
-	"back-match-occs": {
+	{"back-match-occs",
 		"number of occurences in background",
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Occs(ref, 1))
 		}},
-	"query-match-seqs-prop": {
+	{"query-match-seqs-prop",
 		"percentage of matching sequences in query",
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Count(ref, 0)) / float64(ref.Groupings[0])
 		}},
-	"back-match-seqs-prop": {
+	{"back-match-seqs-prop",
 		"percentage of matching sequences in background",
 		func(p *Pattern, ref *Reference) float64 {
 			return float64(p.Count(ref, 1)) / float64(ref.Groupings[1])
 		}},
 
-	"match-hyper-up-pvalue": {
+	{"match-hyper-up-pvalue",
 		"hypergeometric split p-value",
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
@@ -68,7 +55,7 @@ var Features = map[string]Feature{
 			pvalue := utils.HypergeometricSplit(query, back, ref.Groupings[0], ref.Groupings[1])
 			return pvalue
 		}},
-	"match-hyper-up-pvalue-approx": {
+	{"match-hyper-up-pvalue-approx",
 		"hypergeometric split p-value (approximate)",
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
@@ -76,7 +63,7 @@ var Features = map[string]Feature{
 			pvalue := utils.HypergeometricSplitApprox(query, back, ref.Groupings[0], ref.Groupings[1])
 			return pvalue
 		}},
-	"match-hyper-down-pvalue": {
+	{"match-hyper-down-pvalue",
 		"hypergeometric split p-value down",
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
@@ -84,7 +71,7 @@ var Features = map[string]Feature{
 			pvalue := utils.HypergeometricSplitDown(query, back, ref.Groupings[0], ref.Groupings[1])
 			return pvalue
 		}},
-	"match-ratio": {
+	{"match-ratio",
 		"ratio of (matches in query + 1) / (matches in background + 1)",
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
@@ -92,7 +79,7 @@ var Features = map[string]Feature{
 			return float64(query+1) / float64(back+1)
 		}},
 
-	"pat-length": {
+	{"pat-length",
 		"length of the pattern",
 		func(p *Pattern, ref *Reference) float64 {
 			t := -1 // because first "" is also a char
@@ -105,7 +92,7 @@ var Features = map[string]Feature{
 			}
 			return float64(t)
 		}},
-	"pat-chars": {
+	{"pat-chars",
 		"count of characters in pattern",
 		func(p *Pattern, ref *Reference) float64 {
 			t := -1 // because first "" is also a char
@@ -117,7 +104,7 @@ var Features = map[string]Feature{
 			}
 			return float64(t)
 		}},
-	"pat-groups": {
+	{"pat-groups",
 		"count of groups in pattern",
 		func(p *Pattern, ref *Reference) float64 {
 			t := 0
@@ -129,7 +116,7 @@ var Features = map[string]Feature{
 			}
 			return float64(t)
 		}},
-	"pat-stars": {
+	{"pat-stars",
 		"count of stars in pattern",
 		func(p *Pattern, ref *Reference) float64 {
 			t := 0
@@ -143,15 +130,4 @@ var Features = map[string]Feature{
 		}},
 }
 
-var StrFeatures = map[string]StrFeature{
-	"pat": {
-		"representation of the pattern",
-		func(p *Pattern, ref *Reference) string {
-			return p.String()
-		}},
-	"pat-regexp": {
-		"representation of the pattern with group symbols replaced",
-		func(p *Pattern, ref *Reference) string {
-			return ref.ReplaceGroups(p.String())
-		}},
-}
+	
