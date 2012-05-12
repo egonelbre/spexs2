@@ -56,7 +56,7 @@ var All = [...]Desc{
 			return pvalue
 		}},
 	{"match-hyper-up-pvalue-approx",
-		"hypergeometric split p-value (approximate)",
+		"approximate hypergeometric split p-value (~5 significant digits)",
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
 			back := p.Count(ref, 1)
