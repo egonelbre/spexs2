@@ -2,7 +2,7 @@ package features
 
 import (
 	. "spexs"
-	"utils"
+	"stats/hyper"
 )
 
 var All = [...]Desc{
@@ -52,7 +52,7 @@ var All = [...]Desc{
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
 			back := p.Count(ref, 1)
-			pvalue := utils.HypergeometricSplit(query, back, ref.Groupings[0], ref.Groupings[1])
+			pvalue := hyper.Split(query, back, ref.Groupings[0], ref.Groupings[1])
 			return pvalue
 		}},
 	{"match-hyper-up-pvalue-approx",
@@ -60,7 +60,7 @@ var All = [...]Desc{
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
 			back := p.Count(ref, 1)
-			pvalue := utils.HypergeometricSplitApprox(query, back, ref.Groupings[0], ref.Groupings[1])
+			pvalue := hyper.SplitApprox(query, back, ref.Groupings[0], ref.Groupings[1])
 			return pvalue
 		}},
 	{"match-hyper-down-pvalue",
@@ -68,7 +68,7 @@ var All = [...]Desc{
 		func(p *Pattern, ref *Reference) float64 {
 			query := p.Count(ref, 0)
 			back := p.Count(ref, 1)
-			pvalue := utils.HypergeometricSplitDown(query, back, ref.Groupings[0], ref.Groupings[1])
+			pvalue := hyper.SplitDown(query, back, ref.Groupings[0], ref.Groupings[1])
 			return pvalue
 		}},
 	{"match-ratio",

@@ -46,6 +46,32 @@ func setMemLimit(setup *AppSetup) {
 	}
 }
 
+func attachMemProfiler(setup *AppSetup) {
+	filename := *memprofile
+	profile := 0
+	count := 0
+	limit := *memsteps
+
+	ext := setup.Extender
+
+	setup.Extender = func(p *Pattern, ref *Reference) Patterns {
+		if count == limit {
+			f, err := os.Create(filename + string(profile))
+			if err != nil {
+				log.Fatal(err)
+			}
+			pprof.WriteHeapProfile(f)
+			f.Close()
+			lg.Printf("Wrote memory profile %v!\n", profile)
+
+			profile += 1
+			count = 0
+		}
+		count += 1
+		return ext(p, ref)
+	}
+}
+
 var (
 	quitStats    = make(chan int)
 	statsStarted = false

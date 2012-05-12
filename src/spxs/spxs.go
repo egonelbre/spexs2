@@ -23,6 +23,8 @@ var (
 	memoryLimit *int  = flag.Int("mem", -1, "memory limit in MB")
 
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
+	memprofile *string = flag.String("memprofile", "", "write mem profile to file")
+	memsteps *int = flag.Int("memsteps", 10000, "after how many extensions to write the mem profile")
 
 	// logging to stderr
 	lg = log.New(os.Stderr, "", log.Ltime)
@@ -75,6 +77,7 @@ func main() {
 	ifthen(*stats, runStats)
 	ifthen(*live, setupLiveView)
 	ifthen(*memoryLimit > 0, setMemLimit)
+	ifthen(*memprofile != "", attachMemProfiler)
 
 	info("running spexs")
 
