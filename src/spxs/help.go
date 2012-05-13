@@ -17,7 +17,7 @@ var lgh = log.New(os.Stderr, "", 0)
 func PrintHelp(conf Conf) {
 	lgh.Printf("Usage of %s:\n", os.Args[0])
 	lgh.Printf("spxs [FLAGS] [OPTIONS]\n\n")
-	lgh.Printf("FLAGS: \n")
+	lgh.Printf("Flags: \n")
 	flag.PrintDefaults()
 
 	PrintAliases(conf)
@@ -27,7 +27,7 @@ func PrintHelp(conf Conf) {
 	PrintFilters()
 	PrintExtenders()
 
-	lgh.Printf("\nEXAMPLES: \n")
+	lgh.Printf("\nExamples: \n")
 	lgh.Printf("  spxs -procs=4 inp=data.dna ref=random.dna\n")
 
 	lgh.Printf("\n")
@@ -91,7 +91,7 @@ func PrintFeatures() {
 
 func PrintFitnesses() {
 	printCaption("Fitnesses")
-	printItem("+[FEATURES]", "")
+	printItem("+[Features]", "")
 
 	for _, e := range fitnesses.All {
 		printItem(e.Name, e.Desc)
@@ -100,7 +100,7 @@ func PrintFitnesses() {
 
 func PrintFilters() {
 	printCaption("Filters")
-	printItem("+[FEATURES]", "")
+	printItem("+[Features]", "")
 
 	for _, e := range filters.All {
 		printItem(e.Name, e.Desc)
@@ -108,7 +108,7 @@ func PrintFilters() {
 }
 
 func PrintExtenders() {
-	printCaption("Extenders")
+	printCaption("Features")
 	for _, e := range extenders.All {
 		printItem(e.Name, e.Desc)
 	}
