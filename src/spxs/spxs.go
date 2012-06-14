@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	. "spexs"
+	"spexs/pool"
 )
 
 var (
@@ -89,6 +90,15 @@ func main() {
 
 	endStats()
 
+
+	limit := conf.Output.Count
+	setup.Printer(os.Stdout, nil, setup.Ref)
+	for _, node := range setup.Out.(*pool.Priority).Bottom(limit) {
+		setup.Printer(os.Stdout, node, setup.Ref)
+	}
+
+	/*
+
 	if conf.Output.Queue != "lifo" {
 		info("sorting results")
 
@@ -107,7 +117,7 @@ func main() {
 	for ok {
 		setup.Printer(os.Stdout, node, setup.Ref)
 		node, ok = setup.Out.Take()
-	}
+	}*/
 
 	fmt.Printf("\n")
 }

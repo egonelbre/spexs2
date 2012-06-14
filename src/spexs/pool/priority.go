@@ -2,6 +2,7 @@ package pool
 
 import (
 	"container/heap"
+	"sort"
 	. "spexs"
 )
 
@@ -50,6 +51,29 @@ func (p *Priority) Put(pat *Pattern) {
 	//	heap.Pop(p)
 	//}
 	p.token <- 1
+}
+
+func (p *Priority) Top(n int) []*Pattern {
+	sort.Sort(p)
+	last := n
+	if last > p.length {
+		last = p.length
+	}
+	return p.items[:last]
+}
+
+func (p *Priority) Bottom(n int) []*Pattern {
+	sort.Sort(p)
+	first := p.length - n
+	if first < 0 {
+		first = 0
+	}
+	return p.items[first:p.length]
+}
+
+
+func (p *Priority) Heapify() {
+	heap.Init(p)
 }
 
 // sort.Interface
