@@ -24,7 +24,8 @@ func makeFilter(feature features.Func, config interface{}) (f Func, err error) {
 	f = nil
 	if low && high {
 		f = func(p *Pattern, ref *Reference) bool {
-			return (feature(p, ref) <= max) && (feature(p, ref) >= min)
+			v := feature(p, ref)
+			return (v <= max) && (v >= min)
 		}
 	} else if low {
 		f = func(p *Pattern, ref *Reference) bool {
