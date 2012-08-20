@@ -31,7 +31,7 @@ func extend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
 
 			pat, exists := patterns[char]
 			if !exists {
-				pat = NewPattern(char, node)
+				pat = NewPattern(char, node, false, false)
 				patterns[char] = pat
 			}
 			pat.Pos.Add(idx, next)
@@ -52,9 +52,7 @@ func Simplex(node *Pattern, ref *Reference) Patterns {
 
 func combine(node *Pattern, ref *Reference, patterns map[Char]*Pattern, star bool) {
 	for _, g := range ref.Groups {
-		pat := NewPattern(g.Id, node)
-		pat.IsGroup = true
-		pat.IsStar = star
+		pat := NewPattern(g.Id, node, true, star)
 		patterns[g.Id] = pat
 		for _, char := range g.Chars {
 			if _, exists := patterns[char]; exists {
@@ -86,8 +84,7 @@ func starExtend(node *Pattern, ref *Reference, stars map[Char]*Pattern) {
 		for valid {
 			pat, exists := stars[char]
 			if !exists {
-				pat = NewPattern(char, node)
-				pat.IsStar = true
+				pat = NewPattern(char, node, false, true)
 				stars[char] = pat
 			}
 			pat.Pos.Add(idx, next)

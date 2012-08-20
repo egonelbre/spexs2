@@ -82,25 +82,23 @@ var All = [...]Desc{
 	{"pat-length",
 		"length of the pattern",
 		func(p *Pattern, ref *Reference) float64 {
-			t := -1 // because first "" is also a char
-			for p != nil {
+			t := 0
+			for _, e := range p.Pat {
 				t += 1
-				if p.IsStar {
+				if e.IsStar {
 					t += 1
 				}
-				p = p.Parent
 			}
 			return float64(t)
 		}},
 	{"pat-chars",
 		"count of characters in pattern",
 		func(p *Pattern, ref *Reference) float64 {
-			t := -1 // because first "" is also a char
-			for p != nil {
-				if !p.IsGroup {
+			t := 0
+			for _, e := range p.Pat {
+				if !e.IsStar {
 					t += 1
 				}
-				p = p.Parent
 			}
 			return float64(t)
 		}},
@@ -108,11 +106,10 @@ var All = [...]Desc{
 		"count of groups in pattern",
 		func(p *Pattern, ref *Reference) float64 {
 			t := 0
-			for p != nil {
-				if p.IsGroup {
+			for _, e := range p.Pat {
+				if e.IsGroup {
 					t += 1
 				}
-				p = p.Parent
 			}
 			return float64(t)
 		}},
@@ -120,11 +117,10 @@ var All = [...]Desc{
 		"count of stars in pattern",
 		func(p *Pattern, ref *Reference) float64 {
 			t := 0
-			for p != nil {
-				if p.IsStar {
+			for _, e := range p.Pat {
+				if e.IsStar {
 					t += 1
 				}
-				p = p.Parent
 			}
 			return float64(t)
 		}},

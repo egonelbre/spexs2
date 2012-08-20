@@ -9,22 +9,16 @@ var All = [...]Desc{
 		"does not allow pattern to start with group",
 		func(conf Conf) (Func, error) {
 			return func(p *Pattern, ref *Reference) bool {
-				for p != nil {
-					if (p.IsGroup || p.IsStar) &&
-						(p.Parent != nil) &&
-						(p.Parent.Parent == nil) {
-						return false
-					}
-					p = p.Parent
-				}
-				return true
+				e := p.Pat[0]
+				return e.IsGroup || e.IsStar
 			}, nil
 		}},
 	{"no-ending-group",
 		"does not allow pattern to end with group",
 		func(conf Conf) (Func, error) {
 			return func(p *Pattern, ref *Reference) bool {
-				return !p.IsGroup
+				e := p.Pat[len(p.Pat)-1]
+				return !e.IsGroup
 			}, nil
 		}},
 }

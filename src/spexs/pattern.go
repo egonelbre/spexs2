@@ -5,27 +5,30 @@ import (
 	"utils"
 )
 
-type Pattern struct {
+type RegChar struct {
 	Char    Char
-	Parent  *Pattern
-	Pos     sets.HashSet
 	IsGroup bool
 	IsStar  bool
-	count   [2]int
-	occs    [2]int
 }
 
-func NewPattern(char Char, parent *Pattern) *Pattern {
+type Pattern struct {
+	Pat   []RegChar
+	Pos   sets.HashSet
+	count [2]int
+	occs  [2]int
+}
+
+func NewPattern(char Char, parent *Pattern, isGroup bool, isStar bool) *Pattern {
 	p := &Pattern{}
-	p.Char = char
-	p.Parent = parent
+
 	if parent != nil {
+		p.Pat = append(parent.Pat, RegChar{char, isGroup, isStar})
 		p.Pos = *sets.NewHashSet(parent.Pos.Len() / 8)
 	} else {
+		p.Pat = nil
 		p.Pos = *sets.NewHashSet(0)
 	}
-	p.IsGroup = false
-	p.IsStar = false
+
 	p.count[0] = -1
 	p.count[1] = -1
 	p.occs[0] = -1
@@ -34,7 +37,7 @@ func NewPattern(char Char, parent *Pattern) *Pattern {
 }
 
 func NewFullPattern(ref *Reference) *Pattern {
-	p := NewPattern(0, nil)
+	p := NewPattern(0, nil, false, false)
 	for idx, pat := range ref.Seqs {
 		for i, _ := range pat.Pat {
 			p.Pos.Add(idx, uint(i))
@@ -44,21 +47,19 @@ func NewFullPattern(ref *Reference) *Pattern {
 }
 
 func (n *Pattern) String() string {
-	if n.Parent != nil {
-		if n.IsStar {
-			return n.Parent.String() + string('*') + string(n.Char)
+	r := ""
+	for _, e := range n.Pat {
+		if e.IsStar {
+			r += "*" + string(e.Char)
 		} else {
-			return n.Parent.String() + string(n.Char)
+			r += string(e.Char)
 		}
 	}
-	return ""
+	return r
 }
 
 func (n *Pattern) Len() int {
-	if n.Parent != nil {
-		return n.Parent.Len() + 1
-	}
-	return 0
+	return len(n.Pat)
 }
 
 func (n *Pattern) Count(ref *Reference, group int) int {
