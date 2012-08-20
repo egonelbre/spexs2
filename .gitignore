@@ -1,4 +1,5 @@
 **.exe
+**.log
 temp/**
 doc/**
 pkg/**

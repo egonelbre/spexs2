@@ -96,7 +96,7 @@ var All = [...]Desc{
 		func(p *Pattern, ref *Reference) float64 {
 			t := 0
 			for _, e := range p.Pat {
-				if !e.IsStar {
+				if !e.IsGroup {
 					t += 1
 				}
 			}
