@@ -9,13 +9,7 @@ func NewHashSet(size int) *HashSet {
 }
 
 func (hs *HashSet) Add(idx int, pos uint) {
-	val, exists := hs.data[idx]
-	if !exists {
-		val = 0
-		hs.data[idx] = 0
-	}
-	val |= 1 << pos
-	hs.data[idx] = val
+	hs.data[idx] |= 1 << pos
 }
 
 func (hs *HashSet) Contains(idx int, pos uint) bool {
