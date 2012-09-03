@@ -79,6 +79,11 @@ func (db *Database) AddToken(token string) Tid {
 
 func (db *Database) AddSequence(seq Sequence) {
 	db.Sequences = append(db.Sequences, seq)
+	if seq.Section >= len(db.Sections) {
+		df := seq.Section - len(db.Sections) + 1
+		extension := make([]Section, df)
+		db.Sections = append(db.Sections, extension...)
+	}
 	db.Sections[seq.Section].Count += 1
 }
 
