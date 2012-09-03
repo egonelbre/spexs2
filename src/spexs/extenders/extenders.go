@@ -5,111 +5,122 @@ import (
 	"utils"
 )
 
-func output(out Patterns, patterns map[Char]*Pattern) {
-	for _, node := range patterns {
-		out <- node
+type queryMap map[Tid]*Query
+
+func flush(querys queryMap, to Querys) {
+	for _, q := range querys {
+		to <- q
 	}
 }
 
-func extend(node *Pattern, ref *Reference, patterns map[Char]*Pattern) {
-	for idx, ipos := range node.Pos.Iter() {
-		px := ref.Seqs[idx].Pat
-		plen := uint(len(px))
-		for k := uint(0); k < plen; k += 1 {
-			if (ipos >> k & 1) == 0 {
+func extend(base *Query, db *Database, querys queryMap) {
+	for i, pv := range base.Loc.Iter() {
+		seq := db.Sequences[i]
+		seqLen := seq.Len
+
+		for k := 0; k < seqLen; k += 1 {
+			if ((pv >> uint(k)) & 1) == 0 {
 				continue
 			}
-			char := Char(px[k])
-			pat, exists := patterns[char]
-			if !exists {
-				pat = NewPattern(char, node, false, false)
-				patterns[char] = pat
+
+			tid, ok, next := db.GetToken(i, k)
+			if !ok {
+				continue
 			}
-			pat.Pos.Add(idx, k+1)
+
+			q, ok := querys[tid]
+			if !ok {
+				q = NewQuery(base, Rid{tid, false, false})
+				querys[tid] = q
+			}
+			q.Loc.Add(i, next)
 		}
 	}
 }
 
-func Simplex(node *Pattern, ref *Reference) Patterns {
-	result := NewPatterns()
-	patterns := make(map[Char]*Pattern)
+func Simplex(base *Query, db *Database) Querys {
+	querys := make(queryMap)
 
-	extend(node, ref, patterns)
+	extend(base, db, querys)
 
-	output(result, patterns)
+	result := NewQuerys()
+	flush(querys, result)
 	close(result)
 	return result
 }
 
-func combine(node *Pattern, ref *Reference, patterns map[Char]*Pattern, star bool) {
-	for _, g := range ref.Groups {
-		pat := NewPattern(g.Id, node, true, star)
-		patterns[g.Id] = pat
-		for _, char := range g.Chars {
-			if _, exists := patterns[char]; exists {
-				patterns[g.Id].Pos.AddSet(patterns[char].Pos)
+func combine(base *Query, db *Database, querys queryMap, isStar bool) {
+	for _, group := range db.Groups {
+		q := NewQuery(base, Rid{group.Id, true, isStar})
+		querys[group.Id] = q
+		for _, tid := range group.Elems {
+			single, ok := querys[tid]
+			if ok {
+				q.Loc.AddSet(single.Loc)
 			}
 		}
 	}
 }
 
-func Groupex(node *Pattern, ref *Reference) Patterns {
-	result := NewPatterns()
-	patterns := make(map[Char]*Pattern)
+func Groupex(base *Query, db *Database) Querys {
+	querys := make(queryMap)
 
-	extend(node, ref, patterns)
-	combine(node, ref, patterns, false)
+	extend(base, db, querys)
+	combine(base, db, querys, false)
 
-	output(result, patterns)
+	result := NewQuerys()
+	flush(querys, result)
 	close(result)
 	return result
 }
 
-func starExtend(node *Pattern, ref *Reference, stars map[Char]*Pattern) {
-	for idx, mpos := range node.Pos.Iter() {
-		k := utils.BitScanLeft64(uint64(mpos))
-		if k < 0 {
+func starExtend(base *Query, db *Database, querys queryMap) {
+	for i, pv := range base.Loc.Iter() {
+		last := utils.BitScanLeft64(uint64(pv))
+		if last < 0 {
 			continue
 		}
-		char, next, valid := ref.Next(idx, uint(k))
-		for valid {
-			pat, exists := stars[char]
-			if !exists {
-				pat = NewPattern(char, node, false, true)
-				stars[char] = pat
+
+		tid, ok, next := db.GetToken(i, last)
+		for ok {
+			q, ok := querys[tid]
+			if !ok {
+				q = NewQuery(base, Rid{tid, false, true})
+				querys[tid] = q
 			}
-			pat.Pos.Add(idx, next)
-			char, next, valid = ref.Next(idx, next)
+			q.Loc.Add(i, next)
+			tid, ok, next = db.GetToken(i, next)
 		}
 	}
 }
 
-func Starex(node *Pattern, ref *Reference) Patterns {
-	result := NewPatterns()
-	patterns := make(map[Char]*Pattern)
-	stars := make(map[Char]*Pattern)
-	extend(node, ref, patterns)
-	starExtend(node, ref, stars)
+func Starex(base *Query, db *Database) Querys {
+	result := NewQuerys()
 
-	output(result, patterns)
-	output(result, stars)
+	patterns := make(queryMap)
+	extend(base, db, patterns)
+	flush(patterns, result)
+
+	stars := make(queryMap)
+	starExtend(base, db, stars)
+	flush(stars, result)
 
 	close(result)
 	return result
 }
 
-func Regex(node *Pattern, ref *Reference) Patterns {
-	result := NewPatterns()
-	patterns := make(map[Char]*Pattern)
-	stars := make(map[Char]*Pattern)
+func Regex(base *Query, db *Database) Querys {
+	result := NewQuerys()
 
-	extend(node, ref, patterns)
-	combine(node, ref, patterns, false)
-	starExtend(node, ref, stars)
-	combine(node, ref, stars, true)
+	patterns := make(queryMap)
+	extend(base, db, patterns)
+	combine(base, db, patterns, false)
+	flush(patterns, result)
 
-	output(result, patterns)
-	output(result, stars)
+	stars := make(queryMap)
+	starExtend(base, db, stars)
+	combine(base, db, stars, true)
+	flush(stars, result)
 
 	close(result)
 	return result

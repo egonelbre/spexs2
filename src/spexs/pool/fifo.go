@@ -18,7 +18,7 @@ func NewFifo() *Fifo {
 	return p
 }
 
-func (p *Fifo) Take() (*spexs.Pattern, bool) {
+func (p *Fifo) Take() (*spexs.Query, bool) {
 	<-p.token
 	if p.list.Len() == 0 {
 		p.token <- 1
@@ -27,10 +27,10 @@ func (p *Fifo) Take() (*spexs.Pattern, bool) {
 	tmp := p.list.Front()
 	p.list.Remove(tmp)
 	p.token <- 1
-	return tmp.Value.(*spexs.Pattern), true
+	return tmp.Value.(*spexs.Query), true
 }
 
-func (p *Fifo) Put(pat *spexs.Pattern) {
+func (p *Fifo) Put(pat *spexs.Query) {
 	<-p.token
 	p.list.PushBack(pat)
 	p.token <- 1

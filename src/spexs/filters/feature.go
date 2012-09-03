@@ -23,16 +23,16 @@ func makeFilter(feature features.Func, config interface{}) (f Func, err error) {
 
 	f = nil
 	if low && high {
-		f = func(p *Pattern, ref *Reference) bool {
+		f = func(p *Query, ref *Database) bool {
 			v := feature(p, ref)
 			return (v <= max) && (v >= min)
 		}
 	} else if low {
-		f = func(p *Pattern, ref *Reference) bool {
+		f = func(p *Query, ref *Database) bool {
 			return feature(p, ref) >= min
 		}
 	} else if high {
-		f = func(p *Pattern, ref *Reference) bool {
+		f = func(p *Query, ref *Database) bool {
 			return feature(p, ref) <= max
 		}
 	}

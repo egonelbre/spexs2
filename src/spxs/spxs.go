@@ -25,7 +25,7 @@ var (
 
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
 	memprofile *string = flag.String("memprofile", "", "write mem profile to file")
-	memsteps *int = flag.Int("memsteps", 10000, "after how many extensions to write the mem profile")
+	memsteps   *int    = flag.Int("memsteps", 10000, "after how many extensions to write the mem profile")
 
 	// logging to stderr
 	lg = log.New(os.Stderr, "", log.Ltime)
@@ -90,7 +90,6 @@ func main() {
 
 	endStats()
 
-
 	limit := conf.Output.Count
 	setup.Printer(os.Stdout, nil, setup.Ref)
 	for _, node := range setup.Out.(*pool.Priority).Bottom(limit) {
@@ -99,25 +98,25 @@ func main() {
 
 	/*
 
-	if conf.Output.Queue != "lifo" {
-		info("sorting results")
+		if conf.Output.Queue != "lifo" {
+			info("sorting results")
 
-		limit := conf.Output.Count
-		if limit > 0 {
-			for setup.Out.Len() > limit {
-				setup.Out.Take()
+			limit := conf.Output.Count
+			if limit > 0 {
+				for setup.Out.Len() > limit {
+					setup.Out.Take()
+				}
 			}
 		}
-	}
 
-	info("printing results")
+		info("printing results")
 
-	setup.Printer(os.Stdout, nil, setup.Ref)
-	node, ok := setup.Out.Take()
-	for ok {
-		setup.Printer(os.Stdout, node, setup.Ref)
-		node, ok = setup.Out.Take()
-	}*/
+		setup.Printer(os.Stdout, nil, setup.Ref)
+		node, ok := setup.Out.Take()
+		for ok {
+			setup.Printer(os.Stdout, node, setup.Ref)
+			node, ok = setup.Out.Take()
+		}*/
 
 	fmt.Printf("\n")
 }

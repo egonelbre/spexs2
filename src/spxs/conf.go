@@ -17,7 +17,8 @@ import (
 const baseConfiguration = `{
 	"data" : {
 		"input" : "",
-		"reference" : ""
+		"reference" : "",
+		"reader" : "ansi"
 	},
 	"alphabet" : {
 		"characters" : "",
@@ -44,8 +45,9 @@ const baseConfiguration = `{
 
 type Conf struct {
 	Data struct {
-		Input     string
-		Reference string
+		Input    string
+		Database string
+		Reader   string
 	}
 	Alphabet struct {
 		Characters string

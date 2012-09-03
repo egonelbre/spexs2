@@ -4,7 +4,7 @@ import (
 	. "spexs"
 )
 
-type Func func(*Pattern, *Reference) float64
+type Func func(*Query, *Database) float64
 
 type Desc struct {
 	Name string
@@ -21,7 +21,7 @@ func Get(name string) (*Desc, bool) {
 	return nil, false
 }
 
-type StrFunc func(*Pattern, *Reference) string
+type StrFunc func(*Query, *Database) string
 
 type StrDesc struct {
 	Name string

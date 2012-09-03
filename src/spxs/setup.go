@@ -16,7 +16,7 @@ const MAX_POOL_SIZE = 1024 * 1024 * 1024
 type TrieFitnessCreator func(interface{}) FitnessFunc
 type TrieExtenderCreator func(interface{}) ExtenderFunc
 
-type PrinterFunc func(io.Writer, *Pattern, *Reference)
+type PrinterFunc func(io.Writer, *Query, *Database)
 
 type AppSetup struct {
 	Setup
@@ -24,7 +24,7 @@ type AppSetup struct {
 	Printer PrinterFunc
 }
 
-func lengthFitness(p *Pattern) float64 {
+func lengthFitness(p *Query) float64 {
 	return 1 / float64(p.Len())
 }
 
@@ -60,7 +60,7 @@ func CreateSetup(conf Conf) AppSetup {
 	s.Extendable = CreateFilter(conf.Extension.Filter, s)
 	s.Outputtable = CreateFilter(conf.Output.Filter, s)
 
-	s.PostProcess = func(p *Pattern, s *Setup) error {
+	s.PostProcess = func(p *Query, s *Setup) error {
 		p.Occs(s.Ref, 0)
 		p.Count(s.Ref, 0)
 		p.Pos.Clear()
@@ -114,7 +114,7 @@ func CreateFitness(conf Conf, setup AppSetup) FitnessFunc {
 		log.Fatal(err)
 	}
 
-	return func(p *Pattern) float64 {
+	return func(p *Query) float64 {
 		return fit(p, setup.Ref)
 	}
 }

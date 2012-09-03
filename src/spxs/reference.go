@@ -11,7 +11,7 @@ import (
 	"unicode/utf8"
 )
 
-func CreateReference(conf Conf) *Reference {
+func CreateReference(conf Conf) *Database {
 	ref := NewReference(1024)
 
 	if conf.Alphabet.Characters == "" {
@@ -26,7 +26,7 @@ func CreateReference(conf Conf) *Reference {
 			log.Fatal("Group identifier must be of length 1.")
 		}
 
-		group.Id = Char(id[0])
+		group.Id = Tid(id[0])
 		group.Long = "[" + grp.Group + "]"
 		group.Chars = chars(grp.Group)
 
@@ -39,17 +39,17 @@ func CreateReference(conf Conf) *Reference {
 
 	addSeqsFromFile(ref, conf.Data.Input, 0)
 
-	if conf.Data.Reference != "" {
-		addSeqsFromFile(ref, conf.Data.Reference, 1)
+	if conf.Data.Database != "" {
+		addSeqsFromFile(ref, conf.Data.Database, 1)
 	}
 
 	return ref
 }
 
-func chars(s string) []Char {
-	a := make([]Char, 0, len(s))
+func chars(s string) []Tid {
+	a := make([]Tid, 0, len(s))
 	for _, c := range s {
-		a = append(a, Char(c))
+		a = append(a, Tid(c))
 	}
 	return a
 }
@@ -64,7 +64,7 @@ func seq(data string, group int) Sequence {
 	return p
 }
 
-func addSeqsFromFile(ref *Reference, filename string, group int) {
+func addSeqsFromFile(ref *Database, filename string, group int) {
 	var (
 		file   *os.File
 		reader *bufio.Reader

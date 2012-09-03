@@ -11,11 +11,11 @@ func TestHashSet(t *testing.T) {
 	hs := NewHashSet(10)
 
 	good := map[p]bool{
-		p{0, 0}:         true,
-		p{13, 1}:        true,
-		p{14, 2}:        true,
-		p{1025235, 3}:   true,
-		p{2000, 15}:     true,
+		p{0, 0}:       true,
+		p{13, 1}:      true,
+		p{14, 2}:      true,
+		p{1025235, 3}: true,
+		p{2000, 15}:   true,
 		//p{200000, 30}:   true,
 		//p{200000, 100}:  true,
 		//p{200000, 3000}: true,

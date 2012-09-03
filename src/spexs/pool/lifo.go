@@ -9,7 +9,7 @@ import (
 // based on https://github.com/fmstephe/lfqueue
 
 type node struct {
-	val *spexs.Pattern
+	val *spexs.Query
 	nxt unsafe.Pointer
 }
 
@@ -26,7 +26,7 @@ func NewLifo() (q *Lifo) {
 	return
 }
 
-func (q *Lifo) Take() (val *spexs.Pattern, success bool) {
+func (q *Lifo) Take() (val *spexs.Query, success bool) {
 	var h, t, n unsafe.Pointer
 	for {
 		h = q.head
@@ -48,7 +48,7 @@ func (q *Lifo) Take() (val *spexs.Pattern, success bool) {
 	panic("Unreachable")
 }
 
-func (q *Lifo) Put(val *spexs.Pattern) {
+func (q *Lifo) Put(val *spexs.Query) {
 	var t, n unsafe.Pointer
 	n = unsafe.Pointer(&node{val: val, nxt: nil})
 	for {

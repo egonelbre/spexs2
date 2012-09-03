@@ -8,7 +8,7 @@ import (
 
 type Priority struct {
 	token     chan int
-	items     []*Pattern
+	items     []*Query
 	Fitness   FitnessFunc
 	length    int
 	limit     int
@@ -18,7 +18,7 @@ type Priority struct {
 func NewPriority(fitness FitnessFunc, limit int, ascending bool) *Priority {
 	p := &Priority{}
 	p.token = make(chan int, 1)
-	p.items = make([]*Pattern, limit+100)
+	p.items = make([]*Query, limit+100)
 	p.length = 0
 	p.limit = limit
 	p.Fitness = fitness
@@ -33,7 +33,7 @@ func (p *Priority) IsEmpty() bool {
 	return p.length == 0
 }
 
-func (p *Priority) Take() (*Pattern, bool) {
+func (p *Priority) Take() (*Query, bool) {
 	<-p.token
 	if p.IsEmpty() {
 		p.token <- 1
@@ -41,10 +41,10 @@ func (p *Priority) Take() (*Pattern, bool) {
 	}
 	v := heap.Pop(p)
 	p.token <- 1
-	return v.(*Pattern), true
+	return v.(*Query), true
 }
 
-func (p *Priority) Put(pat *Pattern) {
+func (p *Priority) Put(pat *Query) {
 	<-p.token
 	heap.Push(p, pat)
 	//if p.limit > 0 && p.Len() > p.limit {
@@ -53,7 +53,7 @@ func (p *Priority) Put(pat *Pattern) {
 	p.token <- 1
 }
 
-func (p *Priority) Top(n int) []*Pattern {
+func (p *Priority) Top(n int) []*Query {
 	sort.Sort(p)
 	last := n
 	if last > p.length {
@@ -62,7 +62,7 @@ func (p *Priority) Top(n int) []*Pattern {
 	return p.items[:last]
 }
 
-func (p *Priority) Bottom(n int) []*Pattern {
+func (p *Priority) Bottom(n int) []*Query {
 	sort.Sort(p)
 	first := p.length - n
 	if first < 0 {
@@ -70,7 +70,6 @@ func (p *Priority) Bottom(n int) []*Pattern {
 	}
 	return p.items[first:p.length]
 }
-
 
 func (p *Priority) Heapify() {
 	heap.Init(p)
@@ -95,12 +94,12 @@ func (p *Priority) Less(i, j int) bool {
 // heap.Interface
 func (p *Priority) Push(x interface{}) {
 	if p.length+1 > len(p.items) {
-		tmp := make([]*Pattern, len(p.items)+50000)
+		tmp := make([]*Query, len(p.items)+50000)
 		copy(tmp, p.items)
 		p.items = tmp
 	}
 
-	p.items[p.length] = x.(*Pattern)
+	p.items[p.length] = x.(*Query)
 	p.length += 1
 }
 

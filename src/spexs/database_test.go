@@ -6,10 +6,10 @@ import (
 	"unicode/utf8"
 )
 
-func chars(s string) []Char {
-	a := make([]Char, 0, 100)
+func chars(s string) []Tid {
+	a := make([]Tid, 0, 100)
 	for _, c := range s {
-		a = append(a, Char(c))
+		a = append(a, Tid(c))
 	}
 	return a
 }
@@ -23,7 +23,7 @@ func seq(data string) Sequence {
 	return p
 }
 
-func createTestReference() *Reference {
+func createTestReference() *Database {
 	u := NewReference(10)
 	u.Alphabet = chars("ACGT")
 
@@ -46,7 +46,7 @@ func TestReferenceNext(t *testing.T) {
 	u := createTestReference()
 
 	testStr := func(idx int, str string) {
-		var x Char
+		var x Tid
 		var ok bool
 		idx, pos := idx, uint(0)
 		for _, c := range str {
@@ -54,7 +54,7 @@ func TestReferenceNext(t *testing.T) {
 			if !ok {
 				t.Errorf("string '%s' ended too early", str)
 			}
-			if Char(c) != x {
+			if Tid(c) != x {
 				t.Errorf("wrong char: str='%s' got='%v' expected='%v'", str, x, c)
 			}
 		}

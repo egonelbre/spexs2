@@ -60,7 +60,7 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		log.Fatal(err)
 	}
 
-	f := func(out io.Writer, pat *Pattern, ref *Reference) {
+	f := func(out io.Writer, pat *Query, ref *Database) {
 		if pat == nil {
 			fmt.Print(header)
 			return

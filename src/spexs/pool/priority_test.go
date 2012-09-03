@@ -1,22 +1,22 @@
 package pool
 
 import (
-	"testing"
 	. "spexs"
+	"testing"
 	"unicode/utf8"
 )
 
-func pat(s string) *Pattern {
+func pat(s string) *Query {
 	r := NewPattern(0, nil)
 	return add(r, s)
 }
 
-func add(base *Pattern, s string) *Pattern {
+func add(base *Query, s string) *Query {
 	if len(s) <= 0 {
 		return base
 	}
 	rune, size := utf8.DecodeRuneInString(s)
-	n := NewPattern(Char(rune), base)
+	n := NewPattern(Tid(rune), base)
 	if rune == 'X' {
 		n.IsStar = true
 	}
@@ -52,7 +52,7 @@ func TestFifo(t *testing.T) {
 }
 
 func TestPriority(t *testing.T) {
-	lenFitness := func(p *Pattern) float64 {
+	lenFitness := func(p *Query) float64 {
 		return float64(len(p.String()))
 	}
 	p := NewPriority(lenFitness, 100, true)

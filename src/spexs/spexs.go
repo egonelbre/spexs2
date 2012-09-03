@@ -6,23 +6,23 @@ const (
 	patternsBufferSize = 128
 )
 
-type Char byte
+type Tid byte
 
-type Patterns chan *Pattern
+type Querys chan *Query
 
 type Pooler interface {
-	Take() (*Pattern, bool)
-	Put(*Pattern)
+	Take() (*Query, bool)
+	Put(*Query)
 	Len() int
 }
 
-type ExtenderFunc func(p *Pattern, ref *Reference) Patterns
-type FilterFunc func(p *Pattern, ref *Reference) bool
-type FitnessFunc func(p *Pattern) float64
-type PostProcessFunc func(p *Pattern, s *Setup) error
+type ExtenderFunc func(p *Query, db *Database) Querys
+type FilterFunc func(p *Query, db *Database) bool
+type FitnessFunc func(p *Query) float64
+type PostProcessFunc func(p *Query, s *Setup) error
 
 type Setup struct {
-	Ref *Reference
+	DB  *Database
 	Out Pooler
 	In  Pooler
 
@@ -34,8 +34,8 @@ type Setup struct {
 	PostProcess PostProcessFunc
 }
 
-func NewPatterns() Patterns {
-	return make(Patterns, patternsBufferSize)
+func NewQuerys() Querys {
+	return make(Querys, patternsBufferSize)
 }
 
 func Run(s *Setup) {
@@ -45,12 +45,12 @@ func Run(s *Setup) {
 			return
 		}
 
-		extensions := s.Extender(p, s.Ref)
+		extensions := s.Extender(p, s.DB)
 		for extended := range extensions {
-			if s.Extendable(extended, s.Ref) {
+			if s.Extendable(extended, s.DB) {
 				s.In.Put(extended)
 			}
-			if s.Outputtable(extended, s.Ref) {
+			if s.Outputtable(extended, s.DB) {
 				s.Out.Put(extended)
 			}
 		}
@@ -97,12 +97,12 @@ func RunParallel(s *Setup, routines int) {
 					counter <- 1
 				}
 
-				extensions := s.Extender(p, s.Ref)
+				extensions := s.Extender(p, s.DB)
 				for extended := range extensions {
-					if s.Extendable(extended, s.Ref) {
+					if s.Extendable(extended, s.DB) {
 						s.In.Put(extended)
 					}
-					if s.Outputtable(extended, s.Ref) {
+					if s.Outputtable(extended, s.DB) {
 						s.Out.Put(extended)
 					}
 				}

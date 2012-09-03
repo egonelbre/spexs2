@@ -4,7 +4,7 @@ import (
 	. "spexs"
 )
 
-type Func func(p *Pattern, ref *Reference) bool
+type Func func(p *Query, ref *Database) bool
 
 type Conf map[string]interface{}
 type CreateFunc func(Conf) (Func, error)
