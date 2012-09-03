@@ -8,82 +8,85 @@ import (
 var All = [...]Desc{
 	{"query-seqs",
 		"total number of query sequences",
-		func(p *Query, ref *Database) float64 {
-			return float64(ref.Groupings[0])
+		func(q *Query, db *Database) float64 {
+			return float64(db.Sections[0].Count)
 		}},
 	{"back-seqs",
 		"total number of background sequences",
-		func(p *Query, ref *Database) float64 {
-			return float64(ref.Groupings[1])
+		func(q *Query, db *Database) float64 {
+			return float64(db.Sections[1].Count)
 		}},
 	{"query-match-seqs",
 		"number of matching query sequences",
-		func(p *Query, ref *Database) float64 {
-			return float64(p.Count(ref, 0))
+		func(q *Query, db *Database) float64 {
+			return float64(q.SeqCount(db)[0])
 		}},
 	{"back-match-seqs",
 		"number of matching background sequences",
-		func(p *Query, ref *Database) float64 {
-			return float64(p.Count(ref, 1))
+		func(q *Query, db *Database) float64 {
+			return float64(q.SeqCount(db)[1])
 		}},
 	{"query-match-occs",
 		"number of occurences in query",
-		func(p *Query, ref *Database) float64 {
-			return float64(p.Occs(ref, 0))
+		func(q *Query, db *Database) float64 {
+			return float64(q.MatchCount(db)[0])
 		}},
 	{"back-match-occs",
 		"number of occurences in background",
-		func(p *Query, ref *Database) float64 {
-			return float64(p.Occs(ref, 1))
+		func(q *Query, db *Database) float64 {
+			return float64(q.MatchCount(db)[1])
 		}},
 	{"query-match-seqs-prop",
 		"percentage of matching sequences in query",
-		func(p *Query, ref *Database) float64 {
-			return float64(p.Count(ref, 0)) / float64(ref.Groupings[0])
+		func(q *Query, db *Database) float64 {
+			seqs := q.SeqCount(db)[0]
+			total := db.Sections[0].Count
+			return float64(seqs) / float64(total)
 		}},
 	{"back-match-seqs-prop",
 		"percentage of matching sequences in background",
-		func(p *Query, ref *Database) float64 {
-			return float64(p.Count(ref, 1)) / float64(ref.Groupings[1])
+		func(q *Query, db *Database) float64 {
+			seqs := q.SeqCount(db)[1]
+			total := db.Sections[1].Count
+			return float64(seqs) / float64(total)
 		}},
 
 	{"match-hyper-up-pvalue",
-		"hypergeometric split p-value",
-		func(p *Query, ref *Database) float64 {
-			query := p.Count(ref, 0)
-			back := p.Count(ref, 1)
-			pvalue := hyper.Split(query, back, ref.Groupings[0], ref.Groupings[1])
+		"hypergeometric split q-value",
+		func(q *Query, db *Database) float64 {
+			seqs := q.SeqCount(db)
+			pvalue := hyper.Split(seqs[0], seqs[1],
+				db.Sections[0].Count, db.Sections[1].Count)
 			return pvalue
 		}},
 	{"match-hyper-up-pvalue-approx",
-		"approximate hypergeometric split p-value (~5 significant digits)",
-		func(p *Query, ref *Database) float64 {
-			query := p.Count(ref, 0)
-			back := p.Count(ref, 1)
-			pvalue := hyper.SplitApprox(query, back, ref.Groupings[0], ref.Groupings[1])
+		"approximate hypergeometric split q-value (~5 significant digits)",
+		func(q *Query, db *Database) float64 {
+			seqs := q.SeqCount(db)
+			pvalue := hyper.SplitApprox(seqs[0], seqs[1],
+				db.Sections[0].Count, db.Sections[1].Count)
 			return pvalue
 		}},
 	{"match-hyper-down-pvalue",
-		"hypergeometric split p-value down",
-		func(p *Query, ref *Database) float64 {
-			query := p.Count(ref, 0)
-			back := p.Count(ref, 1)
-			pvalue := hyper.SplitDown(query, back, ref.Groupings[0], ref.Groupings[1])
+		"hypergeometric split q-value down",
+		func(q *Query, db *Database) float64 {
+			seqs := q.SeqCount(db)
+			pvalue := hyper.SplitDown(seqs[0], seqs[1],
+				db.Sections[0].Count, db.Sections[1].Count)
 			return pvalue
 		}},
 	{"match-ratio",
 		"ratio of (matches in query + 1) / (matches in background + 1)",
-		func(p *Query, ref *Database) float64 {
-			query := p.Count(ref, 0)
-			back := p.Count(ref, 1)
-			return float64(query+1) / float64(back+1)
+		func(q *Query, db *Database) float64 {
+			seqs := q.SeqCount(db)
+			return float64(seqs[0]+1) / float64(seqs[1]+1)
 		}},
 
 	{"pat-length",
 		"length of the pattern",
-		func(p *Query, ref *Database) float64 {
+		func(q *Query, db *Database) float64 {
 			t := 0
-			for _, e := range p.Pat {
+			for _, e := range q.Pat {
 				t += 1
 				if e.IsStar {
 					t += 1
@@ -93,9 +96,9 @@ var All = [...]Desc{
 		}},
 	{"pat-chars",
 		"count of characters in pattern",
-		func(p *Query, ref *Database) float64 {
+		func(q *Query, db *Database) float64 {
 			t := 0
-			for _, e := range p.Pat {
+			for _, e := range q.Pat {
 				if !e.IsGroup {
 					t += 1
 				}
@@ -104,9 +107,9 @@ var All = [...]Desc{
 		}},
 	{"pat-groups",
 		"count of groups in pattern",
-		func(p *Query, ref *Database) float64 {
+		func(q *Query, db *Database) float64 {
 			t := 0
-			for _, e := range p.Pat {
+			for _, e := range q.Pat {
 				if e.IsGroup {
 					t += 1
 				}
@@ -115,9 +118,9 @@ var All = [...]Desc{
 		}},
 	{"pat-stars",
 		"count of stars in pattern",
-		func(p *Query, ref *Database) float64 {
+		func(q *Query, db *Database) float64 {
 			t := 0
-			for _, e := range p.Pat {
+			for _, e := range q.Pat {
 				if e.IsStar {
 					t += 1
 				}

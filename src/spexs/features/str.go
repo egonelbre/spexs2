@@ -7,12 +7,12 @@ import (
 var Str = [...]StrDesc{
 	{"pat",
 		"representation of the pattern",
-		func(p *Query, ref *Database) string {
-			return p.String()
+		func(q *Query, db *Database) string {
+			return q.ToString(db)
 		}},
 	{"pat-regexp",
 		"representation of the pattern with group symbols replaced",
-		func(p *Query, ref *Database) string {
-			return ref.ReplaceGroups(p.String())
+		func(q *Query, db *Database) string {
+			return q.ToString(db)
 		}},
 }

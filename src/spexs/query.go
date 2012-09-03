@@ -58,7 +58,7 @@ type queryCache struct {
 	occs  []int
 }
 
-func CountQuery(db *Database, q *Query) []int {
+func (q *Query) SeqCount(db *Database) []int {
 	if q.cache.count == nil {
 		count := make([]int, len(db.Sections))
 
@@ -72,7 +72,7 @@ func CountQuery(db *Database, q *Query) []int {
 	return q.cache.count
 }
 
-func CountQueryOccs(db *Database, q *Query) []int {
+func (q *Query) MatchCount(db *Database) []int {
 	if q.cache.occs == nil {
 		occs := make([]int, len(db.Sections))
 
@@ -87,7 +87,7 @@ func CountQueryOccs(db *Database, q *Query) []int {
 	return q.cache.occs
 }
 
-func QueryToString(db *Database, q *Query) string {
+func (q *Query) ToString(db *Database) string {
 	buf := bytes.NewBufferString("")
 
 	for _, rid := range q.Pat {

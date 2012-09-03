@@ -19,7 +19,7 @@ type Token struct {
 }
 
 type Section struct {
-	Sequences int
+	Count int
 }
 
 type Database struct {
@@ -60,5 +60,5 @@ func (db *Database) AddGroup(group Group) {
 
 func (db *Database) AddSequence(seq Sequence) {
 	db.Sequences = append(db.Sequences, seq)
-	db.Sections[seq.Section].Sequences += 1
+	db.Sections[seq.Section].Count += 1
 }
