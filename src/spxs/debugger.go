@@ -15,10 +15,10 @@ func attachDebugger(s *AppSetup) {
 		tmp := f(q, db)
 		result := NewQuerys()
 		dbg.Break(func() {
-			fmt.Fprintf(dbg.Logout, "extending: %v\n", q.String(db, false))
+			fmt.Fprintf(dbg.Logout, "extending: %v\n", q.String(db, true))
 			for extended := range tmp {
 				result <- extended
-				fmt.Fprintf(dbg.Logout, "  | %v\n", q.String(db, false))
+				fmt.Fprintf(dbg.Logout, "  | %v\n", q.String(db, true))
 				if *verbose {
 					fmt.Fprintf(dbg.Logout, "\tE:%v\tO:%v\n",
 						s.Extendable(extended, db),

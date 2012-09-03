@@ -41,9 +41,8 @@ func CreateDatabase(conf Conf) *Database {
 	}
 
 	addSeqsFromFile(db, conf.Data.Input, 0)
-
-	if conf.Data.Database != "" {
-		addSeqsFromFile(db, conf.Data.Database, 1)
+	if conf.Data.Reference != "" {
+		addSeqsFromFile(db, conf.Data.Reference, 1)
 	}
 
 	return db
@@ -76,7 +75,12 @@ func addSeqsFromFile(db *Database, filename string, section int) {
 			continue
 		}
 
-		seq := Sequence{tids, len(tids), section, 1}
+		seq := Sequence{
+			Tokens:  tids,
+			Len:     len(tids),
+			Section: section,
+			Count:   1,
+		}
 		db.AddSequence(seq)
 	}
 }

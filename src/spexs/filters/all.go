@@ -10,7 +10,7 @@ var All = [...]Desc{
 		func(conf Conf) (Func, error) {
 			return func(p *Query, ref *Database) bool {
 				e := p.Pat[0]
-				return e.IsGroup || e.IsStar
+				return !(e.IsGroup || e.IsStar)
 			}, nil
 		}},
 	{"no-ending-group",

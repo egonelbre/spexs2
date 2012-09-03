@@ -59,8 +59,12 @@ type queryCache struct {
 }
 
 func (q *Query) CacheValues(db *Database) {
-	q.SeqCount(db)
-	q.MatchCount(db)
+	if q.cache.count == nil {
+		q.SeqCount(db)
+	}
+	if q.cache.occs == nil {
+		q.MatchCount(db)
+	}
 	q.Loc.Clear()
 }
 

@@ -15,7 +15,8 @@
 		"method" : "regexp",
 		"args" : {"star":{ "max-gap": 3}},
 		"filter" : {
-			"query-match-seqs-prop" : {"min":0.8}
+			"query-match-seqs-prop" : {"min":0.8},
+			"no-starting-group" : {}
 		}
 	},
 	"output" : {
@@ -23,7 +24,9 @@
 		"sort" : "desc",
 		"args" : {"p-value":{}},
 		"filter" : {
-			"query-match-seqs-prop" : {"min":0.8}
+			"query-match-seqs-prop" : {"min":0.8},
+			"no-ending-group" : {},
+			"no-starting-group" : {}
 		},
 		"count": 100,
 		"format": "{pat}\t{pat-chars}\t{match-hyper-up-pvalue}\n"
