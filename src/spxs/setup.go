@@ -33,7 +33,7 @@ type PatternFilterCreator func(limit int) FilterFunc
 func CreateInput(conf Conf, setup AppSetup) Pooler {
 	//in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE, true)
 	in := pool.NewLifo()
-	in.Put(NewFullPattern(setup.Ref))
+	in.Put(NewEmptyQuery(setup.DB))
 	return in
 }
 
