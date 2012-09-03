@@ -58,6 +58,12 @@ type queryCache struct {
 	occs  []int
 }
 
+func (q *Query) CacheValues(db *Database) {
+	q.SeqCount(db)
+	q.MatchCount(db)
+	q.Loc.Clear()
+}
+
 func (q *Query) SeqCount(db *Database) []int {
 	if q.cache.count == nil {
 		count := make([]int, len(db.Sections))

@@ -91,9 +91,9 @@ func main() {
 	endStats()
 
 	limit := conf.Output.Count
-	setup.Printer(os.Stdout, nil, setup.Ref)
+	setup.Printer(os.Stdout, nil, setup.DB)
 	for _, node := range setup.Out.(*pool.Priority).Bottom(limit) {
-		setup.Printer(os.Stdout, node, setup.Ref)
+		setup.Printer(os.Stdout, node, setup.DB)
 	}
 
 	/*

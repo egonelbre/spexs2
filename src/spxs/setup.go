@@ -50,7 +50,7 @@ func CreateOutput(conf Conf, setup AppSetup, f FitnessFunc) Pooler {
 
 func CreateSetup(conf Conf) AppSetup {
 	var s AppSetup
-	s.Ref = CreateReference(conf)
+	s.DB = CreateDatabase(conf)
 
 	s.In = CreateInput(conf, s)
 	s.Fitness = CreateFitness(conf, s)
@@ -60,10 +60,8 @@ func CreateSetup(conf Conf) AppSetup {
 	s.Extendable = CreateFilter(conf.Extension.Filter, s)
 	s.Outputtable = CreateFilter(conf.Output.Filter, s)
 
-	s.PostProcess = func(p *Query, s *Setup) error {
-		p.Occs(s.Ref, 0)
-		p.Count(s.Ref, 0)
-		p.Pos.Clear()
+	s.PostProcess = func(q *Query, s *Setup) error {
+		q.CacheValues(s.DB)
 		return nil
 	}
 
@@ -114,7 +112,7 @@ func CreateFitness(conf Conf, setup AppSetup) FitnessFunc {
 		log.Fatal(err)
 	}
 
-	return func(p *Query) float64 {
-		return fit(p, setup.Ref)
+	return func(q *Query) float64 {
+		return fit(q, setup.DB)
 	}
 }
