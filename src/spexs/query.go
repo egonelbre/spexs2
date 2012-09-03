@@ -87,7 +87,7 @@ func (q *Query) MatchCount(db *Database) []int {
 	return q.cache.occs
 }
 
-func (q *Query) ToString(db *Database) string {
+func (q *Query) String(db *Database, short bool) string {
 	buf := bytes.NewBufferString("")
 
 	for _, rid := range q.Pat {
@@ -98,7 +98,12 @@ func (q *Query) ToString(db *Database) string {
 
 		group, ok := db.Groups[rid.Id]
 		if ok {
-			buf.WriteString(group.Str)
+			if short {
+				buf.WriteString(group.Alias)
+			} else {
+				buf.WriteString(group.Str)
+			}
+
 		}
 	}
 

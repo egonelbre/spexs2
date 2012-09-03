@@ -10,6 +10,7 @@ type Sequence struct {
 type Group struct {
 	Id    Tid
 	Elems []Tid
+	Alias string
 	Str   string
 }
 
@@ -29,7 +30,8 @@ type Database struct {
 	Sequences []Sequence
 	Sections  []Section
 
-	lastId int
+	tokenToId map[string]Tid
+	lastId    Tid
 }
 
 func NewDatabase(estimatedSize int) *Database {
@@ -40,7 +42,8 @@ func NewDatabase(estimatedSize int) *Database {
 		Sequences: make([]Sequence, 0, estimatedSize),
 		Sections:  make([]Section, 0, 2),
 
-		lastId: 0,
+		tokenToId: make(map[string]Tid),
+		lastId:    Tid(0),
 	}
 }
 
@@ -54,11 +57,39 @@ func (db *Database) GetToken(seqIdx int, tokenPos int) (token Tid, ok bool, next
 	return Tid(rune), true, tokenPos + width
 }
 
-func (db *Database) AddGroup(group Group) {
-	db.Groups[group.Id] = group
+func (db *Database) nextId() Tid {
+	id := db.lastId
+	db.lastId += 1
+	return id
+}
+
+func (db *Database) AddGroup(group Group) Tid {
+	tid := db.nextId()
+	group.Id = tid
+	db.Groups[tid] = group
+	return tid
+}
+
+func (db *Database) AddToken(token string) Tid {
+	tid := db.nextId()
+	db.tokenToId[token] = tid
+	db.Alphabet[tid] = Token{tid, token}
+	return tid
 }
 
 func (db *Database) AddSequence(seq Sequence) {
 	db.Sequences = append(db.Sequences, seq)
 	db.Sections[seq.Section].Count += 1
+}
+
+func (db *Database) ToTids(tokens []string) []Tid {
+	tids := make([]Tid, len(tokens))
+	for i, token := range tokens {
+		tid, ok := db.tokenToId[token]
+		if !ok {
+			tid = db.AddToken(token)
+		}
+		tids[i] = tid
+	}
+	return tids
 }
