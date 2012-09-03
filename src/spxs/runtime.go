@@ -37,12 +37,12 @@ func setMemLimit(setup *AppSetup) {
 	ext := setup.Extender
 	m := new(runtime.MemStats)
 
-	setup.Extender = func(p *Query, ref *Database) Patterns {
+	setup.Extender = func(q *Query, db *Database) Querys {
 		runtime.ReadMemStats(m)
 		if m.Alloc/mb > memLimit {
 			panic(errors.New("MEMORY LIMIT EXCEEDED!"))
 		}
-		return ext(p, ref)
+		return ext(q, db)
 	}
 }
 
@@ -54,7 +54,7 @@ func attachMemProfiler(setup *AppSetup) {
 
 	ext := setup.Extender
 
-	setup.Extender = func(p *Query, ref *Database) Patterns {
+	setup.Extender = func(q *Query, db *Database) Querys {
 		if count == limit {
 			f, err := os.Create(filename + string(profile))
 			if err != nil {
@@ -68,7 +68,7 @@ func attachMemProfiler(setup *AppSetup) {
 			count = 0
 		}
 		count += 1
-		return ext(p, ref)
+		return ext(q, db)
 	}
 }
 
@@ -97,10 +97,10 @@ func runStats(setup *AppSetup) {
 	}()
 
 	ext := setup.Extender
-	setup.Extender = func(p *Query, ref *Database) Patterns {
-		seq = p.String()
+	setup.Extender = func(q *Query, db *Database) Querys {
+		seq = q.String(db, false)
 		counter += 1
-		return ext(p, ref)
+		return ext(q, db)
 	}
 }
 
@@ -112,10 +112,10 @@ func endStats() {
 
 func setupLiveView(setup *AppSetup) {
 	out := setup.Outputtable
-	setup.Outputtable = func(p *Query, ref *Database) bool {
-		result := out(p, ref)
+	setup.Outputtable = func(q *Query, db *Database) bool {
+		result := out(q, db)
 		if result {
-			setup.Printer(os.Stderr, p, ref)
+			setup.Printer(os.Stderr, q, db)
 		}
 		return result
 	}
