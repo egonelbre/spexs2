@@ -1,0 +1,21 @@
+Frequent Factor mining
+• New data structures for analyzing frequent factors in strings
+
+Programming models
+• Kahn Process Networks [Kahn74, Kahn76]
+• Dataflow Process Networks [Lee95]
+
+Programming languages
+• Lucid [Wadge85]
+• VAL [Acherman79], later SISAL [Mcgraw85]
+• Id [Arvind90], later Parallel Haskell (pH) [Nikhil93]
+• Streamit [Thies02]
+• Single Assignment C [Scholz03] and S-Net [Grelck07]
+
+Lock-free
+• Wait-free Queues With Multiple Enqueuers and Dequeuers
+• Simple, Fast, and Practical Non-Blocking and Blocking Concurrent Queue Algorithms
+
+Ideas
+• Logic for Problem Solving
+	Algorithm = Logic + Control

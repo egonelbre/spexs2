@@ -1,9 +1,9 @@
 **.exe
 **.log
 temp/**
-doc/**
 pkg/**
 bin/**
+doc/build/**
 *.prof
 *.sublime-project
 *.sublime-workspace
