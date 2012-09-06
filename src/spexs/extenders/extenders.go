@@ -7,10 +7,14 @@ import (
 
 type queryMap map[Token]*Query
 
-func flush(querys queryMap, to Querys) {
-	for _, q := range querys {
-		to <- q
+func toQuerys(queryMap queryMap) Querys {
+	querys := make(Querys, len(queryMap))
+	i := 0
+	for _, q := range queryMap {
+		querys[i] = q
+		i += 1
 	}
+	return querys
 }
 
 func extend(base *Query, db *Database, querys queryMap) {
@@ -40,13 +44,8 @@ func extend(base *Query, db *Database, querys queryMap) {
 
 func Simplex(base *Query, db *Database) Querys {
 	querys := make(queryMap)
-
 	extend(base, db, querys)
-
-	result := NewQuerys()
-	flush(querys, result)
-	close(result)
-	return result
+	return toQuerys(querys)
 }
 
 func combine(base *Query, db *Database, querys queryMap, isStar bool) {
@@ -64,14 +63,9 @@ func combine(base *Query, db *Database, querys queryMap, isStar bool) {
 
 func Groupex(base *Query, db *Database) Querys {
 	querys := make(queryMap)
-
 	extend(base, db, querys)
 	combine(base, db, querys, false)
-
-	result := NewQuerys()
-	flush(querys, result)
-	close(result)
-	return result
+	return toQuerys(querys)
 }
 
 func starExtend(base *Query, db *Database, querys queryMap) {
@@ -95,33 +89,19 @@ func starExtend(base *Query, db *Database, querys queryMap) {
 }
 
 func Starex(base *Query, db *Database) Querys {
-	result := NewQuerys()
-
 	patterns := make(queryMap)
 	extend(base, db, patterns)
-	flush(patterns, result)
-
 	stars := make(queryMap)
 	starExtend(base, db, stars)
-	flush(stars, result)
-
-	close(result)
-	return result
+	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 
 func Regex(base *Query, db *Database) Querys {
-	result := NewQuerys()
-
 	patterns := make(queryMap)
 	extend(base, db, patterns)
 	combine(base, db, patterns, false)
-	flush(patterns, result)
-
 	stars := make(queryMap)
 	starExtend(base, db, stars)
 	combine(base, db, stars, true)
-	flush(stars, result)
-
-	close(result)
-	return result
+	return append(toQuerys(patterns), toQuerys(stars)...)
 }

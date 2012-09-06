@@ -40,15 +40,15 @@ func CreateDatabase(conf Conf) *Database {
 		log.Fatal("Data file not defined")
 	}
 
-	addSeqsFromFile(db, conf.Data.Input, 0)
+	addSeqsFromFile(db, conf, conf.Data.Input, 0)
 	if conf.Data.Reference != "" {
-		addSeqsFromFile(db, conf.Data.Reference, 1)
+		addSeqsFromFile(db, conf, conf.Data.Reference, 1)
 	}
 
 	return db
 }
 
-func addSeqsFromFile(db *Database, filename string, section int) {
+func addSeqsFromFile(db *Database, conf Conf, filename string, section int) {
 	var (
 		file   *os.File
 		reader *bufio.Reader
@@ -68,16 +68,16 @@ func addSeqsFromFile(db *Database, filename string, section int) {
 		}
 
 		line = strings.TrimSpace(line)
-		tokens := strings.Split(line, "")
-		tids := db.ToTokens(tokens)
+		tokenNames := strings.Split(line, conf.Alphabet.Separator)
+		tokens := db.ToTokens(tokenNames)
 
-		if len(tids) <= 0 {
+		if len(tokens) <= 0 {
 			continue
 		}
 
 		seq := Sequence{
-			Tokens:  tids,
-			Len:     len(tids),
+			Tokens:  tokens,
+			Len:     len(tokens),
 			Section: section,
 			Count:   1,
 		}

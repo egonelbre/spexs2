@@ -2,13 +2,8 @@ package spexs
 
 import "time"
 
-const (
-	patternsBufferSize = 128
-)
-
-type Token byte
-
-type Querys chan *Query
+type Token uint16
+type Querys []*Query
 
 type Pooler interface {
 	Take() (*Query, bool)
@@ -34,10 +29,6 @@ type Setup struct {
 	PostProcess PostProcessFunc
 }
 
-func NewQuerys() Querys {
-	return make(Querys, patternsBufferSize)
-}
-
 func Run(s *Setup) {
 	for {
 		p, valid := s.In.Take()
@@ -46,7 +37,7 @@ func Run(s *Setup) {
 		}
 
 		extensions := s.Extender(p, s.DB)
-		for extended := range extensions {
+		for _, extended := range extensions {
 			if s.Extendable(extended, s.DB) {
 				s.In.Put(extended)
 			}
@@ -98,7 +89,7 @@ func RunParallel(s *Setup, routines int) {
 				}
 
 				extensions := s.Extender(p, s.DB)
-				for extended := range extensions {
+				for _, extended := range extensions {
 					if s.Extendable(extended, s.DB) {
 						s.In.Put(extended)
 					}
