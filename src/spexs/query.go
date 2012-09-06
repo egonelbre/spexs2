@@ -100,20 +100,24 @@ func (q *Query) MatchCount(db *Database) []int {
 func (q *Query) String(db *Database, short bool) string {
 	buf := bytes.NewBufferString("")
 
-	for _, rid := range q.Pat {
-		tokInfo, ok := db.Alphabet[rid.Token]
+	for i, regToken := range q.Pat {
+		tokInfo, ok := db.Alphabet[regToken.Token]
 		if ok {
 			buf.WriteString(tokInfo.Name)
 		}
 
-		group, ok := db.Groups[rid.Token]
+		group, ok := db.Groups[regToken.Token]
 		if ok {
 			if short {
 				buf.WriteString(group.Name)
 			} else {
 				buf.WriteString(group.FullName)
 			}
+		}
 
+		isLast := len(q.Pat)-1 == i
+		if !isLast {
+			buf.WriteString(db.Separator)
 		}
 	}
 

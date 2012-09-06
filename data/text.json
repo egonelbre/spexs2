@@ -1,0 +1,41 @@
+{
+	"data" : {
+		"input" : "data/text.inp",
+		"reference" : "data/text.ref"
+	},
+
+	"alphabet" : {
+		"separator" : " ",
+		"groups" : {
+			"(bind)": {"group":"and or if then else the a my"}
+		}
+	},
+
+	"extension" : {
+		"method" : "group",
+		"args" : {"star":{ "max-gap": 3}},
+		"filter" : {
+			"pat-groups" : {"max":3},
+			"pat-length" : {"max":6},
+			"no-starting-group" : {}
+		}
+	},
+	"output" : {
+		"order" : "query-match-seqs",
+		"sort" : "asc",
+		"args" : {"p-value":{}},
+		"filter" : {
+			"no-starting-group" : {},
+			"no-ending-group" : {}
+		},
+		"count": 100,
+		"format": "'{pat}'\t\t{query-match-seqs}\t{back-match-seqs}\t{match-hyper-up-pvalue}\n",
+		"queue": ""
+	},
+	"aliases" : {
+		"inp" : {"desc":"input file",            "modify":["data.input"]},
+		"ref" : {"desc":"reference file",        "modify":["data.reference"]},
+		"p-min" : {"desc":"minimum for p-value", "modify":["output.filter.p-value.min"]},
+		"p-max" : {"desc":"maximum for p-value", "modify":["output.filter.p-value.max"]}
+	}
+}

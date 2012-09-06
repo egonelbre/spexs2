@@ -30,6 +30,8 @@ type Database struct {
 	Sequences []Sequence
 	Sections  []Section
 
+	Separator string // separator for joining pattern
+
 	nameToToken map[string]Token
 	lastToken   Token
 }
@@ -41,6 +43,8 @@ func NewDatabase(estimatedSize int) *Database {
 
 		Sequences: make([]Sequence, 0, estimatedSize),
 		Sections:  make([]Section, 0, 2),
+
+		Separator: "",
 
 		nameToToken: make(map[string]Token),
 		lastToken:   Token(0),

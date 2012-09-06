@@ -1,6 +1,6 @@
 package sets
 
-type BitVector uint16
+type BitVector uint64
 type Positions map[int]BitVector
 
 type Set interface {

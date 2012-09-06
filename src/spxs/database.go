@@ -24,21 +24,14 @@ func removeEmpty(names []string) []string {
 
 func CreateDatabase(conf Conf) *Database {
 	db := NewDatabase(1024)
+	db.Separator = conf.Alphabet.Separator
 
-	if conf.Alphabet.Characters == "" {
-		log.Fatal("No alphabet defined!")
-	}
-
-	for _, alpha := range conf.Alphabet.Characters {
-		db.AddToken(string(alpha))
-	}
+	//for _, alpha := range conf.Alphabet.Characters {
+	//	db.AddToken(string(alpha))
+	//}
 
 	for id, grp := range conf.Alphabet.Groups {
 		group := Group{}
-
-		if len(id) != 1 {
-			log.Fatal("Group identifier must be of length 1.")
-		}
 
 		group.Name = id
 		group.FullName = "[" + grp.Group + "]"
