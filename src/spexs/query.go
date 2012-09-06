@@ -6,20 +6,20 @@ import (
 	"utils"
 )
 
-type Rid struct {
+type RegToken struct {
 	Token   Token
 	IsGroup bool
 	IsStar  bool
 }
 
 type Query struct {
-	Pat []Rid
+	Pat []RegToken
 	Loc *sets.HashSet
 
 	cache queryCache
 }
 
-func NewQuery(parent *Query, token Rid) *Query {
+func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
 
 	if parent != nil {
@@ -36,7 +36,7 @@ func NewQuery(parent *Query, token Rid) *Query {
 }
 
 func NewEmptyQuery(db *Database) *Query {
-	q := NewQuery(nil, Rid{})
+	q := NewQuery(nil, RegToken{})
 	for i, _ := range db.Sequences {
 		last := 0
 		_, ok, next := db.GetToken(i, last)

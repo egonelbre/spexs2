@@ -17,12 +17,12 @@ import (
 const baseConfiguration = `{
 	"data" : {
 		"input" : "",
-		"reference" : "",
-		"reader" : ""
+		"reference" : ""
 	},
 	"alphabet" : {
 		"characters" : "",
-		"groups" : {}
+		"groups" : {},
+		"separator" : ""
 	},
 	"extension" : {
 		"method" : "",
@@ -47,13 +47,11 @@ type Conf struct {
 	Data struct {
 		Input     string
 		Reference string
-		Reader    string
 	}
 	Alphabet struct {
 		Characters string
-		Groups     map[string]struct {
-			Group string
-		}
+		Groups     map[string]struct{ Group string }
+		Separator  string
 	}
 	Extension struct {
 		Method string

@@ -30,7 +30,7 @@ func CreateDatabase(conf Conf) *Database {
 		group.Name = id
 		group.FullName = "[" + grp.Group + "]"
 
-		tokens := strings.Split(grp.Group, "")
+		tokens := strings.Split(grp.Group, conf.Alphabet.Separator)
 		group.Elems = db.ToTokens(tokens)
 
 		db.AddGroup(group)

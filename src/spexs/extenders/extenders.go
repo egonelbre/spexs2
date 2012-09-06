@@ -30,7 +30,7 @@ func extend(base *Query, db *Database, querys queryMap) {
 
 			q, ok := querys[token]
 			if !ok {
-				q = NewQuery(base, Rid{token, false, false})
+				q = NewQuery(base, RegToken{token, false, false})
 				querys[token] = q
 			}
 			q.Loc.Add(i, next)
@@ -51,7 +51,7 @@ func Simplex(base *Query, db *Database) Querys {
 
 func combine(base *Query, db *Database, querys queryMap, isStar bool) {
 	for _, group := range db.Groups {
-		q := NewQuery(base, Rid{group.Token, true, isStar})
+		q := NewQuery(base, RegToken{group.Token, true, isStar})
 		querys[group.Token] = q
 		for _, token := range group.Elems {
 			single, ok := querys[token]
@@ -85,7 +85,7 @@ func starExtend(base *Query, db *Database, querys queryMap) {
 		for ok {
 			q, ok := querys[token]
 			if !ok {
-				q = NewQuery(base, Rid{token, false, true})
+				q = NewQuery(base, RegToken{token, false, true})
 				querys[token] = q
 			}
 			q.Loc.Add(i, next)
