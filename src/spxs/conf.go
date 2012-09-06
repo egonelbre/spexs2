@@ -20,9 +20,8 @@ const baseConfiguration = `{
 		"reference" : ""
 	},
 	"alphabet" : {
-		"characters" : "",
-		"groups" : {},
-		"separator" : ""
+		"separator" : "",
+		"groups" : {}
 	},
 	"extension" : {
 		"method" : "",
@@ -49,9 +48,8 @@ type Conf struct {
 		Reference string
 	}
 	Alphabet struct {
-		Characters string
-		Groups     map[string]struct{ Group string }
-		Separator  string
+		Separator string
+		Groups    map[string]struct{ Elements string }
 	}
 	Extension struct {
 		Method string

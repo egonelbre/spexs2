@@ -26,17 +26,13 @@ func CreateDatabase(conf Conf) *Database {
 	db := NewDatabase(1024)
 	db.Separator = conf.Alphabet.Separator
 
-	//for _, alpha := range conf.Alphabet.Characters {
-	//	db.AddToken(string(alpha))
-	//}
-
 	for id, grp := range conf.Alphabet.Groups {
 		group := Group{}
 
 		group.Name = id
-		group.FullName = "[" + grp.Group + "]"
+		group.FullName = "[" + grp.Elements + "]"
 
-		tokenNames := strings.Split(grp.Group, conf.Alphabet.Separator)
+		tokenNames := strings.Split(grp.Elements, conf.Alphabet.Separator)
 		tokenNames = removeEmpty(tokenNames)
 		group.Elems = db.ToTokens(tokenNames)
 
