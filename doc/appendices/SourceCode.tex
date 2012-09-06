@@ -1,4 +1,31 @@
 \chapter{Source Code}
 \label{add:files}
 
-Source code for this application is available at http://github.com/egonelbre/spexs.
+The source code for the new implementation of SPEXS is available at \url{''http://github.com/egonelbre/spexs''}.
+
+Folder structure has layout
+
+	src | root for the source code
+		debugger | debugger as explained in Implementation:Debugging
+		stats | statistics utilities
+		utils | other utility functions
+		spxs  | the command line application
+			spxs.go | main entry point
+			conf.go | configuration file reading
+			database.go | reading of the database file
+			debugger.go | code for setting up debugger for spexs algorithm
+			help.go | printing of help
+			printer.go | output formatter
+			setup.go | constructs the data structures necessary for spexs algorithm
+			version.go | automatically generated file for versioning
+		spexs | algorithm implementation
+			extenders | query extending methods
+			features | query features
+			filters  | query filtering methods
+			fitnesses | fitness functions for sorting results
+			pool | pool implementations for storing querys
+			sets | position bitvector storing
+
+			spexs.go | main algorithm and the setup
+			database.go | implementation of a sequence database
+			query.go | implementation for storing querys
