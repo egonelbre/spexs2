@@ -1,22 +1,22 @@
 package spexs
 
 type Sequence struct {
-	Tokens  []Tid
+	Tokens  []Token
 	Len     int
 	Section int
 	Count   int
 }
 
 type Group struct {
-	Id    Tid
-	Elems []Tid
-	Alias string
-	Str   string
+	Token    Token
+	Elems    []Token
+	Name     string
+	FullName string
 }
 
-type Token struct {
-	Id  Tid
-	Str string
+type TokenInfo struct {
+	Token Token
+	Name  string
 }
 
 type Section struct {
@@ -24,57 +24,57 @@ type Section struct {
 }
 
 type Database struct {
-	Alphabet map[Tid]Token
-	Groups   map[Tid]Group
+	Alphabet map[Token]TokenInfo
+	Groups   map[Token]Group
 
 	Sequences []Sequence
 	Sections  []Section
 
-	tokenToId map[string]Tid
-	lastId    Tid
+	nameToToken map[string]Token
+	lastToken   Token
 }
 
 func NewDatabase(estimatedSize int) *Database {
 	return &Database{
-		Alphabet: make(map[Tid]Token),
-		Groups:   make(map[Tid]Group),
+		Alphabet: make(map[Token]TokenInfo),
+		Groups:   make(map[Token]Group),
 
 		Sequences: make([]Sequence, 0, estimatedSize),
 		Sections:  make([]Section, 0, 2),
 
-		tokenToId: make(map[string]Tid),
-		lastId:    Tid(0),
+		nameToToken: make(map[string]Token),
+		lastToken:   Token(0),
 	}
 }
 
-func (db *Database) GetToken(seqIdx int, tokenPos int) (token Tid, ok bool, nextPos int) {
+func (db *Database) GetToken(seqIdx int, tokenPos int) (token Token, ok bool, nextPos int) {
 	seq := &db.Sequences[seqIdx]
 	if int(tokenPos) >= len(seq.Tokens) {
 		return 0, false, 0
 	}
 
 	rune, width := seq.Tokens[tokenPos], 1
-	return Tid(rune), true, tokenPos + width
+	return Token(rune), true, tokenPos + width
 }
 
-func (db *Database) nextId() Tid {
-	id := db.lastId
-	db.lastId += 1
-	return id
+func (db *Database) nextToken() Token {
+	newToken := db.lastToken
+	db.lastToken += 1
+	return newToken
 }
 
-func (db *Database) AddGroup(group Group) Tid {
-	tid := db.nextId()
-	group.Id = tid
-	db.Groups[tid] = group
-	return tid
+func (db *Database) AddGroup(group Group) Token {
+	token := db.nextToken()
+	group.Token = token
+	db.Groups[token] = group
+	return token
 }
 
-func (db *Database) AddToken(token string) Tid {
-	tid := db.nextId()
-	db.tokenToId[token] = tid
-	db.Alphabet[tid] = Token{tid, token}
-	return tid
+func (db *Database) AddToken(tokenName string) Token {
+	token := db.nextToken()
+	db.nameToToken[tokenName] = token
+	db.Alphabet[token] = TokenInfo{token, tokenName}
+	return token
 }
 
 func (db *Database) AddSequence(seq Sequence) {
@@ -87,14 +87,14 @@ func (db *Database) AddSequence(seq Sequence) {
 	db.Sections[seq.Section].Count += 1
 }
 
-func (db *Database) ToTids(tokens []string) []Tid {
-	tids := make([]Tid, len(tokens))
-	for i, token := range tokens {
-		tid, ok := db.tokenToId[token]
+func (db *Database) ToTokens(tokenNames []string) []Token {
+	tokens := make([]Token, len(tokenNames))
+	for i, name := range tokenNames {
+		token, ok := db.nameToToken[name]
 		if !ok {
-			tid = db.AddToken(token)
+			token = db.AddToken(name)
 		}
-		tids[i] = tid
+		tokens[i] = token
 	}
-	return tids
+	return tokens
 }

@@ -5,7 +5,7 @@ import (
 	"utils"
 )
 
-type queryMap map[Tid]*Query
+type queryMap map[Token]*Query
 
 func flush(querys queryMap, to Querys) {
 	for _, q := range querys {
@@ -23,15 +23,15 @@ func extend(base *Query, db *Database, querys queryMap) {
 				continue
 			}
 
-			tid, ok, next := db.GetToken(i, k)
+			token, ok, next := db.GetToken(i, k)
 			if !ok {
 				continue
 			}
 
-			q, ok := querys[tid]
+			q, ok := querys[token]
 			if !ok {
-				q = NewQuery(base, Rid{tid, false, false})
-				querys[tid] = q
+				q = NewQuery(base, Rid{token, false, false})
+				querys[token] = q
 			}
 			q.Loc.Add(i, next)
 		}
@@ -51,10 +51,10 @@ func Simplex(base *Query, db *Database) Querys {
 
 func combine(base *Query, db *Database, querys queryMap, isStar bool) {
 	for _, group := range db.Groups {
-		q := NewQuery(base, Rid{group.Id, true, isStar})
-		querys[group.Id] = q
-		for _, tid := range group.Elems {
-			single, ok := querys[tid]
+		q := NewQuery(base, Rid{group.Token, true, isStar})
+		querys[group.Token] = q
+		for _, token := range group.Elems {
+			single, ok := querys[token]
 			if ok {
 				q.Loc.AddSet(single.Loc)
 			}
@@ -81,15 +81,15 @@ func starExtend(base *Query, db *Database, querys queryMap) {
 			continue
 		}
 
-		tid, ok, next := db.GetToken(i, last)
+		token, ok, next := db.GetToken(i, last)
 		for ok {
-			q, ok := querys[tid]
+			q, ok := querys[token]
 			if !ok {
-				q = NewQuery(base, Rid{tid, false, true})
-				querys[tid] = q
+				q = NewQuery(base, Rid{token, false, true})
+				querys[token] = q
 			}
 			q.Loc.Add(i, next)
-			tid, ok, next = db.GetToken(i, next)
+			token, ok, next = db.GetToken(i, next)
 		}
 	}
 }

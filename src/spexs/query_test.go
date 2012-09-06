@@ -15,7 +15,7 @@ func add(base *Query, s string) *Query {
 		return base
 	}
 	rune, size := utf8.DecodeRuneInString(s)
-	n := NewPattern(Tid(rune), base)
+	n := NewPattern(Token(rune), base)
 	if rune == 'X' {
 		n.IsStar = true
 	}

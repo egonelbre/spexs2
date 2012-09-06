@@ -6,10 +6,10 @@ import (
 	"unicode/utf8"
 )
 
-func chars(s string) []Tid {
-	a := make([]Tid, 0, 100)
+func chars(s string) []Token {
+	a := make([]Token, 0, 100)
 	for _, c := range s {
-		a = append(a, Tid(c))
+		a = append(a, Token(c))
 	}
 	return a
 }
@@ -46,7 +46,7 @@ func TestReferenceNext(t *testing.T) {
 	u := createTestReference()
 
 	testStr := func(idx int, str string) {
-		var x Tid
+		var x Token
 		var ok bool
 		idx, pos := idx, uint(0)
 		for _, c := range str {
@@ -54,7 +54,7 @@ func TestReferenceNext(t *testing.T) {
 			if !ok {
 				t.Errorf("string '%s' ended too early", str)
 			}
-			if Tid(c) != x {
+			if Token(c) != x {
 				t.Errorf("wrong char: str='%s' got='%v' expected='%v'", str, x, c)
 			}
 		}

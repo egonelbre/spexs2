@@ -6,7 +6,7 @@ const (
 	patternsBufferSize = 128
 )
 
-type Tid byte
+type Token byte
 
 type Querys chan *Query
 

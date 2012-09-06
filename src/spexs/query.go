@@ -7,7 +7,7 @@ import (
 )
 
 type Rid struct {
-	Id      Tid
+	Token   Token
 	IsGroup bool
 	IsStar  bool
 }
@@ -101,17 +101,17 @@ func (q *Query) String(db *Database, short bool) string {
 	buf := bytes.NewBufferString("")
 
 	for _, rid := range q.Pat {
-		alpha, ok := db.Alphabet[rid.Id]
+		tokInfo, ok := db.Alphabet[rid.Token]
 		if ok {
-			buf.WriteString(alpha.Str)
+			buf.WriteString(tokInfo.Name)
 		}
 
-		group, ok := db.Groups[rid.Id]
+		group, ok := db.Groups[rid.Token]
 		if ok {
 			if short {
-				buf.WriteString(group.Alias)
+				buf.WriteString(group.Name)
 			} else {
-				buf.WriteString(group.Str)
+				buf.WriteString(group.FullName)
 			}
 
 		}

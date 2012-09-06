@@ -27,11 +27,11 @@ func CreateDatabase(conf Conf) *Database {
 			log.Fatal("Group identifier must be of length 1.")
 		}
 
-		group.Alias = id
-		group.Str = "[" + grp.Group + "]"
+		group.Name = id
+		group.FullName = "[" + grp.Group + "]"
 
 		tokens := strings.Split(grp.Group, "")
-		group.Elems = db.ToTids(tokens)
+		group.Elems = db.ToTokens(tokens)
 
 		db.AddGroup(group)
 	}
@@ -69,7 +69,7 @@ func addSeqsFromFile(db *Database, filename string, section int) {
 
 		line = strings.TrimSpace(line)
 		tokens := strings.Split(line, "")
-		tids := db.ToTids(tokens)
+		tids := db.ToTokens(tokens)
 
 		if len(tids) <= 0 {
 			continue
