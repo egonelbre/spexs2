@@ -62,7 +62,9 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 
 	f := func(out io.Writer, pat *Query, ref *Database) {
 		if pat == nil {
-			fmt.Print(header)
+			if header != "hidden" {
+				fmt.Print(header)
+			}
 			return
 		}
 

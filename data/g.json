@@ -7,7 +7,7 @@
 	"alphabet" : {
 		"characters" : "ACDEFGHIKLMNPRQSTVWY",
 		"groups" : {
-			".": {"group":"ACDEFGHIKLMNPRQSTVWY"}
+			".": {"elements":"ACDEFGHIKLMNPRQSTVWY"}
 		}
 	},
 
