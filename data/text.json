@@ -7,7 +7,7 @@
 	"alphabet" : {
 		"separator" : " ",
 		"groups" : {
-			"(bind)": {"group":"and or if then else the a my"}
+			"(bind)": {"elements":"and or if then else the a my"}
 		}
 	},
 
