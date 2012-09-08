@@ -23,10 +23,10 @@ func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
 
 	if parent != nil {
-		q.Pat = make([]RegToken, len(parent.Pat), len(parent.Pat)+1)
+		size := len(parent.Pat) + 1
+		q.Pat = make([]RegToken, size)
 		copy(q.Pat, parent.Pat)
-		q.Pat = append(q.Pat, token)
-		//q.Pat = append(parent.Pat, token)
+		q.Pat[size-1] = token
 
 		estimatedSize := parent.Loc.Len() / 8
 		q.Loc = sets.NewHashSet(estimatedSize)
