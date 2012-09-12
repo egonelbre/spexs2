@@ -25,6 +25,7 @@
 		"sort" : "asc",
 		"args" : {"p-value":{}},
 		"filter" : {
+			"pat-length" : { "min" : 2},
 			"no-starting-group" : {},
 			"no-ending-group" : {}
 		},

@@ -2,7 +2,7 @@
 	(:require clojure.set))
 
 (def input [\A \C \G \G \G \T \A \C nil \C \G \G \G \A \T nil])
-(def full-set (set (range 0 (count text))))
+(def full-set (set (range 0 (count input))))
 
 ; generates first layer
 (defn identify [i] 
