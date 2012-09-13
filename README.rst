@@ -1,7 +1,7 @@
 ==================================
-SPEXS
+SPeXS
 ==================================
-Sequence Pattern EXhaustive Search
+Sequence Pattern eXhaustive Search
 ----------------------------------
 
 Implementation of SPEXS algorithm
