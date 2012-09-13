@@ -20,7 +20,7 @@ var (
 	configs          *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
 
 	stats       *bool = flag.Bool("stats", false, "print memory/extension statistics")
-	procs       *int  = flag.Int("procs", 4, "parallel routines for extending")
+	procs       *int  = flag.Int("procs", 16, "parallel routines for extending")
 	memoryLimit *int  = flag.Int("mem", -1, "memory limit in MB")
 
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
