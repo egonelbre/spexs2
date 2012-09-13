@@ -15,4 +15,4 @@ changes
 fixes
 -----
 
-* fixed append problem introduced in v0.7@82a18155
+* fixed append problem introduced in v0.7:82a18155
