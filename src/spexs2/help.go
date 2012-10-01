@@ -108,7 +108,7 @@ func PrintFilters() {
 }
 
 func PrintExtenders() {
-	printCaption("Features")
+	printCaption("Extenders")
 	for _, e := range extenders.All {
 		printItem(e.Name, e.Desc)
 	}
