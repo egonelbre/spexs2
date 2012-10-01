@@ -2,8 +2,18 @@
 SPeXS Changelog
 ===============
 
-spxs v0.9
-=========
+spxs 0.9.3
+===========
+
+fixes
+-----
+
+* fixed star extension
+* renamed spxs to spexs
+* better versioning
+
+spxs 0.9.0
+===========
 
 changes
 -------
