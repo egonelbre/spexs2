@@ -41,7 +41,7 @@ func main() {
 	flag.Parse()
 
 	if *configs == "" {
-		fmt.Fprintf(os.Stderr, "Configuration file is required!")
+		fmt.Fprintf(os.Stderr, "Configuration file is required!\n")
 		return
 	}
 
