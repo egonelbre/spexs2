@@ -17,7 +17,7 @@ var (
 
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
 	live             *bool   = flag.Bool("live", false, "print live output")
-	configs          *string = flag.String("conf", "spxs.json", "configuration file(s), comma-delimited")
+	configs          *string = flag.String("conf", "", "configuration file(s), comma-delimited")
 
 	stats       *bool = flag.Bool("stats", false, "print memory/extension statistics")
 	procs       *int  = flag.Int("procs", 16, "parallel routines for extending")

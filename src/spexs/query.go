@@ -107,6 +107,7 @@ func (q *Query) String(db *Database, short bool) string {
 
 		if regToken.IsStar {
 			buf.WriteString("*")
+			buf.WriteString(db.Separator)
 		}
 
 		tokInfo, ok := db.Alphabet[regToken.Token]

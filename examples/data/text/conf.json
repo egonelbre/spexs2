@@ -5,34 +5,32 @@
 	},
 
 	"alphabet" : {
-		"characters" : "ACDEFGHIKLMNPRQSTVWY",
+		"separator" : " ",
 		"groups" : {
-			".": {"elements":"ACDEFGHIKLMNPRQSTVWY"}
+			"(bind)": {"elements":"and or if then else the a my"}
 		}
 	},
 
 	"extension" : {
-		"method" : "group",
+		"method" : "regexp",
 		"args" : {"star":{ "max-gap": 3}},
 		"filter" : {
 			"pat-groups" : {"max":3},
 			"pat-length" : {"max":6},
-			"query-match-seqs" : {"min":20},
 			"no-starting-group" : {}
 		}
 	},
 	"output" : {
-		"order" : "match-hyper-up-pvalue",
-		"sort" : "desc",
+		"order" : "query-match-seqs",
+		"sort" : "asc",
 		"args" : {"p-value":{}},
 		"filter" : {
-			"match-ratio" : {"min":2},
-			"match-hyper-up-pvalue-approx" : {"max":1e-3},
+			"pat-length" : { "min" : 2},
 			"no-starting-group" : {},
 			"no-ending-group" : {}
 		},
 		"count": 100,
-		"format": "{pat}\t{pat-length}\t{pat-groups}\t{pat-chars}\t{query-match-seqs}\t{back-match-seqs}\t{match-ratio}\t{match-hyper-up-pvalue}\n",
+		"format": "'{pat}'\t\t{query-match-seqs}\t{back-match-seqs}\t{match-hyper-up-pvalue}\n",
 		"queue": ""
 	},
 	"aliases" : {
