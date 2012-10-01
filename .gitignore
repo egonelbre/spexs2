@@ -1,10 +1,11 @@
 **.exe
 **.log
+
 temp/**
 pkg/**
 bin/**
 doc/build/**
-!tests/*
+
 *.prof
 *.sublime-project
 *.sublime-workspace
