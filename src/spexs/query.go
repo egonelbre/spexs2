@@ -104,6 +104,11 @@ func (q *Query) String(db *Database, short bool) string {
 	buf := bytes.NewBufferString("")
 
 	for i, regToken := range q.Pat {
+
+		if regToken.IsStar {
+			buf.WriteString("*")
+		}
+
 		tokInfo, ok := db.Alphabet[regToken.Token]
 		if ok {
 			buf.WriteString(tokInfo.Name)

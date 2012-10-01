@@ -75,9 +75,10 @@ func starExtend(base *Query, db *Database, querys queryMap) {
 			continue
 		}
 
+		var q *Query
 		token, ok, next := db.GetToken(i, last)
 		for ok {
-			q, ok := querys[token]
+			q, ok = querys[token]
 			if !ok {
 				q = NewQuery(base, RegToken{token, false, true})
 				querys[token] = q

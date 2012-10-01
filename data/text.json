@@ -12,7 +12,7 @@
 	},
 
 	"extension" : {
-		"method" : "group",
+		"method" : "regexp",
 		"args" : {"star":{ "max-gap": 3}},
 		"filter" : {
 			"pat-groups" : {"max":3},
