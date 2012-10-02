@@ -69,6 +69,9 @@ func (q *Query) CacheValues(db *Database) {
 	if q.cache.occs == nil {
 		q.MatchCount(db)
 	}
+	if q.cache.acc == nil {
+		q.Accumulative(db)
+	}
 	q.Loc.Clear()
 }
 
