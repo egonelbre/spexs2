@@ -13,7 +13,6 @@
 
 	"extension" : {
 		"method" : "regexp",
-		"args" : {"star":{ "max-gap": 3}},
 		"filter" : {
 			"pat-groups" : {"max":3},
 			"pat-length" : {"max":6},
@@ -23,15 +22,13 @@
 	"output" : {
 		"order" : "query-match-seqs",
 		"sort" : "asc",
-		"args" : {"p-value":{}},
 		"filter" : {
 			"pat-length" : { "min" : 2},
 			"no-starting-group" : {},
 			"no-ending-group" : {}
 		},
-		"count": 100,
 		"format": "'{pat}'\t\t{query-match-seqs}\t{back-match-seqs}\t{match-hyper-up-pvalue}\n",
-		"queue": ""
+		"count": 100
 	},
 	"aliases" : {
 		"inp" : {"desc":"input file",            "modify":["data.input"]},
