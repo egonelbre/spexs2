@@ -2,7 +2,6 @@ package spexs
 
 import (
 	"bytes"
-	"fmt"
 	"math"
 	"sort"
 	"spexs/sets"
@@ -39,7 +38,7 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Loc = sets.NewHashSet(0)
 	}
 
-	q.cache.acc = -1.0
+	q.cache.reset()
 
 	return q
 }
@@ -63,10 +62,21 @@ func (q *Query) Len() int {
 }
 
 type queryCache struct {
-	count    []int
-	occs     []int
-	acc      float64
-	accdebug string
+	count        []int
+	occs         []int
+	optimalSplit optimalSplit
+}
+
+type optimalSplit struct {
+	pvalue  float64
+	matches int
+	seqs    int
+}
+
+func (q *queryCache) reset() {
+	q.count = nil
+	q.occs = nil
+	q.optimalSplit.pvalue = -1.0
 }
 
 func (q *Query) CacheValues(db *Database) {
@@ -75,9 +85,6 @@ func (q *Query) CacheValues(db *Database) {
 	}
 	if q.cache.occs == nil {
 		q.MatchCount(db)
-	}
-	if math.IsNaN(q.cache.acc) {
-		q.AccumulativeSplit(db)
 	}
 	q.Loc.Clear()
 }
@@ -111,42 +118,54 @@ func (q *Query) MatchCount(db *Database) []int {
 	return q.cache.occs
 }
 
-func (q *Query) AccumulativeSplit(db *Database) float64 {
-	if q.cache.acc < 0 {
-		matches := q.SeqCount(db)[0]
-		count := db.Sections[0].Count
-		acc := 0
-		min := float64(10.0)
-		debug := ""
-
+func (q *Query) FindOptimalSplit(db *Database) float64 {
+	if q.cache.optimalSplit.pvalue < 0 {
 		positions := make([]int, q.Loc.Len())
 		k := 0
 		for i := range q.Loc.Iter() {
 			positions[k] = i
 			k += 1
 		}
-
 		sort.Ints(positions)
+
+		matches := 0
+		for _, c := range q.SeqCount(db) {
+			matches += c
+		}
+
+		all := 0
+		for _, s := range db.Sections {
+			all += s.Count
+		}
+
+		accCount := 0
+		splt := optimalSplit{math.Inf(1.0), -1, -1}
+
 		for _, i := range positions {
 			seq := db.Sequences[i]
-			acc += seq.Count
-			p := hyper.Split(acc, matches, i+1, count)
-			if p < min {
-				min = p
-				debug = fmt.Sprintf("hyp(%v,%v,%v,%v)", acc, matches, i+1, count)
+			accCount += seq.Count
+			p := hyper.Split(accCount, matches, i+1, all)
+			if p < splt.pvalue {
+				splt = optimalSplit{p, accCount, i + 1}
 			}
 		}
-		q.cache.acc = min
-		q.cache.accdebug = debug
+		q.cache.optimalSplit = splt
 	}
-	return q.cache.acc
+	return q.cache.optimalSplit.pvalue
 }
 
-func (q *Query) AccumulativeDebug(db *Database) string {
-	if q.cache.acc < 0 {
-		q.AccumulativeSplit(db)
+func (q *Query) FindOptimalSplitSeqs(db *Database) int {
+	if q.cache.optimalSplit.pvalue < 0 {
+		q.FindOptimalSplit(db)
 	}
-	return q.cache.accdebug
+	return q.cache.optimalSplit.seqs
+}
+
+func (q *Query) FindOptimalSplitMatches(db *Database) int {
+	if q.cache.optimalSplit.pvalue < 0 {
+		q.FindOptimalSplit(db)
+	}
+	return q.cache.optimalSplit.matches
 }
 
 func (q *Query) String(db *Database, short bool) string {

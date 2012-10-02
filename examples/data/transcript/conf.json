@@ -1,0 +1,42 @@
+{
+	"data" : {
+		"input" : "",
+		"reference" : ""
+	},
+
+	"alphabet" : {
+		"separator" : " ",
+		"groups" : {
+		}
+	},
+
+	"extension" : {
+		"method" : "star",
+		"args" : {"star":{ "max-gap": 3}},
+		"filter" : {
+			"pat-groups" : {"max": 3},
+			"pat-length" : {"max": 6},
+			"query-match-seqs" : {"min" : 10},
+			"no-starting-group" : {}
+		}
+	},
+	"output" : {
+		"order" : "match-hyper-optimal-pvalue",
+		"sort" : "desc",
+		"args" : {"p-value":{}},
+		"filter" : {
+			"query-match-seqs" : {"min" : 10},
+			"no-starting-group" : {},
+			"no-ending-group" : {},
+			"match-hyper-optimal-pvalue" : {"max": 0.003 }
+		},
+		"count": 100,
+		"header": "<$fg/#fg>\t<$all/#all>\tp-value\tpattern\n",
+		"format": "<{match-hyper-optimal-matches}/{match-hyper-optimal-seqs}>\t<{query-match-seqs}/{query-seqs}>\t{match-hyper-optimal-pvalue}\t'{pat}'\n",
+		"queue": ""
+	},
+	"aliases" : {
+		"inp" : {"desc":"input file",            "modify":["data.input"]},
+		"ref" : {"desc":"reference file",        "modify":["data.reference"]}
+	}
+}

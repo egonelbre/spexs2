@@ -50,6 +50,7 @@ var All = [...]Desc{
 			total := db.Sections[1].Count
 			return float64(seqs) / float64(total)
 		}},
+
 	{"match-hyper-up-pvalue",
 		"hypergeometric split q-value",
 		func(q *Query, db *Database) float64 {
@@ -57,11 +58,6 @@ var All = [...]Desc{
 			pvalue := hyper.Split(seqs[0], seqs[1],
 				db.Sections[0].Count, db.Sections[1].Count)
 			return pvalue
-		}},
-	{"match-hyper-min-split",
-		"hypergeometric split q-value",
-		func(q *Query, db *Database) float64 {
-			return q.AccumulativeSplit(db)
 		}},
 	{"match-hyper-up-pvalue-approx",
 		"approximate hypergeometric split q-value (~5 significant digits)",
@@ -84,6 +80,22 @@ var All = [...]Desc{
 		func(q *Query, db *Database) float64 {
 			seqs := q.SeqCount(db)
 			return float64(seqs[0]+1) / float64(seqs[1]+1)
+		}},
+
+	{"match-hyper-optimal-pvalue",
+		"finds optimal hypergeometric p-value for the input",
+		func(q *Query, db *Database) float64 {
+			return q.FindOptimalSplit(db)
+		}},
+	{"match-hyper-optimal-seqs",
+		"how many sequences were in optimal hypergeometric",
+		func(q *Query, db *Database) float64 {
+			return float64(q.FindOptimalSplitSeqs(db))
+		}},
+	{"match-hyper-optimal-matches",
+		"how many matches were in optimal hypergeometric",
+		func(q *Query, db *Database) float64 {
+			return float64(q.FindOptimalSplitMatches(db))
 		}},
 
 	{"pat-length",

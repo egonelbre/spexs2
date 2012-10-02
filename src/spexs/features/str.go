@@ -15,9 +15,4 @@ var Str = [...]StrDesc{
 		func(q *Query, db *Database) string {
 			return q.String(db, false)
 		}},
-	{"match-hyper-min-split-debug",
-		"hypergeometric split q-value",
-		func(q *Query, db *Database) string {
-			return q.AccumulativeDebug(db)
-		}},
 }
