@@ -2,9 +2,7 @@
 
 SPEXS=../bin/spexs2
 
-time $SPEXS -procs=16 \
-	-stats \
-	-cpuprofile=spxs.prof \
+time $SPEXS -stats \
 	-conf=data/text/conf.json \
 	inp=data/text/text.inp \
 	ref=data/text/text.ref
