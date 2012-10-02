@@ -59,6 +59,7 @@ func (q *Query) Len() int {
 type queryCache struct {
 	count []int
 	occs  []int
+	acc   []Acc
 }
 
 func (q *Query) CacheValues(db *Database) {
@@ -98,6 +99,31 @@ func (q *Query) MatchCount(db *Database) []int {
 		q.cache.occs = occs
 	}
 	return q.cache.occs
+}
+
+type Acc {
+	Idx int
+	Count int
+}
+
+func (q *Query) Accumulative(db *Database) []Acc {
+	if q.cache.acc == nil {
+		acc := make([]Acc, q.Loc.Len())
+		
+		var a Acc
+
+		total := 0
+		for i := range q.Loc.Iter() {
+			seq := db.Sequences[i]
+			count += seq.Count
+
+			a.Idx = i
+			a.Count = count
+			acc[i] = a
+		}
+		q.cache.acc = acc
+	}
+	return q.cache.acc
 }
 
 func (q *Query) String(db *Database, short bool) string {

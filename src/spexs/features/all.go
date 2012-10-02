@@ -50,13 +50,28 @@ var All = [...]Desc{
 			total := db.Sections[1].Count
 			return float64(seqs) / float64(total)
 		}},
-
 	{"match-hyper-up-pvalue",
 		"hypergeometric split q-value",
 		func(q *Query, db *Database) float64 {
 			seqs := q.SeqCount(db)
 			pvalue := hyper.Split(seqs[0], seqs[1],
 				db.Sections[0].Count, db.Sections[1].Count)
+			return pvalue
+		}},
+	{"match-hyper-min-split",
+		"hypergeometric split q-value",
+		func(q *Query, db *Database) float64 {
+			seqCount := q.SeqCount(db)[0]
+			totalCount := db.Sections[0].Count
+			accumulative := q.Accumulative(db)
+
+			pvalue := 1.0
+			for _, a := range accumulative {
+				p := hyper.SplitApprox(a.Count, total-a.Count, a.Idx, totalCount-a.Idx)
+				if p < pvalue {
+					pvalue = p
+				}
+			}
 			return pvalue
 		}},
 	{"match-hyper-up-pvalue-approx",
