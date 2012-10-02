@@ -2,7 +2,10 @@ package spexs
 
 import (
 	"bytes"
+	"math"
+	"sort"
 	"spexs/sets"
+	"stats/hyper"
 	"utils"
 )
 
@@ -35,6 +38,8 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Loc = sets.NewHashSet(0)
 	}
 
+	q.cache.reset()
+
 	return q
 }
 
@@ -57,8 +62,21 @@ func (q *Query) Len() int {
 }
 
 type queryCache struct {
-	count []int
-	occs  []int
+	count        []int
+	occs         []int
+	optimalSplit optimalSplit
+}
+
+type optimalSplit struct {
+	pvalue  float64
+	matches int
+	seqs    int
+}
+
+func (q *queryCache) reset() {
+	q.count = nil
+	q.occs = nil
+	q.optimalSplit.pvalue = -1.0
 }
 
 func (q *Query) CacheValues(db *Database) {
@@ -98,6 +116,56 @@ func (q *Query) MatchCount(db *Database) []int {
 		q.cache.occs = occs
 	}
 	return q.cache.occs
+}
+
+func (q *Query) FindOptimalSplit(db *Database) float64 {
+	if q.cache.optimalSplit.pvalue < 0 {
+		positions := make([]int, q.Loc.Len())
+		k := 0
+		for i := range q.Loc.Iter() {
+			positions[k] = i
+			k += 1
+		}
+		sort.Ints(positions)
+
+		matches := 0
+		for _, c := range q.SeqCount(db) {
+			matches += c
+		}
+
+		all := 0
+		for _, s := range db.Sections {
+			all += s.Count
+		}
+
+		accCount := 0
+		splt := optimalSplit{math.Inf(1.0), -1, -1}
+
+		for _, i := range positions {
+			seq := db.Sequences[i]
+			accCount += seq.Count
+			p := hyper.Split(accCount, matches, i+1, all)
+			if p < splt.pvalue {
+				splt = optimalSplit{p, accCount, i + 1}
+			}
+		}
+		q.cache.optimalSplit = splt
+	}
+	return q.cache.optimalSplit.pvalue
+}
+
+func (q *Query) FindOptimalSplitSeqs(db *Database) int {
+	if q.cache.optimalSplit.pvalue < 0 {
+		q.FindOptimalSplit(db)
+	}
+	return q.cache.optimalSplit.seqs
+}
+
+func (q *Query) FindOptimalSplitMatches(db *Database) int {
+	if q.cache.optimalSplit.pvalue < 0 {
+		q.FindOptimalSplit(db)
+	}
+	return q.cache.optimalSplit.matches
 }
 
 func (q *Query) String(db *Database, short bool) string {

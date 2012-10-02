@@ -82,6 +82,22 @@ var All = [...]Desc{
 			return float64(seqs[0]+1) / float64(seqs[1]+1)
 		}},
 
+	{"match-hyper-optimal-pvalue",
+		"finds optimal hypergeometric p-value for the input",
+		func(q *Query, db *Database) float64 {
+			return q.FindOptimalSplit(db)
+		}},
+	{"match-hyper-optimal-seqs",
+		"how many sequences were in optimal hypergeometric",
+		func(q *Query, db *Database) float64 {
+			return float64(q.FindOptimalSplitSeqs(db))
+		}},
+	{"match-hyper-optimal-matches",
+		"how many matches were in optimal hypergeometric",
+		func(q *Query, db *Database) float64 {
+			return float64(q.FindOptimalSplitMatches(db))
+		}},
+
 	{"pat-length",
 		"length of the pattern",
 		func(q *Query, db *Database) float64 {
