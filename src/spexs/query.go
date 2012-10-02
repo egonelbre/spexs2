@@ -2,7 +2,11 @@ package spexs
 
 import (
 	"bytes"
+	"fmt"
+	"math"
+	"sort"
 	"spexs/sets"
+	"stats/hyper"
 	"utils"
 )
 
@@ -35,6 +39,8 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Loc = sets.NewHashSet(0)
 	}
 
+	q.cache.acc = -1.0
+
 	return q
 }
 
@@ -57,9 +63,10 @@ func (q *Query) Len() int {
 }
 
 type queryCache struct {
-	count []int
-	occs  []int
-	acc   []Acc
+	count    []int
+	occs     []int
+	acc      float64
+	accdebug string
 }
 
 func (q *Query) CacheValues(db *Database) {
@@ -69,8 +76,8 @@ func (q *Query) CacheValues(db *Database) {
 	if q.cache.occs == nil {
 		q.MatchCount(db)
 	}
-	if q.cache.acc == nil {
-		q.Accumulative(db)
+	if math.IsNaN(q.cache.acc) {
+		q.AccumulativeSplit(db)
 	}
 	q.Loc.Clear()
 }
@@ -104,29 +111,42 @@ func (q *Query) MatchCount(db *Database) []int {
 	return q.cache.occs
 }
 
-type Acc {
-	Idx int
-	Count int
-}
+func (q *Query) AccumulativeSplit(db *Database) float64 {
+	if q.cache.acc < 0 {
+		matches := q.SeqCount(db)[0]
+		count := db.Sections[0].Count
+		acc := 0
+		min := float64(10.0)
+		debug := ""
 
-func (q *Query) Accumulative(db *Database) []Acc {
-	if q.cache.acc == nil {
-		acc := make([]Acc, q.Loc.Len())
-		
-		var a Acc
-
-		total := 0
+		positions := make([]int, q.Loc.Len())
+		k := 0
 		for i := range q.Loc.Iter() {
-			seq := db.Sequences[i]
-			count += seq.Count
-
-			a.Idx = i
-			a.Count = count
-			acc[i] = a
+			positions[k] = i
+			k += 1
 		}
-		q.cache.acc = acc
+
+		sort.Ints(positions)
+		for _, i := range positions {
+			seq := db.Sequences[i]
+			acc += seq.Count
+			p := hyper.Split(acc, matches, i+1, count)
+			if p < min {
+				min = p
+				debug = fmt.Sprintf("hyp(%v,%v,%v,%v)", acc, matches, i+1, count)
+			}
+		}
+		q.cache.acc = min
+		q.cache.accdebug = debug
 	}
 	return q.cache.acc
+}
+
+func (q *Query) AccumulativeDebug(db *Database) string {
+	if q.cache.acc < 0 {
+		q.AccumulativeSplit(db)
+	}
+	return q.cache.accdebug
 }
 
 func (q *Query) String(db *Database, short bool) string {

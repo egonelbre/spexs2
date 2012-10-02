@@ -61,18 +61,7 @@ var All = [...]Desc{
 	{"match-hyper-min-split",
 		"hypergeometric split q-value",
 		func(q *Query, db *Database) float64 {
-			seqCount := q.SeqCount(db)[0]
-			totalCount := db.Sections[0].Count
-			accumulative := q.Accumulative(db)
-
-			pvalue := 1.0
-			for _, a := range accumulative {
-				p := hyper.SplitApprox(a.Count, total-a.Count, a.Idx, totalCount-a.Idx)
-				if p < pvalue {
-					pvalue = p
-				}
-			}
-			return pvalue
+			return q.AccumulativeSplit(db)
 		}},
 	{"match-hyper-up-pvalue-approx",
 		"approximate hypergeometric split q-value (~5 significant digits)",
