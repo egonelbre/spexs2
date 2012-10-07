@@ -1,5 +1,6 @@
-**.exe
-**.log
+*.exe
+*.log
+*.pdf
 
 temp/**
 pkg/**
