@@ -86,20 +86,25 @@ func (q *queryCache) reset() {
 
 func (q *Query) CacheValues(db *Database) {
 	if q.cache.count == nil {
-		q.SeqCount(db)
+		q.MatchSeqs(db)
 	}
 	if q.cache.occs == nil {
-		q.MatchCount(db)
+		q.MatchOccs(db)
 	}
 	q.Loc = nil
 }
 
-func (q *Query) SeqCount(db *Database) []int {
+func (q *Query) MatchSeqs(db *Database) []int {
 	if q.cache.count == nil {
+		counted := make(map[uint]bool, q.Loc.Len())
 		count := make([]int, len(db.Sections))
 
 		for val := range q.Loc.Iter() {
 			i, _ := DecodePos(val)
+			if counted[i] {
+				continue
+			}
+			counted[i] = true
 			seq := db.Sequences[i]
 			count[seq.Section] += seq.Count
 		}
@@ -109,8 +114,7 @@ func (q *Query) SeqCount(db *Database) []int {
 	return q.cache.count
 }
 
-func (q *Query) MatchCount(db *Database) []int {
-	//FIXTHIS 
+func (q *Query) MatchOccs(db *Database) []int {
 	if q.cache.occs == nil {
 		occs := make([]int, len(db.Sections))
 
@@ -136,7 +140,7 @@ func (q *Query) FindOptimalSplit(db *Database) float64 {
 		sort.Ints(positions)
 
 		matches := 0
-		for _, c := range q.SeqCount(db) {
+		for _, c := range q.MatchSeqs(db) {
 			matches += c
 		}
 

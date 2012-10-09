@@ -19,34 +19,34 @@ var All = [...]Desc{
 	{"query-match-seqs",
 		"number of matching query sequences",
 		func(q *Query, db *Database) float64 {
-			return float64(q.SeqCount(db)[0])
+			return float64(q.MatchSeqs(db)[0])
 		}},
 	{"back-match-seqs",
 		"number of matching background sequences",
 		func(q *Query, db *Database) float64 {
-			return float64(q.SeqCount(db)[1])
+			return float64(q.MatchSeqs(db)[1])
 		}},
 	{"query-match-occs",
 		"number of occurences in query",
 		func(q *Query, db *Database) float64 {
-			return float64(q.MatchCount(db)[0])
+			return float64(q.MatchOccs(db)[0])
 		}},
 	{"back-match-occs",
 		"number of occurences in background",
 		func(q *Query, db *Database) float64 {
-			return float64(q.MatchCount(db)[1])
+			return float64(q.MatchOccs(db)[1])
 		}},
 	{"query-match-seqs-prop",
 		"percentage of matching sequences in query",
 		func(q *Query, db *Database) float64 {
-			seqs := q.SeqCount(db)[0]
+			seqs := q.MatchSeqs(db)[0]
 			total := db.Sections[0].Count
 			return float64(seqs) / float64(total)
 		}},
 	{"back-match-seqs-prop",
 		"percentage of matching sequences in background",
 		func(q *Query, db *Database) float64 {
-			seqs := q.SeqCount(db)[1]
+			seqs := q.MatchSeqs(db)[1]
 			total := db.Sections[1].Count
 			return float64(seqs) / float64(total)
 		}},
@@ -54,7 +54,7 @@ var All = [...]Desc{
 	{"match-hyper-up-pvalue",
 		"hypergeometric split q-value",
 		func(q *Query, db *Database) float64 {
-			seqs := q.SeqCount(db)
+			seqs := q.MatchSeqs(db)
 			pvalue := hyper.Split(seqs[0], seqs[1],
 				db.Sections[0].Count, db.Sections[1].Count)
 			return pvalue
@@ -62,7 +62,7 @@ var All = [...]Desc{
 	{"match-hyper-up-pvalue-approx",
 		"approximate hypergeometric split q-value (~5 significant digits)",
 		func(q *Query, db *Database) float64 {
-			seqs := q.SeqCount(db)
+			seqs := q.MatchSeqs(db)
 			pvalue := hyper.SplitApprox(seqs[0], seqs[1],
 				db.Sections[0].Count, db.Sections[1].Count)
 			return pvalue
@@ -70,7 +70,7 @@ var All = [...]Desc{
 	{"match-hyper-down-pvalue",
 		"hypergeometric split q-value down",
 		func(q *Query, db *Database) float64 {
-			seqs := q.SeqCount(db)
+			seqs := q.MatchSeqs(db)
 			pvalue := hyper.SplitDown(seqs[0], seqs[1],
 				db.Sections[0].Count, db.Sections[1].Count)
 			return pvalue
@@ -78,7 +78,7 @@ var All = [...]Desc{
 	{"match-ratio",
 		"ratio of (matches in query + 1) / (matches in background + 1)",
 		func(q *Query, db *Database) float64 {
-			seqs := q.SeqCount(db)
+			seqs := q.MatchSeqs(db)
 			return float64(seqs[0]+1) / float64(seqs[1]+1)
 		}},
 
