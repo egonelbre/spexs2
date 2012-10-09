@@ -1,6 +1,10 @@
 package set
 
-import "testing"
+import (
+	"math/rand"
+	"runtime"
+	"testing"
+)
 
 var goodArr = [...]int{0, 1, 2, 100, 401, 412, 450, 5102, 45104, 51451245}
 
@@ -58,4 +62,25 @@ func iterate(set Set) {
 	for x := range set.Iter() {
 		sum += x
 	}
+}
+
+func testMemoryUse(set Set, n int, t *testing.T) {
+	runtime.GC()
+
+	before := new(runtime.MemStats)
+	runtime.ReadMemStats(before)
+
+	rand.Seed(5)
+	last := 0
+	for i := 0; i < n; i += 1 {
+		last += rand.Intn(30)
+		set.Add(last)
+	}
+
+	after := new(runtime.MemStats)
+	runtime.ReadMemStats(after)
+
+	t.Errorf("memory difference %v", after.Alloc-before.Alloc)
+
+	_ = set
 }

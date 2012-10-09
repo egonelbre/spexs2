@@ -10,6 +10,11 @@ func TestTrieUse(t *testing.T) {
 	testUse(set, t)
 }
 
+func TestTrieMemory(t *testing.T) {
+	set := trie.New()
+	testMemoryUse(set, 50000, t)
+}
+
 func BenchmarkTrieAdd(b *testing.B) {
 	set := trie.New()
 	addValues(set, b.N)

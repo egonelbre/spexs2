@@ -10,6 +10,11 @@ func TestHashUse(t *testing.T) {
 	testUse(set, t)
 }
 
+func TestHashMemory(t *testing.T) {
+	set := hash.New(10)
+	testMemoryUse(set, 50000, t)
+}
+
 func BenchmarkHashAdd(b *testing.B) {
 	set := hash.New(10)
 	addValues(set, b.N)
