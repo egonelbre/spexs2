@@ -1,31 +1,37 @@
 package sets
 
 type HashSet struct {
-	data Positions
+	data map[int]bool
 }
 
 func NewHashSet(size int) *HashSet {
-	return &HashSet{make(Positions, size)}
+	return &HashSet{make(map[int]bool, size)}
 }
 
-func (hs *HashSet) Add(idx int, pos int) {
-	hs.data[idx] |= 1 << uint(pos)
+func (hs *HashSet) Add(val int) {
+	hs.data[val] = true
 }
 
-func (hs *HashSet) Contains(idx int, pos int) bool {
-	pv, exists := hs.data[idx]
-	if !exists {
-		return false
-	}
-	return (pv>>uint(pos))&1 == 1
+func (hs *HashSet) Contains(val int) bool {
+	exists, ok := hs.data[val]
+	return exists && ok
 }
 
 func (hs *HashSet) Len() int {
 	return len(hs.data)
 }
 
-func (hs *HashSet) Iter() Positions {
-	return hs.data
+func (hs *HashSet) Iter() chan int {
+	ch := make(chan int, 100)
+	go func(hs *HashSet, ch chan int) {
+		for val, ex := range hs.data {
+			if ex {
+				ch <- val
+			}
+		}
+		close(ch)
+	}(hs, ch)
+	return ch
 }
 
 func (hs *HashSet) Clear() {
@@ -33,12 +39,7 @@ func (hs *HashSet) Clear() {
 }
 
 func (hs *HashSet) AddSet(g *HashSet) {
-	for gidx, gval := range g.data {
-		hval, exists := hs.data[gidx]
-		if exists {
-			hs.data[gidx] = hval | gval
-		} else {
-			hs.data[gidx] = gval
-		}
+	for gidx, _ := range g.data {
+		hs.data[gidx] = true
 	}
 }

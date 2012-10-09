@@ -6,7 +6,6 @@ import (
 	"sort"
 	"spexs/sets"
 	"stats/hyper"
-	"utils"
 )
 
 type RegToken struct {
@@ -20,6 +19,14 @@ type Query struct {
 	Loc *sets.HashSet
 
 	cache queryCache
+}
+
+func EncodePos(idx int, pos int) int {
+	return (idx << 8) | (pos & 0xFF)
+}
+
+func DecodePos(val int) (int, int) {
+	return val >> 8, val & 0xFF
 }
 
 func NewQuery(parent *Query, token RegToken) *Query {
@@ -49,7 +56,7 @@ func NewEmptyQuery(db *Database) *Query {
 		last := 0
 		_, ok, next := db.GetToken(i, last)
 		for ok {
-			q.Loc.Add(i, last)
+			q.Loc.Add(EncodePos(i, last))
 			last = next
 			_, ok, next = db.GetToken(i, next)
 		}
@@ -93,7 +100,8 @@ func (q *Query) SeqCount(db *Database) []int {
 	if q.cache.count == nil {
 		count := make([]int, len(db.Sections))
 
-		for i := range q.Loc.Iter() {
+		for val := range q.Loc.Iter() {
+			i, _ := DecodePos(val)
 			seq := db.Sequences[i]
 			count[seq.Section] += seq.Count
 		}
@@ -107,10 +115,10 @@ func (q *Query) MatchCount(db *Database) []int {
 	if q.cache.occs == nil {
 		occs := make([]int, len(db.Sections))
 
-		for i, pv := range q.Loc.Iter() {
+		for val := range q.Loc.Iter() {
+			i, _ := DecodePos(val)
 			seq := db.Sequences[i]
-			matchCount := utils.BitCount64(uint64(pv))
-			occs[seq.Section] += seq.Count * matchCount
+			occs[seq.Section] += seq.Count
 		}
 
 		q.cache.occs = occs

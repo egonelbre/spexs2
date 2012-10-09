@@ -2,65 +2,45 @@ package sets
 
 import "testing"
 
-type p struct {
-	idx int
-	pos uint
-}
-
 func TestHashSet(t *testing.T) {
 	hs := NewHashSet(10)
+	good := [...]int{0, 1, 2, 100, 401, 412, 450, 5102, 45104, 51451245}
 
-	good := map[p]bool{
-		p{0, 0}:       true,
-		p{13, 1}:      true,
-		p{14, 2}:      true,
-		p{1025235, 3}: true,
-		p{2000, 15}:   true,
-		//p{200000, 30}:   true,
-		//p{200000, 100}:  true,
-		//p{200000, 3000}: true,
+	for _, val := range good {
+		hs.Add(val)
 	}
 
-	for pos := range good {
-		hs.Add(pos.idx, pos.pos)
-	}
-
-	for pos := range good {
-		if !hs.Contains(pos.idx, pos.pos) {
-			t.Errorf("HashSet didn't contain %v,%v", pos.idx, pos.pos)
+	for _, val := range good {
+		if !hs.Contains(val) {
+			t.Errorf("HashSet didn't contain %v", val)
 		}
 	}
 
-	invalid := map[p]bool{
-		p{10, 0}:       true,
-		p{15, 0}:       true,
-		p{20, 3}:       true,
-		p{102535, 53}:  true,
-		p{2001, 63}:    true,
-		p{2000300, 41}: true,
+	if hs.Len() != len(good) {
+		t.Errorf("HashSet had different size %+v, %+v", hs.data, good)
 	}
 
-	for pos := range invalid {
-		if hs.Contains(pos.idx, pos.pos) {
-			t.Errorf("HashSet contained %v,%v", pos.idx, pos.pos)
+	invalid := [...]int{3, 4, 5, 400, 402, 413, 451, 449, 5101, 5103, 45103}
+	for _, val := range invalid {
+		if hs.Contains(val) {
+			t.Errorf("HashSet contained %v", val)
 		}
 	}
 }
 
 func InsertAndIterate(s Set, patterns int, positions int) {
-	for idx := 0; idx < patterns; idx += 1 {
-		for pos := uint(0); uint(pos) < uint(positions); pos += 1 {
-			s.Add(idx, pos)
-		}
-	}
 
-	sum := 0
-	for x := range s.Iter() {
-		sum += x
-	}
 }
 
 func BenchmarkHashSet(b *testing.B) {
 	hs := NewHashSet(10)
-	InsertAndIterate(hs, 1000000, 10)
+
+	for i := 0; i < b.N; i++ {
+		hs.Add(i)
+	}
+
+	sum := 0
+	for x := range hs.Iter() {
+		sum += x
+	}
 }
