@@ -92,7 +92,7 @@ func (q *Query) CacheValues(db *Database) {
 	if q.cache.occs == nil {
 		q.MatchCount(db)
 	}
-	q.Loc.Clear()
+	q.Loc = nil
 }
 
 func (q *Query) SeqCount(db *Database) []int {

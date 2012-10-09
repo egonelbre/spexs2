@@ -5,5 +5,4 @@ type Set interface {
 	Contains(val int) bool
 	Len() int
 	Iter() chan int
-	Clear()
 }

@@ -29,7 +29,7 @@ func Count64(x uint64) int {
 	return int(x)
 }
 
-func Count(x uint) int {
+func Count(x int) int {
 	x = (x & ms1) + ((x >> 1) & ms1)
 	x = (x & ms2) + ((x >> 2) & ms2)
 	x = (x & ms4) + ((x >> 4) & ms4)
