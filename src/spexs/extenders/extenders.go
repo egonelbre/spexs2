@@ -61,7 +61,7 @@ func Groupex(base *Query, db *Database) Querys {
 	return toQuerys(querys)
 }
 
-func max(a int, b int) int {
+func max(a uint, b uint) uint {
 	if a > b {
 		return a
 	}
@@ -69,7 +69,7 @@ func max(a int, b int) int {
 }
 
 func starExtend(base *Query, db *Database, querys queryMap) {
-	lastPos := make(map[int]int, base.Loc.Len())
+	lastPos := make(map[uint]uint, base.Loc.Len())
 
 	for val := range base.Loc.Iter() {
 		i, pos := DecodePos(val)

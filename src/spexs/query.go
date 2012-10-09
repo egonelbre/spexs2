@@ -20,11 +20,11 @@ type Query struct {
 	cache queryCache
 }
 
-func EncodePos(idx int, pos int) int {
+func EncodePos(idx uint, pos uint) uint {
 	return (idx << 8) | (pos & 0xFF)
 }
 
-func DecodePos(val int) (int, int) {
+func DecodePos(val uint) (uint, uint) {
 	return val >> 8, val & 0xFF
 }
 
@@ -51,8 +51,9 @@ func NewQuery(parent *Query, token RegToken) *Query {
 
 func NewEmptyQuery(db *Database) *Query {
 	q := NewQuery(nil, RegToken{})
-	for i, _ := range db.Sequences {
-		last := 0
+	for idx, _ := range db.Sequences {
+		i := uint(idx)
+		last := uint(0)
 		_, ok, next := db.GetToken(i, last)
 		for ok {
 			q.Loc.Add(EncodePos(i, last))
@@ -131,7 +132,7 @@ func (q *Query) FindOptimalSplit(db *Database) float64 {
 		positions := make([]int, q.Loc.Len())
 		k := 0
 		for i := range q.Loc.Iter() {
-			positions[k] = i
+			positions[k] = int(i)
 			k += 1
 		}
 		sort.Ints(positions)
