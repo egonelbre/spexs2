@@ -29,7 +29,7 @@ func Count64(x uint64) int {
 	return int(x)
 }
 
-func Count(x int) int {
+func Count32(x int32) int {
 	x = (x & ms1) + ((x >> 1) & ms1)
 	x = (x & ms2) + ((x >> 2) & ms2)
 	x = (x & ms4) + ((x >> 4) & ms4)
@@ -46,7 +46,7 @@ func CountInt(x *big.Int) int {
 	return total
 }
 
-func ScanLeft(x uint) int {
+func ScanLeft32(x uint32) int {
 	for k := byte(0); k < 32; k += 1 {
 		if x&(1<<k) != 0 {
 			return int(k)

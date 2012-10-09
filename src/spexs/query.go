@@ -3,7 +3,7 @@ package spexs
 import (
 	"bytes"
 	"math"
-	"set/hash"
+	"set/bin"
 	"sort"
 	"stats/hyper"
 )
@@ -16,7 +16,7 @@ type RegToken struct {
 
 type Query struct {
 	Pat   []RegToken
-	Loc   *hash.Set
+	Loc   *bin.Set
 	cache queryCache
 }
 
@@ -38,10 +38,10 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Pat[size-1] = token
 
 		estimatedSize := parent.Loc.Len() / 8
-		q.Loc = hash.New(estimatedSize)
+		q.Loc = bin.New(estimatedSize)
 	} else {
 		q.Pat = nil
-		q.Loc = hash.New(0)
+		q.Loc = bin.New(0)
 	}
 
 	q.cache.reset()
@@ -111,6 +111,7 @@ func (q *Query) SeqCount(db *Database) []int {
 }
 
 func (q *Query) MatchCount(db *Database) []int {
+	//FIXTHIS 
 	if q.cache.occs == nil {
 		occs := make([]int, len(db.Sections))
 

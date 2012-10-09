@@ -10,63 +10,62 @@ type Set struct {
 	root map[majkey]map[minkey]bitmap
 }
 
-func decompose(value int) (maj majkey, min minkey, bits bitmap) {
+func decompose(value uint) (maj majkey, min minkey, bits bitmap) {
 	bits = bitmap(1 << uint(value&0xF)) // 4 bits
 	min = minkey((value >> 4) & 0xFFFF) // 16 bits
 	maj = majkey(value >> 20)           // +4 bytes
 	return
 }
 
-func compose(maj majkey, min minkey, idx int) int {
-	return (int(maj) << 20) | (int(min) << 4) | idx
+func compose(maj majkey, min minkey, idx uint) uint {
+	return uint(maj)<<20 | uint(min)<<4 | idx
 }
 
 func New() *Set {
 	return &Set{make(map[majkey]map[minkey]bitmap)}
 }
 
-func (s *Set) Add(value int) {
+func (set *Set) Add(value uint) {
 	maj, min, bits := decompose(value)
 
-	first, exists := s.root[maj]
+	first, exists := set.root[maj]
 	if !exists {
 		first = make(map[minkey]bitmap)
-		s.root[maj] = first
+		set.root[maj] = first
 	}
 
 	first[min] |= bits
 }
 
-func (s *Set) Contains(value int) bool {
+func (set *Set) Contains(value uint) bool {
 	maj, min, bits := decompose(value)
-	mmin, exists := s.root[maj]
+	mmin, exists := set.root[maj]
 	if !exists {
 		return false
 	}
 	return mmin[min]&bits != 0
 }
 
-func (s *Set) Iter() chan int {
-	ch := make(chan int, 100)
-	go func(s *Set, ch chan int) {
-		for maj, mmin := range s.root {
+func (set *Set) Iter() chan uint {
+	ch := make(chan uint, 100)
+	go func(set *Set, ch chan uint) {
+		for maj, mmin := range set.root {
 			for min, bits := range mmin {
-				for k := 0; k < 16; k += 1 {
+				for k := uint(0); k < 16; k += 1 {
 					if (bits>>uint(k))&1 == 1 {
 						ch <- compose(maj, min, k)
 					}
 				}
 			}
 		}
-
 		close(ch)
-	}(s, ch)
+	}(set, ch)
 	return ch
 }
 
-func (s *Set) Len() int {
+func (set *Set) Len() int {
 	count := 0
-	for _, m := range s.root {
+	for _, m := range set.root {
 		for _, v := range m {
 			count += bit.Count64(uint64(v))
 		}
@@ -74,12 +73,15 @@ func (s *Set) Len() int {
 	return count
 }
 
-func (s *Set) AddSet(t *Set) {
-	/*for tmaj, tchild := range t.root {
-		schild, ok := s.root[tmaj]
-		if !ok {
-			schild := make(map[minkey]bitmap)
-			s.root[tmaj] = schild
+func (set *Set) AddSet(other *Set) {
+	for maj, mmin := range other.root {
+		mm, exists := set.root[maj]
+		if !exists {
+			mm = make(map[minkey]bitmap)
+			set.root[maj] = mm
 		}
-	}*/
+		for min, bits := range mmin {
+			mm[min] |= bits
+		}
+	}
 }

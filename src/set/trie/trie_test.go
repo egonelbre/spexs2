@@ -7,10 +7,10 @@ import (
 )
 
 func TestDecompose(t *testing.T) {
-	check := func(v int) bool {
+	check := func(v uint) bool {
 		maj, min, bits := decompose(v)
-		idx := bit.ScanLeft(uint(bits))
-		r := compose(maj, min, idx)
+		idx := bit.ScanLeft64(uint64(bits))
+		r := compose(maj, min, uint(idx))
 		return v == r
 	}
 
@@ -18,7 +18,7 @@ func TestDecompose(t *testing.T) {
 		t.Error(err)
 	}
 
-	testValues := [...]int{5102, 412, 51451245, 5102}
+	testValues := [...]uint{5102, 412, 51451245, 5102}
 
 	for _, v := range testValues {
 		if !check(v) {

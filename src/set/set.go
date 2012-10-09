@@ -1,8 +1,8 @@
 package set
 
 type Set interface {
-	Add(val int)
-	Contains(val int) bool
+	Add(val uint)
+	Contains(val uint) bool
 	Len() int
-	Iter() chan int
+	Iter() chan uint
 }

@@ -6,10 +6,10 @@ import (
 	"testing"
 )
 
-var goodArr = [...]int{0, 1, 2, 100, 401, 412, 450, 5102, 45104, 51451245}
+var goodArr = [...]uint{0, 1, 2, 100, 401, 412, 450, 5102, 45104, 51451245}
 
-func mapFrom(arr []int) map[int]int {
-	res := make(map[int]int)
+func mapFrom(arr []uint) map[uint]int {
+	res := make(map[uint]int)
 	for _, val := range arr {
 		res[val] = 0
 	}
@@ -43,7 +43,7 @@ func testUse(set Set, t *testing.T) {
 		}
 	}
 
-	invalid := [...]int{3, 4, 5, 400, 402, 413, 451, 449, 5101, 5103, 45103}
+	invalid := [...]uint{3, 4, 5, 400, 402, 413, 451, 449, 5101, 5103, 45103}
 	for _, val := range invalid {
 		if set.Contains(val) {
 			t.Errorf("contained %v", val)
@@ -52,13 +52,13 @@ func testUse(set Set, t *testing.T) {
 }
 
 func addValues(set Set, n int) {
-	for i := 0; i < n; i++ {
+	for i := uint(0); i < uint(n); i++ {
 		set.Add(i)
 	}
 }
 
 func iterate(set Set) {
-	sum := 0
+	sum := uint(0)
 	for x := range set.Iter() {
 		sum += x
 	}
@@ -71,9 +71,9 @@ func testMemoryUse(set Set, n int, t *testing.T) {
 	runtime.ReadMemStats(before)
 
 	rand.Seed(5)
-	last := 0
+	last := uint(0)
 	for i := 0; i < n; i += 1 {
-		last += rand.Intn(30)
+		last += 10 + uint(rand.Intn(20))
 		set.Add(last)
 	}
 

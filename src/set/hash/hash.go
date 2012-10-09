@@ -1,18 +1,18 @@
 package hash
 
 type Set struct {
-	data map[int]bool
+	data map[uint]bool
 }
 
-func New(size int) *Set {
-	return &Set{make(map[int]bool, size)}
+func New(size uint) *Set {
+	return &Set{make(map[uint]bool, size)}
 }
 
-func (set *Set) Add(val int) {
+func (set *Set) Add(val uint) {
 	set.data[val] = true
 }
 
-func (set *Set) Contains(val int) bool {
+func (set *Set) Contains(val uint) bool {
 	exists, ok := set.data[val]
 	return exists && ok
 }
@@ -21,13 +21,11 @@ func (set *Set) Len() int {
 	return len(set.data)
 }
 
-func (set *Set) Iter() chan int {
-	ch := make(chan int, 100)
-	go func(set *Set, ch chan int) {
-		for val, ex := range set.data {
-			if ex {
-				ch <- val
-			}
+func (set *Set) Iter() chan uint {
+	ch := make(chan uint, 100)
+	go func(set *Set, ch chan uint) {
+		for val := range set.data {
+			ch <- val
 		}
 		close(ch)
 	}(set, ch)
