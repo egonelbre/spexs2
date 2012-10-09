@@ -3,8 +3,8 @@ package spexs
 import (
 	"bytes"
 	"math"
+	"set/hash"
 	"sort"
-	"spexs/sets"
 	"stats/hyper"
 )
 
@@ -15,9 +15,8 @@ type RegToken struct {
 }
 
 type Query struct {
-	Pat []RegToken
-	Loc *sets.HashSet
-
+	Pat   []RegToken
+	Loc   *hash.Set
 	cache queryCache
 }
 
@@ -39,10 +38,10 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Pat[size-1] = token
 
 		estimatedSize := parent.Loc.Len() / 8
-		q.Loc = sets.NewHashSet(estimatedSize)
+		q.Loc = hash.New(estimatedSize)
 	} else {
 		q.Pat = nil
-		q.Loc = sets.NewHashSet(0)
+		q.Loc = hash.New(0)
 	}
 
 	q.cache.reset()

@@ -1,4 +1,4 @@
-package sets
+package set
 
 type Set interface {
 	Add(val int)

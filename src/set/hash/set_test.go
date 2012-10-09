@@ -1,9 +1,9 @@
-package sets
+package hash
 
 import "testing"
 
-func TestHashSet(t *testing.T) {
-	hs := NewHashSet(10)
+func TestRoutine(t *testing.T) {
+	hs := New(10)
 	good := [...]int{0, 1, 2, 100, 401, 412, 450, 5102, 45104, 51451245}
 
 	for _, val := range good {
@@ -28,12 +28,8 @@ func TestHashSet(t *testing.T) {
 	}
 }
 
-func InsertAndIterate(s Set, patterns int, positions int) {
-
-}
-
-func BenchmarkHashSet(b *testing.B) {
-	hs := NewHashSet(10)
+func BenchmarkSet(b *testing.B) {
+	hs := New(10)
 
 	for i := 0; i < b.N; i++ {
 		hs.Add(i)
