@@ -14,9 +14,10 @@
 	"extension" : {
 		"method" : "group",
 		"filter" : {
-			"pat-groups" : {"max":4},
-			"pat-length" : {"max":8},
-			"query-match-seqs" : {"min":10}
+			"pat-groups" : {"max":3},
+			"pat-length" : {"max":6},
+			"query-match-seqs" : {"min":20},
+			"no-starting-group" : {}
 		}
 	},
 	"output" : {
@@ -24,7 +25,9 @@
 		"sort" : "desc",
 		"filter" : {
 			"match-ratio" : {"min":2},
-			"match-hyper-up-pvalue-approx" : {"max":1e-2}
+			"match-hyper-up-pvalue-approx" : {"max":1e-3},
+			"no-starting-group" : {},
+			"no-ending-group" : {}
 		},
 		"format": "{pat}\t{pat-length}\t{pat-groups}\t{pat-chars}\t{query-match-seqs}\t{back-match-seqs}\t{match-ratio}\t{match-hyper-up-pvalue}\n",
 		"count": 100
