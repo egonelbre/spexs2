@@ -21,11 +21,11 @@ type Query struct {
 }
 
 func EncodePos(idx uint, pos uint) uint {
-	return (idx << 8) | (pos & 0xF)
+	return (idx << 8) | (pos & 0xFF)
 }
 
 func DecodePos(val uint) (uint, uint) {
-	return val >> 8, val & 0xF
+	return val >> 8, val & 0xFF
 }
 
 func NewQuery(parent *Query, token RegToken) *Query {
