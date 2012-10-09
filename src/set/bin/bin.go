@@ -6,11 +6,13 @@ type Set struct {
 
 type bitvector uint64
 
-const bitsSize = 64
-const bitsCount = 6
-const bitsOffset = 4
-const offsetMask = (1 << bitsOffset) - 1
-const bitsMask = (1 << bitsCount) - 1
+const (
+	bitsSize   = 64
+	bitsCount  = 6 // log2 bitsSize
+	bitsOffset = 10
+	offsetMask = (1 << bitsOffset) - 1
+	bitsMask   = (1 << bitsCount) - 1
+)
 
 func decompose(val uint) (uint, bitvector) {
 	high := (val >> (bitsCount + bitsOffset)) << bitsOffset

@@ -3,7 +3,7 @@ package spexs
 import (
 	"bytes"
 	"math"
-	"set/bin"
+	"set/trie"
 	"sort"
 	"stats/hyper"
 )
@@ -16,16 +16,16 @@ type RegToken struct {
 
 type Query struct {
 	Pat   []RegToken
-	Loc   *bin.Set
+	Loc   *trie.Set
 	cache queryCache
 }
 
 func EncodePos(idx uint, pos uint) uint {
-	return (idx << 8) | (pos & 0xFF)
+	return (idx << 8) | (pos & 0xF)
 }
 
 func DecodePos(val uint) (uint, uint) {
-	return val >> 8, val & 0xFF
+	return val >> 8, val & 0xF
 }
 
 func NewQuery(parent *Query, token RegToken) *Query {
@@ -36,12 +36,10 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Pat = make([]RegToken, size)
 		copy(q.Pat, parent.Pat)
 		q.Pat[size-1] = token
-
-		estimatedSize := parent.Loc.Len() / 8
-		q.Loc = bin.New(estimatedSize)
+		q.Loc = trie.New()
 	} else {
 		q.Pat = nil
-		q.Loc = bin.New(0)
+		q.Loc = trie.New()
 	}
 
 	q.cache.reset()

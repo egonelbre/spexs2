@@ -4,7 +4,7 @@ type Set struct {
 	data map[uint]bool
 }
 
-func New(size uint) *Set {
+func New(size int) *Set {
 	return &Set{make(map[uint]bool, size)}
 }
 
