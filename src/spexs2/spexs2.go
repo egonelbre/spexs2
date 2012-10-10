@@ -7,6 +7,7 @@ import (
 	"os"
 	. "spexs"
 	"spexs/pool"
+	"time"
 )
 
 var (
@@ -20,7 +21,7 @@ var (
 	configs          *string = flag.String("conf", "", "configuration file(s), comma-delimited")
 
 	stats       *bool = flag.Bool("stats", false, "print memory/extension statistics")
-	procs       *int  = flag.Int("procs", 16, "parallel routines for extending")
+	procs       *int  = flag.Int("procs", 16, "goroutines for extending")
 	memoryLimit *int  = flag.Int("mem", -1, "memory limit in MB")
 
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
@@ -33,6 +34,7 @@ var (
 
 func info(v ...interface{}) {
 	if *verbose {
+		fmt.Fprintf(os.Stderr, "%+v: ", time.Now())
 		fmt.Fprintln(os.Stderr, v...)
 	}
 }
@@ -92,9 +94,17 @@ func main() {
 
 	limit := conf.Output.Count
 	setup.Printer(os.Stdout, nil, setup.DB)
-	for _, node := range setup.Out.(*pool.Priority).Bottom(limit) {
+
+	info("getting best results")
+
+	best := setup.Out.(*pool.Priority).Bottom(limit)
+
+	info("printing results")
+	for _, node := range best {
 		setup.Printer(os.Stdout, node, setup.DB)
 	}
+
+	info("done")
 
 	/*
 
