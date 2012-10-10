@@ -1,5 +1,7 @@
 package bin
 
+import "bit"
+
 type Set struct {
 	data map[uint]bitvector
 }
@@ -44,22 +46,25 @@ func (set *Set) Contains(val uint) bool {
 }
 
 func (set *Set) Len() int {
-	return len(set.data)
+	count := 0
+	for _, bits := range set.data {
+		count += bit.Count64(uint64(bits))
+	}
+	return count
 }
 
-func (set *Set) Iter() chan uint {
-	ch := make(chan uint, 100)
-	go func(set *Set, ch chan uint) {
-		for val, bits := range set.data {
-			for k := uint(0); k < bitsSize; k += 1 {
-				if (bits>>k)&1 == 1 {
-					ch <- compose(val, k)
-				}
+func (set *Set) Iter() []uint {
+	iter := make([]uint, set.Len())
+	i := 0
+	for val, bits := range set.data {
+		for k := uint(0); k < bitsSize; k += 1 {
+			if (bits>>k)&1 == 1 {
+				iter[i] = compose(val, k)
+				i += 1
 			}
 		}
-		close(ch)
-	}(set, ch)
-	return ch
+	}
+	return iter
 }
 
 func (set *Set) AddSet(other *Set) {

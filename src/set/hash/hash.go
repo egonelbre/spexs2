@@ -21,15 +21,14 @@ func (set *Set) Len() int {
 	return len(set.data)
 }
 
-func (set *Set) Iter() chan uint {
-	ch := make(chan uint, 100)
-	go func(set *Set, ch chan uint) {
-		for val := range set.data {
-			ch <- val
-		}
-		close(ch)
-	}(set, ch)
-	return ch
+func (set *Set) Iter() []uint {
+	iter := make([]uint, set.Len())
+	i := 0
+	for val := range set.data {
+		iter[i] = val
+		i += 1
+	}
+	return iter
 }
 
 func (set *Set) AddSet(other *Set) {

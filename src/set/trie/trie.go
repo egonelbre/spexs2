@@ -46,21 +46,20 @@ func (set *Set) Contains(value uint) bool {
 	return mmin[min]&bits != 0
 }
 
-func (set *Set) Iter() chan uint {
-	ch := make(chan uint, 100)
-	go func(set *Set, ch chan uint) {
-		for maj, mmin := range set.root {
-			for min, bits := range mmin {
-				for k := uint(0); k < 16; k += 1 {
-					if (bits>>uint(k))&1 == 1 {
-						ch <- compose(maj, min, k)
-					}
+func (set *Set) Iter() []uint {
+	iter := make([]uint, set.Len())
+	i := 0
+	for maj, mmin := range set.root {
+		for min, bits := range mmin {
+			for k := uint(0); k < 16; k += 1 {
+				if (bits>>uint(k))&1 == 1 {
+					iter[i] = compose(maj, min, k)
+					i += 1
 				}
 			}
 		}
-		close(ch)
-	}(set, ch)
-	return ch
+	}
+	return iter
 }
 
 func (set *Set) Len() int {

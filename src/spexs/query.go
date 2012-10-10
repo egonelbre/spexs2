@@ -32,10 +32,9 @@ func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
 
 	if parent != nil {
-		size := len(parent.Pat) + 1
-		q.Pat = make([]RegToken, size)
+		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)
-		q.Pat[size-1] = token
+		q.Pat[len(q.Pat)-1] = token
 		q.Loc = trie.New()
 	} else {
 		q.Pat = nil
@@ -99,7 +98,7 @@ func (q *Query) MatchSeqs(db *Database) []int {
 		counted := make(map[uint]bool, q.Loc.Len())
 		count := make([]int, len(db.Sections))
 
-		for val := range q.Loc.Iter() {
+		for _, val := range q.Loc.Iter() {
 			i, _ := DecodePos(val)
 			if counted[i] {
 				continue
@@ -118,7 +117,7 @@ func (q *Query) MatchOccs(db *Database) []int {
 	if q.cache.occs == nil {
 		occs := make([]int, len(db.Sections))
 
-		for val := range q.Loc.Iter() {
+		for _, val := range q.Loc.Iter() {
 			i, _ := DecodePos(val)
 			seq := db.Sequences[i]
 			occs[seq.Section] += seq.Count
@@ -129,15 +128,22 @@ func (q *Query) MatchOccs(db *Database) []int {
 	return q.cache.occs
 }
 
+type uintSlice []uint
+
+func (p uintSlice) Len() int           { return len(p) }
+func (p uintSlice) Less(i, j int) bool { return p[i] < p[j] }
+func (p uintSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
 func (q *Query) FindOptimalSplit(db *Database) float64 {
 	if q.cache.optimalSplit.pvalue < 0 {
-		positions := make([]int, q.Loc.Len())
+		positions := make([]uint, q.Loc.Len())
 		k := 0
-		for i := range q.Loc.Iter() {
-			positions[k] = int(i)
+		for _, val := range q.Loc.Iter() {
+			p, _ := DecodePos(val)
+			positions[k] = p
 			k += 1
 		}
-		sort.Ints(positions)
+		sort.Sort(uintSlice(positions))
 
 		matches := 0
 		for _, c := range q.MatchSeqs(db) {
@@ -155,9 +161,9 @@ func (q *Query) FindOptimalSplit(db *Database) float64 {
 		for _, i := range positions {
 			seq := db.Sequences[i]
 			accCount += seq.Count
-			p := hyper.Split(accCount, matches, i+1, all)
+			p := hyper.Split(accCount, matches, int(i+1), all)
 			if p < splt.pvalue {
-				splt = optimalSplit{p, accCount, i + 1}
+				splt = optimalSplit{p, accCount, int(i + 1)}
 			}
 		}
 		q.cache.optimalSplit = splt

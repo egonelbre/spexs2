@@ -29,7 +29,7 @@ func testUse(set Set, t *testing.T) {
 		}
 	}
 
-	for val := range set.Iter() {
+	for _, val := range set.Iter() {
 		it, exists := good[val]
 		if !exists {
 			t.Errorf("contained value %v that was not added", val)
@@ -59,7 +59,7 @@ func addValues(set Set, n int) {
 
 func iterate(set Set) {
 	sum := uint(0)
-	for x := range set.Iter() {
+	for _, x := range set.Iter() {
 		sum += x
 	}
 }

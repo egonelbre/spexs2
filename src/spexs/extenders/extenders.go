@@ -17,7 +17,7 @@ func toQuerys(queryMap queryMap) Querys {
 }
 
 func extend(base *Query, db *Database, querys queryMap) {
-	for val := range base.Loc.Iter() {
+	for _, val := range base.Loc.Iter() {
 		i, pos := DecodePos(val)
 
 		token, ok, next := db.GetToken(i, pos)
@@ -71,7 +71,7 @@ func max(a uint, b uint) uint {
 func starExtend(base *Query, db *Database, querys queryMap) {
 	lastPos := make(map[uint]uint, base.Loc.Len())
 
-	for val := range base.Loc.Iter() {
+	for _, val := range base.Loc.Iter() {
 		i, pos := DecodePos(val)
 		lastPos[i] = max(lastPos[i], pos)
 	}
