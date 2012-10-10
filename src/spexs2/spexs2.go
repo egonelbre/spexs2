@@ -40,15 +40,8 @@ func info(v ...interface{}) {
 func main() {
 	flag.Parse()
 
-	if *configs == "" {
-		fmt.Fprintf(os.Stderr, "Configuration file is required!\n")
-		return
-	}
-
-	conf := ReadConfiguration(*configs)
-
 	if *details {
-		PrintHelp(conf)
+		PrintHelp()
 		os.Exit(0)
 	}
 
@@ -56,6 +49,13 @@ func main() {
 		PrintVersion()
 		os.Exit(0)
 	}
+
+	if *configs == "" {
+		fmt.Fprintf(os.Stderr, "Configuration file is required!\n")
+		return
+	}
+
+	conf := ReadConfiguration(*configs)
 
 	info("reading input")
 

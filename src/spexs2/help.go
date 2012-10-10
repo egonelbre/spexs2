@@ -14,13 +14,12 @@ import (
 
 var lgh = log.New(os.Stderr, "", 0)
 
-func PrintHelp(conf Conf) {
+func PrintHelp() {
 	lgh.Printf("Usage of %s:\n", os.Args[0])
 	lgh.Printf("spxs [FLAGS] [OPTIONS]\n\n")
 	lgh.Printf("Flags: \n")
 	flag.PrintDefaults()
 
-	PrintAliases(conf)
 	PrintStrFeatures()
 	PrintFeatures()
 	PrintFitnesses()
@@ -28,7 +27,7 @@ func PrintHelp(conf Conf) {
 	PrintExtenders()
 
 	lgh.Printf("\nExamples: \n")
-	lgh.Printf("  spxs -procs=4 inp=data.dna ref=random.dna\n")
+	lgh.Printf("  spexs2 -conf=conf.json inp=data.dna ref=random.dna\n")
 
 	lgh.Printf("\n")
 }
@@ -64,15 +63,6 @@ func printSection(caption string, data map[string]string) {
 	for _, name := range names {
 		printItem(name, data[name])
 	}
-}
-
-func PrintAliases(conf Conf) {
-	info := make(map[string]string)
-	for name, data := range conf.Aliases {
-		info[name] = data.Desc
-	}
-
-	printSection("Aliases", info)
 }
 
 func PrintStrFeatures() {
