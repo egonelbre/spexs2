@@ -134,6 +134,21 @@ func (p uintSlice) Len() int           { return len(p) }
 func (p uintSlice) Less(i, j int) bool { return p[i] < p[j] }
 func (p uintSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
+func uniq(data []uint) []uint {
+	if len(data) <= 0 {
+		return data
+	}
+	k := 1
+	for i := 0; i < len(data); i += 1 {
+		if data[k-1] != data[i] {
+			data[k] = data[i]
+			k += 1
+		}
+	}
+
+	return data[0:k]
+}
+
 func (q *Query) FindOptimalSplit(db *Database) float64 {
 	if q.cache.optimalSplit.pvalue < 0 {
 		positions := make([]uint, q.Loc.Len())
@@ -144,6 +159,7 @@ func (q *Query) FindOptimalSplit(db *Database) float64 {
 			k += 1
 		}
 		sort.Sort(uintSlice(positions))
+		positions = uniq(positions)
 
 		matches := 0
 		for _, c := range q.MatchSeqs(db) {
