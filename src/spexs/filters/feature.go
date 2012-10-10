@@ -45,7 +45,7 @@ func makeFilter(feature features.Func, config interface{}) (f Func, err error) {
 }
 
 func wrap(f features.Func) CreateFunc {
-	return func(conf Conf) (Func, error) {
+	return func(conf Conf, setup Setup) (Func, error) {
 		return makeFilter(f, conf)
 	}
 }

@@ -7,7 +7,7 @@ import (
 type Func func(p *Query, ref *Database) bool
 
 type Conf map[string]interface{}
-type CreateFunc func(Conf) (Func, error)
+type CreateFunc func(Conf, Setup) (Func, error)
 
 type Desc struct {
 	Name   string

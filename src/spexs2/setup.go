@@ -90,7 +90,7 @@ func CreateExtender(conf Conf, setup AppSetup) ExtenderFunc {
 }
 
 func CreateFilter(conf map[string]filters.Conf, setup AppSetup) FilterFunc {
-	f, err := filters.Compose(conf)
+	f, err := filters.Compose(conf, setup.Setup)
 	if err != nil {
 		log.Fatal(err)
 	}
