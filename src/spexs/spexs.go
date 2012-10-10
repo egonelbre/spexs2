@@ -2,7 +2,7 @@ package spexs
 
 import "time"
 
-type Token uint16
+type Token uint
 type Querys []*Query
 
 type Pooler interface {
