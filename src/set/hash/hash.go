@@ -4,8 +4,10 @@ type Set struct {
 	data map[uint]bool
 }
 
-func New(size int) *Set {
-	return &Set{make(map[uint]bool, size)}
+const initSize = 30
+
+func New() *Set {
+	return &Set{make(map[uint]bool, initSize)}
 }
 
 func (set *Set) Add(val uint) {

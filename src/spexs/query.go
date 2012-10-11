@@ -3,7 +3,7 @@ package spexs
 import (
 	"bytes"
 	"math"
-	"set/trie"
+	set "set/trie"
 	"sort"
 	"stats/hyper"
 )
@@ -16,7 +16,7 @@ type RegToken struct {
 
 type Query struct {
 	Pat   []RegToken
-	Loc   *trie.Set
+	Loc   *set.Set
 	cache queryCache
 }
 
@@ -31,16 +31,13 @@ func DecodePos(val uint) (uint, uint) {
 func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
 
+	q.Pat = nil
 	if parent != nil {
 		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)
 		q.Pat[len(q.Pat)-1] = token
-		q.Loc = trie.New()
-	} else {
-		q.Pat = nil
-		q.Loc = trie.New()
 	}
-
+	q.Loc = set.New()
 	q.cache.reset()
 
 	return q

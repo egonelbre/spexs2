@@ -9,6 +9,7 @@ type Set struct {
 type bitvector uint64
 
 const (
+	initSize   = 10
 	bitsSize   = 64
 	bitsCount  = 6 // log2 bitsSize
 	bitsOffset = 10
@@ -31,8 +32,8 @@ func compose(idx uint, pos uint) uint {
 	return high | low | mid
 }
 
-func New(size int) *Set {
-	return &Set{make(map[uint]bitvector, size)}
+func New() *Set {
+	return &Set{make(map[uint]bitvector, initSize)}
 }
 
 func (set *Set) Add(val uint) {
