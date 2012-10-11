@@ -20,12 +20,14 @@ type Query struct {
 	cache queryCache
 }
 
+var PosOffset uint = 8
+
 func EncodePos(idx uint, pos uint) uint {
-	return (idx << 8) | (pos & 0xFF)
+	return (idx << PosOffset) | pos
 }
 
 func DecodePos(val uint) (uint, uint) {
-	return val >> 8, val & 0xFF
+	return val >> PosOffset, val & ((1 << PosOffset) - 1)
 }
 
 func NewQuery(parent *Query, token RegToken) *Query {

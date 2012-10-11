@@ -58,9 +58,10 @@ func (set *Set) Iter() []uint {
 	iter := make([]uint, set.Len())
 	i := 0
 	for val, bits := range set.data {
-		for k := uint(0); k < bitsSize; k += 1 {
-			if (bits>>k)&1 == 1 {
+		for k := uint(0); bits > 0; k += 1 {
+			if bits&(1<<k) > 0 {
 				iter[i] = compose(val, k)
+				bits = bits &^ (1 << k)
 				i += 1
 			}
 		}

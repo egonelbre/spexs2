@@ -51,9 +51,10 @@ func (set *Set) Iter() []uint {
 	i := 0
 	for maj, mmin := range set.root {
 		for min, bits := range mmin {
-			for k := uint(0); k < 16; k += 1 {
-				if (bits>>uint(k))&1 == 1 {
+			for k := uint(0); bits > 0; k += 1 {
+				if bits&(1<<k) > 0 {
 					iter[i] = compose(maj, min, k)
+					bits = bits &^ (1 << k)
 					i += 1
 				}
 			}
