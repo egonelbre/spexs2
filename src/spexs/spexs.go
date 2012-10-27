@@ -14,6 +14,7 @@ type Pooler interface {
 type ExtenderFunc func(p *Query) Querys
 type FilterFunc func(p *Query) bool
 type FitnessFunc func(p *Query) float64
+type FeatureFunc func(p *Query) float64, string
 type PostProcessFunc func(p *Query, s *Setup) error
 
 type Setup struct {

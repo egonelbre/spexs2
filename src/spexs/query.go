@@ -14,10 +14,16 @@ type RegToken struct {
 	IsStar  bool
 }
 
+type featureResult struct {
+	Value float64
+	Info  string
+}
+
 type Query struct {
 	Pat   []RegToken
 	Loc   *set.Set
 	Db    *Database
+	memo  map[FeatureFunc]featureResult
 	cache queryCache
 }
 
@@ -36,6 +42,7 @@ func NewQuery(parent *Query, token RegToken) *Query {
 
 	q.Pat = nil
 	q.Db = nil
+	q.cache = make(map[FeatureFunc]featureResult)
 	if parent != nil {
 		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)
@@ -66,6 +73,15 @@ func NewEmptyQuery(db *Database) *Query {
 
 func (q *Query) Len() int {
 	return len(q.Pat)
+}
+
+func (q *Query) Memoized(f FeatureFunc) float64, string {
+	if res, ok := q.memo[f]; ok {
+		return res.Value, res.Info
+	}
+	val, info := f(q)
+	q.memo[f] = Result{val, info}
+	return val, info
 }
 
 type queryCache struct {
