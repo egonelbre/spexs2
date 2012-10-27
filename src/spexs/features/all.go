@@ -81,7 +81,16 @@ var All = [...]Desc{
 			seqs := q.MatchSeqs(db)
 			return float64(seqs[0]+1) / float64(seqs[1]+1)
 		}},
-
+	{"match-seqs-prop-ratio",
+		"( (query-match-seqs+1) / (query-secs) ) / ( (back-match-seqs+1) / (back-seqs) )",
+		func(q *Query, db *Database) float64 {
+			seqs := q.MatchSeqs(db)
+			querymatch := float64(seqs[0] + 1)
+			backmatch := float64(seqs[1] + 1)
+			queryseqs := float64(db.Sections[0].Count)
+			backseqs := float64(db.Sections[1].Count)
+			return (querymatch / queryseqs) / (backmatch / backseqs)
+		}},
 	{"match-hyper-optimal-pvalue",
 		"finds optimal hypergeometric p-value for the input",
 		func(q *Query, db *Database) float64 {
