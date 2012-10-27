@@ -60,8 +60,8 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		log.Fatal(err)
 	}
 
-	f := func(out io.Writer, pat *Query, ref *Database) {
-		if pat == nil {
+	f := func(out io.Writer, q *Query) {
+		if q == nil {
 			if header != "hidden" {
 				fmt.Print(header)
 			}
@@ -73,17 +73,17 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		for name, fixName := range fixedNames {
 			f, valid := feats[name]
 			if valid {
-				values[fixName] = f(pat, ref)
+				values[fixName] = f(q)
 			}
 			fstr, valid := strFeats[name]
 			if valid {
-				values[fixName] = fstr(pat, ref)
+				values[fixName] = fstr(q)
 			}
 		}
 
 		err = tmpl.Execute(out, values)
 		if err != nil {
-			log.Println("Unable to output pattern.")
+			log.Println("Unable to output qtern.")
 			log.Fatal(err)
 		}
 	}

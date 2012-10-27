@@ -11,13 +11,13 @@ type Pooler interface {
 	Len() int
 }
 
-type ExtenderFunc func(p *Query, db *Database) Querys
-type FilterFunc func(p *Query, db *Database) bool
+type ExtenderFunc func(p *Query) Querys
+type FilterFunc func(p *Query) bool
 type FitnessFunc func(p *Query) float64
 type PostProcessFunc func(p *Query, s *Setup) error
 
 type Setup struct {
-	DB  *Database
+	Db  *Database
 	Out Pooler
 	In  Pooler
 
@@ -31,7 +31,7 @@ type Setup struct {
 
 func prepareSpexs(s *Setup) {
 	maxSeq := 0
-	for _, seq := range s.DB.Sequences {
+	for _, seq := range s.Db.Sequences {
 		if seq.Len > maxSeq {
 			maxSeq = seq.Len
 		}
@@ -44,7 +44,7 @@ func prepareSpexs(s *Setup) {
 		}
 	}
 
-	s.In.Put(NewEmptyQuery(s.DB))
+	s.In.Put(NewEmptyQuery(s.Db))
 }
 
 func Run(s *Setup) {
@@ -55,12 +55,12 @@ func Run(s *Setup) {
 			return
 		}
 
-		extensions := s.Extender(p, s.DB)
+		extensions := s.Extender(p)
 		for _, extended := range extensions {
-			if s.Extendable(extended, s.DB) {
+			if s.Extendable(extended) {
 				s.In.Put(extended)
 			}
-			if s.Outputtable(extended, s.DB) {
+			if s.Outputtable(extended) {
 				s.Out.Put(extended)
 			}
 		}
@@ -109,12 +109,12 @@ func RunParallel(s *Setup, routines int) {
 					counter <- 1
 				}
 
-				extensions := s.Extender(p, s.DB)
+				extensions := s.Extender(p)
 				for _, extended := range extensions {
-					if s.Extendable(extended, s.DB) {
+					if s.Extendable(extended) {
 						s.In.Put(extended)
 					}
-					if s.Outputtable(extended, s.DB) {
+					if s.Outputtable(extended) {
 						s.Out.Put(extended)
 					}
 				}

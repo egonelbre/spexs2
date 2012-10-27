@@ -17,6 +17,7 @@ type RegToken struct {
 type Query struct {
 	Pat   []RegToken
 	Loc   *set.Set
+	Db    *Database
 	cache queryCache
 }
 
@@ -34,10 +35,12 @@ func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
 
 	q.Pat = nil
+	q.Db = nil
 	if parent != nil {
 		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)
 		q.Pat[len(q.Pat)-1] = token
+		q.Db = parent.Db
 	}
 	q.Loc = set.New()
 	q.cache.reset()
@@ -47,6 +50,7 @@ func NewQuery(parent *Query, token RegToken) *Query {
 
 func NewEmptyQuery(db *Database) *Query {
 	q := NewQuery(nil, RegToken{})
+	q.Db = db
 	for idx, _ := range db.Sequences {
 		i := uint(idx)
 		last := uint(0)
@@ -82,18 +86,19 @@ func (q *queryCache) reset() {
 	q.optimalSplit.pvalue = -1.0
 }
 
-func (q *Query) CacheValues(db *Database) {
+func (q *Query) CacheValues() {
 	if q.cache.count == nil {
-		q.MatchSeqs(db)
+		q.MatchSeqs()
 	}
 	if q.cache.occs == nil {
-		q.MatchOccs(db)
+		q.MatchOccs()
 	}
 	q.Loc = nil
 }
 
-func (q *Query) MatchSeqs(db *Database) []int {
+func (q *Query) MatchSeqs() []int {
 	if q.cache.count == nil {
+		db := q.Db
 		counted := make(map[uint]bool, q.Loc.Len())
 		count := make([]int, len(db.Sections))
 
@@ -112,8 +117,9 @@ func (q *Query) MatchSeqs(db *Database) []int {
 	return q.cache.count
 }
 
-func (q *Query) MatchOccs(db *Database) []int {
+func (q *Query) MatchOccs() []int {
 	if q.cache.occs == nil {
+		db := q.Db
 		occs := make([]int, len(db.Sections))
 
 		for _, val := range q.Loc.Iter() {
@@ -148,8 +154,9 @@ func uniq(data []uint) []uint {
 	return data[0:k]
 }
 
-func (q *Query) FindOptimalSplit(db *Database) float64 {
+func (q *Query) FindOptimalSplit() float64 {
 	if q.cache.optimalSplit.pvalue < 0 {
+		db := q.Db
 		positions := make([]uint, q.Loc.Len())
 		k := 0
 		for _, val := range q.Loc.Iter() {
@@ -161,7 +168,7 @@ func (q *Query) FindOptimalSplit(db *Database) float64 {
 		positions = uniq(positions)
 
 		matches := 0
-		for _, c := range q.MatchSeqs(db) {
+		for _, c := range q.MatchSeqs() {
 			matches += c
 		}
 
@@ -186,25 +193,24 @@ func (q *Query) FindOptimalSplit(db *Database) float64 {
 	return q.cache.optimalSplit.pvalue
 }
 
-func (q *Query) FindOptimalSplitSeqs(db *Database) int {
+func (q *Query) FindOptimalSplitSeqs() int {
 	if q.cache.optimalSplit.pvalue < 0 {
-		q.FindOptimalSplit(db)
+		q.FindOptimalSplit()
 	}
 	return q.cache.optimalSplit.seqs
 }
 
-func (q *Query) FindOptimalSplitMatches(db *Database) int {
+func (q *Query) FindOptimalSplitMatches() int {
 	if q.cache.optimalSplit.pvalue < 0 {
-		q.FindOptimalSplit(db)
+		q.FindOptimalSplit()
 	}
 	return q.cache.optimalSplit.matches
 }
 
-func (q *Query) String(db *Database, short bool) string {
+func (q *Query) String(short bool) string {
 	buf := bytes.NewBufferString("")
-
+	db := q.Db
 	for i, regToken := range q.Pat {
-
 		if regToken.IsStar {
 			buf.WriteString("*")
 			buf.WriteString(db.Separator)

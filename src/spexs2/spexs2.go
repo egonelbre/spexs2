@@ -93,7 +93,7 @@ func main() {
 	endStats()
 
 	limit := conf.Output.Count
-	setup.Printer(os.Stdout, nil, setup.DB)
+	setup.Printer(os.Stdout, nil)
 
 	info("getting best results")
 
@@ -101,7 +101,7 @@ func main() {
 
 	info("printing results")
 	for _, node := range best {
-		setup.Printer(os.Stdout, node, setup.DB)
+		setup.Printer(os.Stdout, node)
 	}
 
 	info("done")

@@ -5,7 +5,7 @@ import (
 	. "spexs"
 )
 
-func trueFilter(p *Query, ref *Database) bool {
+func trueFilter(p *Query) bool {
 	return true
 }
 
@@ -33,9 +33,9 @@ func Compose(conf map[string]Conf, setup Setup) (Func, error) {
 	}
 
 	// create a composite filter
-	return func(p *Query, ref *Database) bool {
+	return func(p *Query) bool {
 		for _, f := range filters {
-			if !f(p, ref) {
+			if !f(p) {
 				return false
 			}
 		}

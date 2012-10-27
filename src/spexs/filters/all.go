@@ -10,7 +10,7 @@ var All = [...]Desc{
 	{"no-starting-group",
 		"does not allow pattern to start with group",
 		func(conf Conf, setup Setup) (Func, error) {
-			return func(q *Query, db *Database) bool {
+			return func(q *Query) bool {
 				e := q.Pat[0]
 				return !(e.IsGroup || e.IsStar)
 			}, nil
@@ -18,7 +18,7 @@ var All = [...]Desc{
 	{"no-ending-group",
 		"does not allow pattern to end with group",
 		func(conf Conf, setup Setup) (Func, error) {
-			return func(q *Query, db *Database) bool {
+			return func(q *Query) bool {
 				e := q.Pat[len(q.Pat)-1]
 				return !e.IsGroup
 			}, nil
@@ -30,15 +30,15 @@ var All = [...]Desc{
 			utils.ApplyObject(&conf, &filt)
 
 			line := strings.TrimSpace(filt.Tokens)
-			tokenNames := strings.Split(line, setup.DB.Separator)
-			tokens := setup.DB.ToTokens(tokenNames)
+			tokenNames := strings.Split(line, setup.Db.Separator)
+			tokens := setup.Db.ToTokens(tokenNames)
 
 			contains := make(map[Token]bool, len(tokens))
 			for _, token := range tokens {
 				contains[token] = true
 			}
 
-			return func(q *Query, db *Database) bool {
+			return func(q *Query) bool {
 				e := q.Pat[len(q.Pat)-1]
 				return !contains[e.Token]
 			}, nil

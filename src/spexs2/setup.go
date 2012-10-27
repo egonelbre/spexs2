@@ -16,7 +16,7 @@ const MAX_POOL_SIZE = 1024 * 1024 * 1024
 type TrieFitnessCreator func(interface{}) FitnessFunc
 type TrieExtenderCreator func(interface{}) ExtenderFunc
 
-type PrinterFunc func(io.Writer, *Query, *Database)
+type PrinterFunc func(io.Writer, *Query)
 
 type AppSetup struct {
 	Setup
@@ -49,7 +49,7 @@ func CreateOutput(conf Conf, setup AppSetup, f FitnessFunc) Pooler {
 
 func CreateSetup(conf Conf) AppSetup {
 	var s AppSetup
-	s.DB = CreateDatabase(conf)
+	s.Db = CreateDatabase(conf)
 
 	s.In = CreateInput(conf, s)
 	s.Fitness = CreateFitness(conf, s)
@@ -60,7 +60,7 @@ func CreateSetup(conf Conf) AppSetup {
 	s.Outputtable = CreateFilter(conf.Output.Filter, s)
 
 	s.PostProcess = func(q *Query, s *Setup) error {
-		q.CacheValues(s.DB)
+		q.CacheValues()
 		return nil
 	}
 
@@ -112,6 +112,6 @@ func CreateFitness(conf Conf, setup AppSetup) FitnessFunc {
 	}
 
 	return func(q *Query) float64 {
-		return fit(q, setup.DB)
+		return fit(q)
 	}
 }
