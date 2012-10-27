@@ -1,4 +1,4 @@
-package utils
+package bit
 
 import "math/big"
 
@@ -19,7 +19,7 @@ const (
 	ms32 = m32 & b32
 )
 
-func BitCount64(x uint64) int {
+func Count64(x uint64) int {
 	x = (x & m1) + ((x >> 1) & m1)
 	x = (x & m2) + ((x >> 2) & m2)
 	x = (x & m4) + ((x >> 4) & m4)
@@ -29,7 +29,7 @@ func BitCount64(x uint64) int {
 	return int(x)
 }
 
-func BitCount(x uint) int {
+func Count32(x int32) int {
 	x = (x & ms1) + ((x >> 1) & ms1)
 	x = (x & ms2) + ((x >> 2) & ms2)
 	x = (x & ms4) + ((x >> 4) & ms4)
@@ -38,15 +38,15 @@ func BitCount(x uint) int {
 	return int(x)
 }
 
-func BitCountInt(x *big.Int) int {
+func CountInt(x *big.Int) int {
 	total := 0
 	for _, w := range x.Bits() {
-		total += BitCount64(uint64(w))
+		total += Count64(uint64(w))
 	}
 	return total
 }
 
-func BitScanLeft(x uint) int {
+func ScanLeft32(x uint32) int {
 	for k := byte(0); k < 32; k += 1 {
 		if x&(1<<k) != 0 {
 			return int(k)
@@ -55,7 +55,7 @@ func BitScanLeft(x uint) int {
 	return -1
 }
 
-func BitScanLeft64(x uint64) int {
+func ScanLeft64(x uint64) int {
 	for k := byte(0); k < 64; k += 1 {
 		if x&(1<<k) != 0 {
 			return int(k)
@@ -64,7 +64,7 @@ func BitScanLeft64(x uint64) int {
 	return -1
 }
 
-func BitScanLeftInt(x *big.Int) int {
+func ScanLeftInt(x *big.Int) int {
 	for k := 0; k < x.BitLen(); k += 1 {
 		if x.Bit(k) != 0 {
 			return k

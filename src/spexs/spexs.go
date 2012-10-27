@@ -2,7 +2,7 @@ package spexs
 
 import "time"
 
-type Token uint16
+type Token uint
 type Querys []*Query
 
 type Pooler interface {
@@ -29,7 +29,26 @@ type Setup struct {
 	PostProcess PostProcessFunc
 }
 
+func prepareSpexs(s *Setup) {
+	maxSeq := 0
+	for _, seq := range s.DB.Sequences {
+		if seq.Len > maxSeq {
+			maxSeq = seq.Len
+		}
+	}
+
+	for i := uint(0); i < 32; i += 1 {
+		if 1<<i > maxSeq {
+			PosOffset = i
+			break
+		}
+	}
+
+	s.In.Put(NewEmptyQuery(s.DB))
+}
+
 func Run(s *Setup) {
+	prepareSpexs(s)
 	for {
 		p, valid := s.In.Take()
 		if !valid {
@@ -66,6 +85,8 @@ func Parallel(f func(), routines int) {
 }
 
 func RunParallel(s *Setup, routines int) {
+	prepareSpexs(s)
+
 	quit := make(chan int, routines)
 	counter := make(chan int, routines)
 

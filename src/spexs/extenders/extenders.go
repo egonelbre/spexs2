@@ -1,12 +1,11 @@
 package extenders
 
-import (
-	. "spexs"
-	"utils"
-)
+import . "spexs"
 
 type queryMap map[Token]*Query
 
+//TODO: method queryMap.toQuerys
+//TODO: method queryMap.addLoc(token, pos)
 func toQuerys(queryMap queryMap) Querys {
 	querys := make(Querys, len(queryMap))
 	i := 0
@@ -18,27 +17,21 @@ func toQuerys(queryMap queryMap) Querys {
 }
 
 func extend(base *Query, db *Database, querys queryMap) {
-	for i, pv := range base.Loc.Iter() {
-		seq := db.Sequences[i]
-		seqLen := seq.Len
+	for _, val := range base.Loc.Iter() {
+		i, pos := DecodePos(val)
 
-		for k := 0; k < seqLen; k += 1 {
-			if ((pv >> uint(k)) & 1) == 0 {
-				continue
-			}
-
-			token, ok, next := db.GetToken(i, k)
-			if !ok {
-				continue
-			}
-
-			q, ok := querys[token]
-			if !ok {
-				q = NewQuery(base, RegToken{token, false, false})
-				querys[token] = q
-			}
-			q.Loc.Add(i, next)
+		token, ok, next := db.GetToken(i, pos)
+		if !ok {
+			continue
 		}
+
+		q, exists := querys[token]
+		if !exists {
+			q = NewQuery(base, RegToken{token, false, false})
+			querys[token] = q
+		}
+
+		q.Loc.Add(EncodePos(i, next))
 	}
 }
 
@@ -68,13 +61,22 @@ func Groupex(base *Query, db *Database) Querys {
 	return toQuerys(querys)
 }
 
-func starExtend(base *Query, db *Database, querys queryMap) {
-	for i, pv := range base.Loc.Iter() {
-		last := utils.BitScanLeft64(uint64(pv))
-		if last < 0 {
-			continue
-		}
+func max(a uint, b uint) uint {
+	if a > b {
+		return a
+	}
+	return b
+}
 
+func starExtend(base *Query, db *Database, querys queryMap) {
+	lastPos := make(map[uint]uint, base.Loc.Len())
+
+	for _, val := range base.Loc.Iter() {
+		i, pos := DecodePos(val)
+		lastPos[i] = max(lastPos[i], pos)
+	}
+
+	for i, last := range lastPos {
 		var q *Query
 		token, ok, next := db.GetToken(i, last)
 		for ok {
@@ -83,7 +85,7 @@ func starExtend(base *Query, db *Database, querys queryMap) {
 				q = NewQuery(base, RegToken{token, false, true})
 				querys[token] = q
 			}
-			q.Loc.Add(i, next)
+			q.Loc.Add(EncodePos(i, next))
 			token, ok, next = db.GetToken(i, next)
 		}
 	}

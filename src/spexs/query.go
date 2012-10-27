@@ -3,10 +3,9 @@ package spexs
 import (
 	"bytes"
 	"math"
+	set "set/trie"
 	"sort"
-	"spexs/sets"
 	"stats/hyper"
-	"utils"
 )
 
 type RegToken struct {
@@ -16,28 +15,31 @@ type RegToken struct {
 }
 
 type Query struct {
-	Pat []RegToken
-	Loc *sets.HashSet
-
+	Pat   []RegToken
+	Loc   *set.Set
 	cache queryCache
+}
+
+var PosOffset uint = 8
+
+func EncodePos(idx uint, pos uint) uint {
+	return (idx << PosOffset) | pos
+}
+
+func DecodePos(val uint) (uint, uint) {
+	return val >> PosOffset, val & ((1 << PosOffset) - 1)
 }
 
 func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
 
+	q.Pat = nil
 	if parent != nil {
-		size := len(parent.Pat) + 1
-		q.Pat = make([]RegToken, size)
+		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)
-		q.Pat[size-1] = token
-
-		estimatedSize := parent.Loc.Len() / 8
-		q.Loc = sets.NewHashSet(estimatedSize)
-	} else {
-		q.Pat = nil
-		q.Loc = sets.NewHashSet(0)
+		q.Pat[len(q.Pat)-1] = token
 	}
-
+	q.Loc = set.New()
 	q.cache.reset()
 
 	return q
@@ -45,11 +47,12 @@ func NewQuery(parent *Query, token RegToken) *Query {
 
 func NewEmptyQuery(db *Database) *Query {
 	q := NewQuery(nil, RegToken{})
-	for i, _ := range db.Sequences {
-		last := 0
+	for idx, _ := range db.Sequences {
+		i := uint(idx)
+		last := uint(0)
 		_, ok, next := db.GetToken(i, last)
 		for ok {
-			q.Loc.Add(i, last)
+			q.Loc.Add(EncodePos(i, last))
 			last = next
 			_, ok, next = db.GetToken(i, next)
 		}
@@ -81,19 +84,25 @@ func (q *queryCache) reset() {
 
 func (q *Query) CacheValues(db *Database) {
 	if q.cache.count == nil {
-		q.SeqCount(db)
+		q.MatchSeqs(db)
 	}
 	if q.cache.occs == nil {
-		q.MatchCount(db)
+		q.MatchOccs(db)
 	}
-	q.Loc.Clear()
+	q.Loc = nil
 }
 
-func (q *Query) SeqCount(db *Database) []int {
+func (q *Query) MatchSeqs(db *Database) []int {
 	if q.cache.count == nil {
+		counted := make(map[uint]bool, q.Loc.Len())
 		count := make([]int, len(db.Sections))
 
-		for i := range q.Loc.Iter() {
+		for _, val := range q.Loc.Iter() {
+			i, _ := DecodePos(val)
+			if counted[i] {
+				continue
+			}
+			counted[i] = true
 			seq := db.Sequences[i]
 			count[seq.Section] += seq.Count
 		}
@@ -103,14 +112,14 @@ func (q *Query) SeqCount(db *Database) []int {
 	return q.cache.count
 }
 
-func (q *Query) MatchCount(db *Database) []int {
+func (q *Query) MatchOccs(db *Database) []int {
 	if q.cache.occs == nil {
 		occs := make([]int, len(db.Sections))
 
-		for i, pv := range q.Loc.Iter() {
+		for _, val := range q.Loc.Iter() {
+			i, _ := DecodePos(val)
 			seq := db.Sequences[i]
-			matchCount := utils.BitCount64(uint64(pv))
-			occs[seq.Section] += seq.Count * matchCount
+			occs[seq.Section] += seq.Count
 		}
 
 		q.cache.occs = occs
@@ -118,18 +127,41 @@ func (q *Query) MatchCount(db *Database) []int {
 	return q.cache.occs
 }
 
-func (q *Query) FindOptimalSplit(db *Database) float64 {
-	if q.cache.optimalSplit.pvalue < 0 {
-		positions := make([]int, q.Loc.Len())
-		k := 0
-		for i := range q.Loc.Iter() {
-			positions[k] = i
+type uintSlice []uint
+
+func (p uintSlice) Len() int           { return len(p) }
+func (p uintSlice) Less(i, j int) bool { return p[i] < p[j] }
+func (p uintSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+func uniq(data []uint) []uint {
+	if len(data) <= 0 {
+		return data
+	}
+	k := 1
+	for i := 0; i < len(data); i += 1 {
+		if data[k-1] != data[i] {
+			data[k] = data[i]
 			k += 1
 		}
-		sort.Ints(positions)
+	}
+
+	return data[0:k]
+}
+
+func (q *Query) FindOptimalSplit(db *Database) float64 {
+	if q.cache.optimalSplit.pvalue < 0 {
+		positions := make([]uint, q.Loc.Len())
+		k := 0
+		for _, val := range q.Loc.Iter() {
+			p, _ := DecodePos(val)
+			positions[k] = p
+			k += 1
+		}
+		sort.Sort(uintSlice(positions))
+		positions = uniq(positions)
 
 		matches := 0
-		for _, c := range q.SeqCount(db) {
+		for _, c := range q.MatchSeqs(db) {
 			matches += c
 		}
 
@@ -144,9 +176,9 @@ func (q *Query) FindOptimalSplit(db *Database) float64 {
 		for _, i := range positions {
 			seq := db.Sequences[i]
 			accCount += seq.Count
-			p := hyper.Split(accCount, matches, i+1, all)
+			p := hyper.Split(accCount, matches, int(i+1), all)
 			if p < splt.pvalue {
-				splt = optimalSplit{p, accCount, i + 1}
+				splt = optimalSplit{p, accCount, int(i + 1)}
 			}
 		}
 		q.cache.optimalSplit = splt

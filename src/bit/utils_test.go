@@ -1,11 +1,11 @@
-package utils
+package bit
 
 import (
 	"math/big"
 	"testing"
 )
 
-var bitCountTests = []struct {
+var countTests = []struct {
 	in  uint
 	out int
 }{
@@ -21,23 +21,23 @@ var bitCountTests = []struct {
 	{0xfff, 12},
 }
 
-func TestBitCount(t *testing.T) {
-	for i, test := range bitCountTests {
-		if n := BitCount(test.in); n != test.out {
+func TestCount(t *testing.T) {
+	for i, test := range countTests {
+		if n := Count(test.in); n != test.out {
 			t.Errorf("#%d got %d want %d", i, n, test.out)
 		}
 	}
 }
 
-func TestBitCount64(t *testing.T) {
-	for i, test := range bitCountTests {
-		if n := BitCount64(uint64(test.in)); n != test.out {
+func TestCount64(t *testing.T) {
+	for i, test := range countTests {
+		if n := Count64(uint64(test.in)); n != test.out {
 			t.Errorf("#%d got %d want %d", i, n, test.out)
 		}
 	}
 }
 
-var largeBitCountTests = []struct {
+var largeCountTests = []struct {
 	in  int64
 	out int
 }{
@@ -55,10 +55,10 @@ var largeBitCountTests = []struct {
 	{0xfff<<50 + 3, 14},
 }
 
-func TestBitCountInt(t *testing.T) {
-	for i, test := range largeBitCountTests {
+func TestCountInt(t *testing.T) {
+	for i, test := range largeCountTests {
 		v := big.NewInt(test.in)
-		if n := BitCountInt(v); n != test.out {
+		if n := CountInt(v); n != test.out {
 			t.Errorf("#%d got %d want %d", i, n, test.out)
 		}
 	}

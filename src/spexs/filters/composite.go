@@ -9,7 +9,7 @@ func trueFilter(p *Query, ref *Database) bool {
 	return true
 }
 
-func Compose(conf map[string]Conf) (Func, error) {
+func Compose(conf map[string]Conf, setup Setup) (Func, error) {
 	filters := make([]Func, 0)
 
 	for name, args := range conf {
@@ -18,7 +18,7 @@ func Compose(conf map[string]Conf) (Func, error) {
 			return nil, errors.New("No filter named: " + name)
 		}
 
-		f, err := filter.Create(args)
+		f, err := filter.Create(args, setup)
 		if err != nil {
 			return nil, err
 		}

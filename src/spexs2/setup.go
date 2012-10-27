@@ -33,7 +33,6 @@ type PatternFilterCreator func(limit int) FilterFunc
 func CreateInput(conf Conf, setup AppSetup) Pooler {
 	//in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE, true)
 	in := pool.NewLifo()
-	in.Put(NewEmptyQuery(setup.DB))
 	return in
 }
 
@@ -90,7 +89,7 @@ func CreateExtender(conf Conf, setup AppSetup) ExtenderFunc {
 }
 
 func CreateFilter(conf map[string]filters.Conf, setup AppSetup) FilterFunc {
-	f, err := filters.Compose(conf)
+	f, err := filters.Compose(conf, setup.Setup)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -51,14 +51,13 @@ func NewDatabase(estimatedSize int) *Database {
 	}
 }
 
-func (db *Database) GetToken(seqIdx int, tokenPos int) (token Token, ok bool, nextPos int) {
+func (db *Database) GetToken(seqIdx uint, tokenPos uint) (token Token, ok bool, nextPos uint) {
 	seq := &db.Sequences[seqIdx]
 	if int(tokenPos) >= len(seq.Tokens) {
 		return 0, false, 0
 	}
-
-	rune, width := seq.Tokens[tokenPos], 1
-	return Token(rune), true, tokenPos + width
+	token = seq.Tokens[tokenPos]
+	return token, true, tokenPos + 1
 }
 
 func (db *Database) nextToken() Token {
