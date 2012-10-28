@@ -11,7 +11,7 @@ func Hyper(fore []int, back []int) FeatureFunc {
 		totalFore := countOnly(q.Db.Total, fore)
 		totalBack := countOnly(q.Db.Total, back)
 
-		matches := q.MatchSeqs()
+		matches := q.Matches()
 		countFore := countOnly(matches, fore)
 		countBack := countOnly(matches, back)
 
@@ -25,7 +25,7 @@ func HyperApprox(fore []int, back []int) FeatureFunc {
 		totalFore := countOnly(q.Db.Total, fore)
 		totalBack := countOnly(q.Db.Total, back)
 
-		matches := q.MatchSeqs()
+		matches := q.Matches()
 		countFore := countOnly(matches, fore)
 		countBack := countOnly(matches, back)
 
@@ -39,7 +39,7 @@ func HyperDown(fore []int, back []int) FeatureFunc {
 		totalFore := countOnly(q.Db.Total, fore)
 		totalBack := countOnly(q.Db.Total, back)
 
-		matches := q.MatchSeqs()
+		matches := q.Matches()
 		countFore := countOnly(matches, fore)
 		countBack := countOnly(matches, back)
 

@@ -9,13 +9,13 @@ import (
 type Priority struct {
 	token     chan int
 	items     []*Query
-	Fitness   FitnessFunc
+	Fitness   Feature
 	length    int
 	limit     int
 	ascending bool
 }
 
-func NewPriority(fitness FitnessFunc, limit int, ascending bool) *Priority {
+func NewPriority(fitness Feature, limit int, ascending bool) *Priority {
 	p := &Priority{}
 	p.token = make(chan int, 1)
 	p.items = make([]*Query, limit+100)

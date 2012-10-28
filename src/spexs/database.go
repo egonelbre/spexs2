@@ -1,10 +1,8 @@
 package spexs
 
 type Sequence struct {
-	Tokens  []Token
-	Len     int
-	Section int
-	Count   int
+	Tokens []Token
+	Count  map[int]int
 }
 
 type Group struct {
@@ -19,16 +17,12 @@ type TokenInfo struct {
 	Name  string
 }
 
-type Section struct {
-	Count int
-}
-
 type Database struct {
 	Alphabet map[Token]TokenInfo
 	Groups   map[Token]Group
 
 	Sequences []Sequence
-	Sections  []Section
+	Total     []int // total for each section
 
 	Separator string // separator for joining pattern
 
@@ -42,7 +36,7 @@ func NewDatabase(estimatedSize int) *Database {
 		Groups:   make(map[Token]Group),
 
 		Sequences: make([]Sequence, 0, estimatedSize),
-		Sections:  make([]Section, 0, 2),
+		Total:     make([]int, 0),
 
 		Separator: "",
 
@@ -80,19 +74,9 @@ func (db *Database) AddToken(tokenName string) Token {
 	return token
 }
 
-func (db *Database) AddSequence(seq Sequence) {
-	db.Sequences = append(db.Sequences, seq)
-	if seq.Section >= len(db.Sections) {
-		df := seq.Section - len(db.Sections) + 1
-		extension := make([]Section, df)
-		db.Sections = append(db.Sections, extension...)
-	}
-	db.Sections[seq.Section].Count += 1
-}
-
-func (db *Database) ToTokens(tokenNames []string) []Token {
-	tokens := make([]Token, len(tokenNames))
-	for i, name := range tokenNames {
+func (db *Database) ToTokens(raw []string) []Token {
+	tokens := make([]Token, len(raw))
+	for i, name := range raw {
 		token, ok := db.nameToToken[name]
 		if !ok {
 			token = db.AddToken(name)
@@ -100,4 +84,27 @@ func (db *Database) ToTokens(tokenNames []string) []Token {
 		tokens[i] = token
 	}
 	return tokens
+}
+
+func sum(count []int) int {
+	total := 0
+	for _, val := range count {
+		total += val
+	}
+	return total
+}
+
+func (db *Database) MakeSection(seqs [][]string, count []int) int {
+	ext := make([]Sequence, len(seqs))
+	db.Total = append(db.Total, sum(count))
+	sec := len(db.Total) - 1
+
+	for i, raw := range seqs {
+		seq := Sequence{db.ToTokens(raw), make(map[int]int)}
+		seq.Count[sec] = count[i]
+		ext[i] = seq
+	}
+
+	db.Sequences = append(db.Sequences, ext...)
+	return sec
 }

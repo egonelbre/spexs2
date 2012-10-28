@@ -11,30 +11,30 @@ type Pooler interface {
 	Len() int
 }
 
-type ExtenderFunc func(p *Query) Querys
-type FilterFunc func(p *Query) bool
-type FitnessFunc func(p *Query) float64
-type FeatureFunc func(p *Query) float64, string
-type PostProcessFunc func(p *Query, s *Setup) error
+type Extender func(p *Query) Querys
+type Filter func(p *Query) bool
+type Feature func(p *Query) (float64, string)
+type PostProcess func(p *Query, s *Setup) error
 
 type Setup struct {
 	Db  *Database
 	Out Pooler
 	In  Pooler
 
-	Extender ExtenderFunc
+	Extender Extender
 
-	Extendable  FilterFunc
-	Outputtable FilterFunc
+	Extendable  Filter
+	Outputtable Filter
 
-	PostProcess PostProcessFunc
+	PostProcess PostProcess
 }
 
 func prepareSpexs(s *Setup) {
 	maxSeq := 0
 	for _, seq := range s.Db.Sequences {
-		if seq.Len > maxSeq {
-			maxSeq = seq.Len
+		length := len(seq.Tokens)
+		if length > maxSeq {
+			maxSeq = length
 		}
 	}
 

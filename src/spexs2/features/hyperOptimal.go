@@ -2,6 +2,11 @@ package features
 
 // find optimal hypergeometric split
 /*
+
+"math"
+"sort"
+"stats/hyper"
+
 func HyperOptimal(fore []int) FeatureFunc {
 	return func(q *Query) (float64, string) {
 		totalFore := countOnly(q.Db.Total, fore)

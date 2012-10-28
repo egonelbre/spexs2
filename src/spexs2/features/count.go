@@ -13,7 +13,7 @@ func Seqs(group []int) FeatureFunc {
 // the count of matching sequences
 func Matches(group []int) FeatureFunc {
 	return func(q *Query) (float64, string) {
-		matches := q.MatchSeqs()
+		matches := q.Matches()
 		return countOnly(matches, group), ""
 	}
 }
@@ -21,7 +21,7 @@ func Matches(group []int) FeatureFunc {
 // the count of occurences
 func Occs(group []int) FeatureFunc {
 	return func(q *Query) (float64, string) {
-		occs := q.MatchOccs()
+		occs := q.Occs()
 		return countOnly(occs, group), ""
 	}
 }
@@ -30,7 +30,7 @@ func Occs(group []int) FeatureFunc {
 func MatchesProp(group []int) FeatureFunc {
 	return func(q *Query) (float64, string) {
 		total := countOnly(q.Db.Total, group)
-		matches := q.MatchSeqs()
+		matches := q.Matches()
 		return countOnly(matches, group) / total, ""
 	}
 }
@@ -38,7 +38,7 @@ func MatchesProp(group []int) FeatureFunc {
 // the ratio between matching sequences (adjusted)
 func MatchesRatio(nom []int, denom []int) FeatureFunc {
 	return func(q *Query) (float64, string) {
-		matches := q.MatchSeqs()
+		matches := q.Matches()
 		countNom := countOnly(matches, nom) + 1.0
 		countDenom := countOnly(matches, denom) + 1.0
 		return countNom / countDenom, ""
@@ -48,7 +48,7 @@ func MatchesRatio(nom []int, denom []int) FeatureFunc {
 // the ratio between occurences (adjusted)
 func OccsRatio(nom []int, denom []int) FeatureFunc {
 	return func(q *Query) (float64, string) {
-		occs := q.MatchOccs()
+		occs := q.Occs()
 		countNom := countOnly(occs, nom) + 1.0
 		countDenom := countOnly(occs, denom) + 1.0
 		return countNom / countDenom, ""
@@ -61,7 +61,7 @@ func MatchesPropRatio(nom []int, denom []int) FeatureFunc {
 		totalNom := countOnly(q.Db.Total, nom) + 1.0
 		totalDenom := countOnly(q.Db.Total, denom) + 1.0
 
-		matches := q.MatchSeqs()
+		matches := q.Matches()
 		countNom := countOnly(matches, nom) + 1.0
 		countDenom := countOnly(matches, denom) + 1.0
 		return (countNom / totalNom) / (countDenom / totalDenom), ""

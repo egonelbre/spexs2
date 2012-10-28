@@ -2,10 +2,7 @@ package spexs
 
 import (
 	"bytes"
-	"math"
 	set "set/trie"
-	"sort"
-	"stats/hyper"
 )
 
 type RegToken struct {
@@ -14,7 +11,7 @@ type RegToken struct {
 	IsStar  bool
 }
 
-type featureResult struct {
+type feature struct {
 	Value float64
 	Info  string
 }
@@ -23,7 +20,7 @@ type Query struct {
 	Pat   []RegToken
 	Loc   *set.Set
 	Db    *Database
-	memo  map[FeatureFunc]featureResult
+	memo  map[*Feature]feature
 	cache countCache
 }
 
@@ -42,13 +39,13 @@ func NewQuery(parent *Query, token RegToken) *Query {
 
 	q.Pat = nil
 	q.Db = nil
-	q.cache = make(map[FeatureFunc]featureResult)
 	if parent != nil {
 		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)
 		q.Pat[len(q.Pat)-1] = token
 		q.Db = parent.Db
 	}
+	q.memo = make(map[*Feature]feature)
 	q.Loc = set.New()
 	q.cache.reset()
 
@@ -75,16 +72,16 @@ func (q *Query) Len() int {
 	return len(q.Pat)
 }
 
-func (q *Query) Memoized(f FeatureFunc) (float64, string) {
-	if res, ok := q.memo[f]; ok {
+func (q *Query) Memoized(f Feature) (float64, string) {
+	if res, ok := q.memo[&f]; ok {
 		return res.Value, res.Info
 	}
 	val, info := f(q)
-	q.memo[f] = Result{val, info}
+	q.memo[&f] = feature{val, info}
 	return val, info
 }
 
-type queryCache struct {
+type countCache struct {
 	count []int
 	occs  []int
 }
@@ -95,16 +92,16 @@ func (q *countCache) reset() {
 }
 
 func (q *Query) CacheValues() {
-	q.MatchSeqs()
-	q.MatchOccs()
+	q.Matches()
+	q.Occs()
 	q.Loc = nil
 }
 
-func (q *Query) MatchSeqs() []int {
+func (q *Query) Matches() []int {
 	if q.cache.count == nil {
 		db := q.Db
 		counted := make(map[uint]bool, q.Loc.Len())
-		count := make([]int, len(db.Sections))
+		count := make([]int, len(db.Total))
 
 		for _, val := range q.Loc.Iter() {
 			i, _ := DecodePos(val)
@@ -112,8 +109,11 @@ func (q *Query) MatchSeqs() []int {
 				continue
 			}
 			counted[i] = true
+
 			seq := db.Sequences[i]
-			count[seq.Section] += seq.Count
+			for sec, c := range seq.Count {
+				count[sec] += c
+			}
 		}
 
 		q.cache.count = count
@@ -121,18 +121,18 @@ func (q *Query) MatchSeqs() []int {
 	return q.cache.count
 }
 
-func (q *Query) MatchOccs() []int {
+func (q *Query) Occs() []int {
 	if q.cache.occs == nil {
 		db := q.Db
-		occs := make([]int, len(db.Sections))
-
+		count := make([]int, len(db.Total))
 		for _, val := range q.Loc.Iter() {
 			i, _ := DecodePos(val)
 			seq := db.Sequences[i]
-			occs[seq.Section] += seq.Count
+			for sec, c := range seq.Count {
+				count[sec] += c
+			}
 		}
-
-		q.cache.occs = occs
+		q.cache.occs = count
 	}
 	return q.cache.occs
 }

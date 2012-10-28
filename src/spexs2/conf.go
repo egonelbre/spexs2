@@ -9,9 +9,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	"spexs/extenders"
-	"spexs/filters"
 )
 
 const baseConfiguration = `{
@@ -28,11 +25,7 @@ const baseConfiguration = `{
 	"output" : {
 		"order" : "",
 		"sort" : "desc",
-		"args" : {},
 		"filter" : {},
-		"count": -1,
-		"header": "",
-		"format": "",
 		"queue" : ""
 	},
 	"print" : {

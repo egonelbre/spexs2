@@ -20,8 +20,9 @@ type PrinterFunc func(io.Writer, *Query)
 
 type AppSetup struct {
 	Setup
-	Fitness FitnessFunc
-	Printer PrinterFunc
+	Fitness  FitnessFunc
+	Printer  PrinterFunc
+	Features []FeatureFunc
 }
 
 func lengthFitness(p *Query) float64 {
