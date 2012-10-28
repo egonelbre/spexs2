@@ -17,17 +17,17 @@ func FeatureFilter(feature FeatureFunc, config interface{}) FilterFunc {
 
 	if low && high {
 		return func(q *Query) bool {
-			val := p.Memo(feature)
+			val := p.Memoized(feature)
 			return (min <= val) && (val <= max)
 		}
 	} else if low {
 		return func(q *Query) bool {
-			val := p.Memo(feature)
+			val := p.Memoized(feature)
 			return (min <= val) && (val <= max)
 		}
 	} else if high {
 		return func(q *Query) bool {
-			val := p.Memo(feature)
+			val := p.Memoized(feature)
 			return (min <= val) && (val <= max)
 		}
 	}

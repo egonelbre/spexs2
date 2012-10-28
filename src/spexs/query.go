@@ -24,7 +24,7 @@ type Query struct {
 	Loc   *set.Set
 	Db    *Database
 	memo  map[FeatureFunc]featureResult
-	cache queryCache
+	cache countCache
 }
 
 var PosOffset uint = 8
@@ -75,7 +75,7 @@ func (q *Query) Len() int {
 	return len(q.Pat)
 }
 
-func (q *Query) Memoized(f FeatureFunc) float64, string {
+func (q *Query) Memoized(f FeatureFunc) (float64, string) {
 	if res, ok := q.memo[f]; ok {
 		return res.Value, res.Info
 	}
@@ -85,30 +85,18 @@ func (q *Query) Memoized(f FeatureFunc) float64, string {
 }
 
 type queryCache struct {
-	count        []int
-	occs         []int
-	optimalSplit optimalSplit
+	count []int
+	occs  []int
 }
 
-type optimalSplit struct {
-	pvalue  float64
-	matches int
-	seqs    int
-}
-
-func (q *queryCache) reset() {
+func (q *countCache) reset() {
 	q.count = nil
 	q.occs = nil
-	q.optimalSplit.pvalue = -1.0
 }
 
 func (q *Query) CacheValues() {
-	if q.cache.count == nil {
-		q.MatchSeqs()
-	}
-	if q.cache.occs == nil {
-		q.MatchOccs()
-	}
+	q.MatchSeqs()
+	q.MatchOccs()
 	q.Loc = nil
 }
 
@@ -149,81 +137,15 @@ func (q *Query) MatchOccs() []int {
 	return q.cache.occs
 }
 
-type uintSlice []uint
-
-func (p uintSlice) Len() int           { return len(p) }
-func (p uintSlice) Less(i, j int) bool { return p[i] < p[j] }
-func (p uintSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-
-func uniq(data []uint) []uint {
-	if len(data) <= 0 {
-		return data
-	}
-	k := 1
-	for i := 0; i < len(data); i += 1 {
-		if data[k-1] != data[i] {
-			data[k] = data[i]
-			k += 1
-		}
-	}
-
-	return data[0:k]
+func (q *Query) String() string {
+	return q.string(true)
 }
 
-func (q *Query) FindOptimalSplit() float64 {
-	if q.cache.optimalSplit.pvalue < 0 {
-		db := q.Db
-		positions := make([]uint, q.Loc.Len())
-		k := 0
-		for _, val := range q.Loc.Iter() {
-			p, _ := DecodePos(val)
-			positions[k] = p
-			k += 1
-		}
-		sort.Sort(uintSlice(positions))
-		positions = uniq(positions)
-
-		matches := 0
-		for _, c := range q.MatchSeqs() {
-			matches += c
-		}
-
-		all := 0
-		for _, s := range db.Sections {
-			all += s.Count
-		}
-
-		accCount := 0
-		splt := optimalSplit{math.Inf(1.0), -1, -1}
-
-		for _, i := range positions {
-			seq := db.Sequences[i]
-			accCount += seq.Count
-			p := hyper.Split(accCount, matches, int(i+1), all)
-			if p < splt.pvalue {
-				splt = optimalSplit{p, accCount, int(i + 1)}
-			}
-		}
-		q.cache.optimalSplit = splt
-	}
-	return q.cache.optimalSplit.pvalue
+func (q *Query) StringLong() string {
+	return q.string(false)
 }
 
-func (q *Query) FindOptimalSplitSeqs() int {
-	if q.cache.optimalSplit.pvalue < 0 {
-		q.FindOptimalSplit()
-	}
-	return q.cache.optimalSplit.seqs
-}
-
-func (q *Query) FindOptimalSplitMatches() int {
-	if q.cache.optimalSplit.pvalue < 0 {
-		q.FindOptimalSplit()
-	}
-	return q.cache.optimalSplit.matches
-}
-
-func (q *Query) String(short bool) string {
+func (q *Query) string(short bool) string {
 	buf := bytes.NewBufferString("")
 	db := q.Db
 	for i, regToken := range q.Pat {

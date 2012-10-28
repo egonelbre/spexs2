@@ -72,19 +72,6 @@ func Run(s *Setup) {
 	}
 }
 
-func Parallel(f func(), routines int) {
-	stop := make(chan int, routines)
-	for i := 0; i < routines; i += 1 {
-		go func(rtn int) {
-			defer func() { stop <- 1 }()
-			f()
-		}(i)
-	}
-	for i := 0; i < routines; i += 1 {
-		<-stop
-	}
-}
-
 func RunParallel(s *Setup, routines int) {
 	prepareSpexs(s)
 

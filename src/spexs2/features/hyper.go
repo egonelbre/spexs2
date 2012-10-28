@@ -46,19 +46,3 @@ func HyperDown(fore []int, back []int) FeatureFunc {
 		return hyper.SplitDown(countFore, countBack, totalFore, totalBack), ""
 	}
 }
-
-// find optimal hypergeometric split
-/*
-func HyperOptimal(fore []int) FeatureFunc {
-	return func(q *Query) (float64, string) {
-		totalFore := countOnly(q.Db.Total, fore)
-		totalBack := countOnly(q.Db.Total, back)
-
-		matches := q.MatchSeqs()
-		countFore := countOnly(matches, fore)
-		countBack := countOnly(matches, back)
-
-		return hyper.SplitDown(countFore, countBack, totalFore, totalBack), ""
-	}
-}
-*/

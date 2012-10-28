@@ -5,11 +5,6 @@ import (
 	"log"
 	"os"
 	"sort"
-
-	"spexs/extenders"
-	"spexs/features"
-	"spexs/filters"
-	"spexs/fitnesses"
 )
 
 var lgh = log.New(os.Stderr, "", 0)
@@ -20,11 +15,11 @@ func PrintHelp() {
 	lgh.Printf("Flags: \n")
 	flag.PrintDefaults()
 
-	PrintStrFeatures()
-	PrintFeatures()
-	PrintFitnesses()
-	PrintFilters()
-	PrintExtenders()
+	//PrintStrFeatures()
+	//PrintFeatures()
+	//PrintFitnesses()
+	//PrintFilters()
+	//PrintExtenders()
 
 	lgh.Printf("\nExamples: \n")
 	lgh.Printf("  spexs2 -conf=conf.json inp=data.dna ref=random.dna\n")
@@ -65,6 +60,7 @@ func printSection(caption string, data map[string]string) {
 	}
 }
 
+/*
 func PrintStrFeatures() {
 	printCaption("Features")
 	for _, e := range features.Str {
@@ -103,3 +99,4 @@ func PrintExtenders() {
 		printItem(e.Name, e.Desc)
 	}
 }
+*/
