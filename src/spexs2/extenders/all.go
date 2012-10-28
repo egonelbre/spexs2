@@ -11,7 +11,7 @@ var All = [...]CreateFunc{
 	wrap(Regex),
 }
 
-func wrap(f ExtenderFunc) CreateFunc {
+func wrap(f Extender) CreateFunc {
 	return func(conf Conf) (Func, error) {
 		return f, nil
 	}

@@ -1,6 +1,8 @@
 package filters
 
-type CreateFunc func(Conf, Setup) (Func, error)
+import . "spexs"
+
+type CreateFunc func(Setup, []byte) (Filter, error)
 
 var All = [...]CreateFunc{
 	NoGroupingEnds,
