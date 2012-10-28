@@ -98,7 +98,7 @@ func runStats(setup *AppSetup) {
 
 	ext := setup.Extender
 	setup.Extender = func(q *Query) Querys {
-		seq = q.String(true)
+		seq = q.String()
 		counter += 1
 		return ext(q)
 	}

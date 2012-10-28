@@ -2,17 +2,17 @@ package extenders
 
 import . "spexs"
 
-type CreateFunc func(Conf, Setup) (Func, error)
+type CreateFunc func(Setup, []byte) Extender
 
-var All = [...]CreateFunc{
-	wrap(Simplex),
-	wrap(Groupex),
-	wrap(Starex),
-	wrap(Regex),
+var All = [...]Extender{
+	Simplex,
+	Groupex,
+	Starex,
+	Regex,
 }
 
 func wrap(f Extender) CreateFunc {
-	return func(conf Conf) (Func, error) {
-		return f, nil
+	return func(s Setup, data []byte) Extender {
+		return f
 	}
 }

@@ -85,10 +85,12 @@ func (p *Priority) Swap(i, j int) {
 }
 
 func (p *Priority) Less(i, j int) bool {
+	a, _ := p.items[i].Memoized(p.Fitness)
+	b, _ := p.items[i].Memoized(p.Fitness)
 	if p.ascending {
-		return p.Fitness(p.items[i]) < p.Fitness(p.items[j])
+		return a < b
 	}
-	return p.Fitness(p.items[i]) > p.Fitness(p.items[j])
+	return a > b
 }
 
 // heap.Interface

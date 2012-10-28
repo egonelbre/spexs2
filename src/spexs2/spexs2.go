@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	. "spexs"
-	"spexs/pool"
+	"spexs2/pool"
 	"time"
 )
 
@@ -19,6 +19,7 @@ var (
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
 	live             *bool   = flag.Bool("live", false, "print live output")
 	configs          *string = flag.String("conf", "", "configuration file(s), comma-delimited")
+	writeConf        *string = flag.String("writeconf", "", "write empty conf file")
 
 	stats       *bool = flag.Bool("stats", false, "print memory/extension statistics")
 	procs       *int  = flag.Int("procs", 16, "goroutines for extending")
@@ -52,16 +53,21 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *configs == "" {
-		fmt.Fprintf(os.Stderr, "Configuration file is required!\n")
+	conf := NewConf(*configs)
+
+	if *writeConf != "" {
+		conf.WriteToFile(*writeConf)
 		return
 	}
 
-	conf := ReadConfiguration(*configs)
+	if *configs == "" {
+		log.Fatal("Configuration file is required!")
+		return
+	}
 
 	info("reading input")
 
-	setup := CreateSetup(conf)
+	setup := NewAppSetup(conf)
 
 	// defined in runtime.go
 	setupRuntime()
@@ -72,7 +78,7 @@ func main() {
 
 	ifthen := func(val bool, f func(*AppSetup)) {
 		if val {
-			f(&setup)
+			f(setup)
 		}
 	}
 
@@ -92,7 +98,7 @@ func main() {
 
 	endStats()
 
-	limit := conf.Output.Count
+	limit := conf.Print.Count
 	setup.Printer(os.Stdout, nil)
 
 	info("getting best results")

@@ -1,6 +1,8 @@
 package features
 
-var All = [...]interface{}{
+type CreateFunc interface{}
+
+var All = [...]CreateFunc{
 	// simple counting
 	Seqs, Matches, Occs,
 	// ratios and proportions

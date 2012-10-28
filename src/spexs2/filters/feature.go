@@ -1,21 +1,22 @@
-package feature
+package filters
 
 import (
 	"encoding/json"
+	"log"
 	"math"
 	. "spexs"
 )
 
 type minmax struct{ Min, Max float64 }
 
-func FeatureFilter(feature FeatureFunc, data []byte) FilterFunc {
+func FeatureFilter(feature Feature, data []byte) Filter {
 	var conf struct{ Min, Max float64 }
 	conf.Min = math.NaN()
 	conf.Max = math.NaN()
 
 	err := json.Unmarshal(data, &conf)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	min, max := conf.Min, conf.Max
@@ -23,18 +24,18 @@ func FeatureFilter(feature FeatureFunc, data []byte) FilterFunc {
 
 	if low && high {
 		return func(q *Query) bool {
-			val := p.Memoized(feature)
+			val, _ := q.Memoized(feature)
 			return (min <= val) && (val <= max)
 		}
 	} else if low {
 		return func(q *Query) bool {
-			val := p.Memoized(feature)
-			return (min <= val) && (val <= max)
+			val, _ := q.Memoized(feature)
+			return min <= val
 		}
 	} else if high {
 		return func(q *Query) bool {
-			val := p.Memoized(feature)
-			return (min <= val) && (val <= max)
+			val, _ := q.Memoized(feature)
+			return val <= max
 		}
 	}
 

@@ -13,8 +13,8 @@ type Pooler interface {
 
 type Extender func(p *Query) Querys
 type Filter func(p *Query) bool
+type PostProcess func(p *Query) error
 type Feature func(p *Query) (float64, string)
-type PostProcess func(p *Query, s *Setup) error
 
 type Setup struct {
 	Db  *Database
@@ -66,7 +66,7 @@ func Run(s *Setup) {
 			}
 		}
 
-		if s.PostProcess(p, s) != nil {
+		if s.PostProcess(p) != nil {
 			break
 		}
 	}
@@ -107,7 +107,7 @@ func RunParallel(s *Setup, routines int) {
 					}
 				}
 
-				if s.PostProcess(p, s) != nil {
+				if s.PostProcess(p) != nil {
 					break
 				}
 			}

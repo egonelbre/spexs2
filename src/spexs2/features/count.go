@@ -3,67 +3,67 @@ package features
 import . "spexs"
 
 // the count of sequences
-func Seqs(group []int) FeatureFunc {
+func Seqs(group []int) Feature {
 	return func(q *Query) (float64, string) {
-		total := countOnly(q.Db.Total, group)
+		total := countf(q.Db.Total, group)
 		return total, ""
 	}
 }
 
 // the count of matching sequences
-func Matches(group []int) FeatureFunc {
+func Matches(group []int) Feature {
 	return func(q *Query) (float64, string) {
 		matches := q.Matches()
-		return countOnly(matches, group), ""
+		return countf(matches, group), ""
 	}
 }
 
 // the count of occurences
-func Occs(group []int) FeatureFunc {
+func Occs(group []int) Feature {
 	return func(q *Query) (float64, string) {
 		occs := q.Occs()
-		return countOnly(occs, group), ""
+		return countf(occs, group), ""
 	}
 }
 
 // the ratio of matching sequences to total count
-func MatchesProp(group []int) FeatureFunc {
+func MatchesProp(group []int) Feature {
 	return func(q *Query) (float64, string) {
-		total := countOnly(q.Db.Total, group)
+		total := countf(q.Db.Total, group)
 		matches := q.Matches()
-		return countOnly(matches, group) / total, ""
+		return countf(matches, group) / total, ""
 	}
 }
 
 // the ratio between matching sequences (adjusted)
-func MatchesRatio(nom []int, denom []int) FeatureFunc {
+func MatchesRatio(nom []int, denom []int) Feature {
 	return func(q *Query) (float64, string) {
 		matches := q.Matches()
-		countNom := countOnly(matches, nom) + 1.0
-		countDenom := countOnly(matches, denom) + 1.0
+		countNom := countf(matches, nom) + 1.0
+		countDenom := countf(matches, denom) + 1.0
 		return countNom / countDenom, ""
 	}
 }
 
 // the ratio between occurences (adjusted)
-func OccsRatio(nom []int, denom []int) FeatureFunc {
+func OccsRatio(nom []int, denom []int) Feature {
 	return func(q *Query) (float64, string) {
 		occs := q.Occs()
-		countNom := countOnly(occs, nom) + 1.0
-		countDenom := countOnly(occs, denom) + 1.0
+		countNom := countf(occs, nom) + 1.0
+		countDenom := countf(occs, denom) + 1.0
 		return countNom / countDenom, ""
 	}
 }
 
 // the ratio of proptions between matches (adjusted)
-func MatchesPropRatio(nom []int, denom []int) FeatureFunc {
+func MatchesPropRatio(nom []int, denom []int) Feature {
 	return func(q *Query) (float64, string) {
-		totalNom := countOnly(q.Db.Total, nom) + 1.0
-		totalDenom := countOnly(q.Db.Total, denom) + 1.0
+		totalNom := countf(q.Db.Total, nom) + 1.0
+		totalDenom := countf(q.Db.Total, denom) + 1.0
 
 		matches := q.Matches()
-		countNom := countOnly(matches, nom) + 1.0
-		countDenom := countOnly(matches, denom) + 1.0
+		countNom := countf(matches, nom) + 1.0
+		countDenom := countf(matches, denom) + 1.0
 		return (countNom / totalNom) / (countDenom / totalDenom), ""
 	}
 }

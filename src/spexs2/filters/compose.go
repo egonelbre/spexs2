@@ -6,7 +6,7 @@ import (
 
 func trueFilter(q *Query) bool { return true }
 
-func Compose(filters []FilterFunc) FilterFunc {
+func Compose(filters []Filter) Filter {
 	if len(filters) == 0 {
 		return trueFilter
 	} else if len(filters) == 1 {
@@ -15,7 +15,7 @@ func Compose(filters []FilterFunc) FilterFunc {
 
 	return func(q *Query) bool {
 		for _, filter := range filters {
-			if !filter(p) {
+			if !filter(q) {
 				return false
 			}
 		}

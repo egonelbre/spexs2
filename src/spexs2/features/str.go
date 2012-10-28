@@ -2,13 +2,13 @@ package features
 
 import . "spexs"
 
-func Pat() FeatureFunc {
+func Pat() Feature {
 	return func(q *Query) (float64, string) {
 		return 0.0, q.String()
 	}
 }
 
-func PatRegex() FeatureFunc {
+func PatRegex() Feature {
 	return func(q *Query) (float64, string) {
 		return 0.0, q.StringLong()
 	}

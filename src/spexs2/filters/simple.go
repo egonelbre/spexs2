@@ -6,16 +6,23 @@ import (
 	"strings"
 )
 
-// don't allow start or end to be grouping token
-func NoGroupingEnds(s Setup, data []byte) FilterFunc {
+// don't allow start to be grouping token
+func NoStartingGroup(s Setup, data []byte) Filter {
 	return func(q *Query) bool {
 		start := q.Pat[0]
-		end := q.Pat[len(q.Pat)-1]
-		return !start.IsGroup && !start.IsStar && !end.IsGroup
+		return !start.IsGroup && !start.IsStar
 	}
 }
 
-func NoTokens(s Setup, data []byte) FilterFunc {
+// don't allow ending to be grouping token
+func NoEndingGroup(s Setup, data []byte) Filter {
+	return func(q *Query) bool {
+		end := q.Pat[len(q.Pat)-1]
+		return !end.IsGroup
+	}
+}
+
+func NoTokens(s Setup, data []byte) Filter {
 	var filter struct{ Tokens string }
 	err := json.Unmarshal(data, &filter)
 	if err != nil {
@@ -23,8 +30,8 @@ func NoTokens(s Setup, data []byte) FilterFunc {
 	}
 
 	line := strings.TrimSpace(filter.Tokens)
-	tokenNames := strings.Split(line, setup.Db.Separator)
-	tokens := setup.Db.ToTokens(tokenNames)
+	tokenNames := strings.Split(line, s.Db.Separator)
+	tokens := s.Db.ToTokens(tokenNames)
 
 	contains := make(map[Token]bool, len(tokens))
 	for _, token := range tokens {

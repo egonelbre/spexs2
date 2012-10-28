@@ -2,8 +2,9 @@ package filters
 
 import . "spexs"
 
-type CreateFunc func(Setup, []byte) (Filter, error)
+type CreateFunc func(Setup, []byte) Filter
 
 var All = [...]CreateFunc{
-	NoGroupingEnds,
+	NoStartingGroup,
+	NoEndingGroup,
 }

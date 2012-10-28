@@ -3,11 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"log"
 	"os"
-	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -36,15 +33,20 @@ const baseConfiguration = `{
 	}
 }`
 
+type FileGroup struct {
+	File  string
+	Files []string
+}
+
 type Conf struct {
-	Data     map[string]struct{ Files []string }
+	Data     map[string]FileGroup
 	Alphabet struct {
 		Separator string
 		Groups    map[string]struct{ Elements string }
 	}
 	Extension struct {
 		Method string
-		Args   map[string]json.RawMessage
+		Args   json.RawMessage
 		Filter map[string]json.RawMessage
 	}
 	Output struct {
@@ -69,17 +71,29 @@ func (conf *Conf) ApplyJson(js string) {
 	}
 }
 
-func readBaseConfiguration(config string) Conf {
-	var conf Conf
+func (conf *Conf) WriteToFile(filename string) {
+	file, err := os.Create(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	enc := json.NewEncoder(file)
+	if err = enc.Encode(&conf); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func readBaseConfiguration(config string) *Conf {
+	conf := &Conf{}
 	dec := json.NewDecoder(bytes.NewBufferString(config))
-	if err := dec.Decode(&conf); err != nil {
+	if err := dec.Decode(conf); err != nil {
 		log.Println("Error in base configuration")
 		log.Fatal(err)
 	}
 	return conf
 }
 
-func ReadConfiguration(configs string) Conf {
+func NewConf(configs string) *Conf {
 	configFiles := strings.Split(configs, ",")
 	conf := readBaseConfiguration(baseConfiguration)
 
@@ -96,7 +110,7 @@ func ReadConfiguration(configs string) Conf {
 
 		dec := json.NewDecoder(f)
 
-		if err = dec.Decode(&conf); err != nil {
+		if err = dec.Decode(conf); err != nil {
 			log.Println("Error in configuration file: ", configFile)
 			log.Fatal(err)
 		}

@@ -1,10 +1,15 @@
 package utils
 
 import (
+	"path"
 	"reflect"
 	"runtime"
 )
 
-func FuncName(i interface{}) string {
-	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+func FuncFullName(fn interface{}) string {
+	return runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+}
+
+func FuncName(fn interface{}) string {
+	return path.Ext(FuncFullName(fn))[1:]
 }

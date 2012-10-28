@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -10,46 +9,45 @@ import (
 	"text/template"
 )
 
-func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
-	format := conf.Output.Format
-	header := conf.Output.Header
+type strFeature func(*Query) string
+
+func (s *AppSetup) initPrinter() {
+	format := s.conf.Print.Format
+	header := s.conf.Print.Header
+	showHeader := s.conf.Print.ShowHeader
+
 	if header == "" {
 		regHdr, _ := regexp.Compile(`[\{\}]`)
 		header = regHdr.ReplaceAllString(format, "")
 	}
 
-	regExtract, _ := regexp.Compile(`\{([a-zA-Z0-9\-]+)\}`)
-	regFixName, _ := regexp.Compile(`-`)
+	features := make(map[string]strFeature)
+	featureIdx := 0
 
-	fixedNames := make(map[string]string)
+	regFeature, _ := regexp.Compile(`[a-zA-Z?() @~,]+`)
+	format = regFeature.ReplaceAllStringFunc(format,
+		func(call string) string {
+			feature, info := s.makeFeatureEx(call)
 
-	feats := make(map[string]features.Func)
-	strFeats := make(map[string]features.StrFunc)
+			var feat strFeature
+			if !info {
+				feat = func(q *Query) string {
+					val, _ := q.Memoized(feature)
+					return fmt.Sprintf("%v", val)
+				}
+			} else {
+				feat = func(q *Query) string {
+					_, info := q.Memoized(feature)
+					return info
+				}
+			}
 
-	formatStrs := regExtract.FindAllStringSubmatch(format, -1)
-	for _, tokens := range formatStrs {
-		name := tokens[1]
+			name := fmt.Sprintf("f%v", featureIdx)
+			featureIdx += 1
+			features[name] = feat
 
-		f, valid := features.Get(name)
-		fs, validStr := features.GetStr(name)
-
-		if !(valid || validStr) {
-			log.Fatal(errors.New("No valid format parameter: " + name))
-		}
-
-		if valid {
-			feats[name] = f.Func
-		}
-
-		if validStr {
-			strFeats[name] = fs.Func
-		}
-
-		fixedNames[name] = regFixName.ReplaceAllString(name, "")
-	}
-
-	format = regExtract.ReplaceAllString(format, `{{.$1}}`)
-	format = regFixName.ReplaceAllString(format, "")
+			return "{{." + name + "}}"
+		})
 
 	tmpl, err := template.New("").Parse(format)
 	if err != nil {
@@ -57,35 +55,23 @@ func CreatePrinter(conf Conf, setup AppSetup) PrinterFunc {
 		log.Fatal(err)
 	}
 
-	f := func(out io.Writer, q *Query) {
+	s.Printer = func(out io.Writer, q *Query) {
 		if q == nil {
-			if header != "hidden" {
+			if showHeader {
 				fmt.Print(header)
 			}
 			return
 		}
 
-		values := make(map[string]interface{})
-
-		for name, fixName := range fixedNames {
-			f, valid := feats[name]
-			if valid {
-				values[fixName] = f(q)
-			}
-			fstr, valid := strFeats[name]
-			if valid {
-				values[fixName] = fstr(q)
-			}
+		values := make(map[string]string)
+		for name, fn := range features {
+			values[name] = fn(q)
 		}
 
 		err = tmpl.Execute(out, values)
 		if err != nil {
-			log.Println("Unable to output qtern.")
+			log.Println("Unable to output pattern.")
 			log.Fatal(err)
 		}
 	}
-
-	//TODO: test printer
-
-	return f
 }

@@ -86,6 +86,11 @@ func (db *Database) ToTokens(raw []string) []Token {
 	return tokens
 }
 
+func (db *Database) MakeSection() int {
+	db.Total = append(db.Total, 0)
+	return len(db.Total) - 1
+}
+
 func sum(count []int) int {
 	total := 0
 	for _, val := range count {
@@ -94,11 +99,10 @@ func sum(count []int) int {
 	return total
 }
 
-func (db *Database) MakeSection(seqs [][]string, count []int) int {
-	ext := make([]Sequence, len(seqs))
-	db.Total = append(db.Total, sum(count))
-	sec := len(db.Total) - 1
+func (db *Database) AddSequences(sec int, seqs [][]string, count []int) {
+	db.Total[sec] += sum(count)
 
+	ext := make([]Sequence, len(seqs))
 	for i, raw := range seqs {
 		seq := Sequence{db.ToTokens(raw), make(map[int]int)}
 		seq.Count[sec] = count[i]
@@ -106,5 +110,11 @@ func (db *Database) MakeSection(seqs [][]string, count []int) int {
 	}
 
 	db.Sequences = append(db.Sequences, ext...)
-	return sec
+}
+
+func (db *Database) AddSequence(sec int, raw []string, count int) {
+	db.Total[sec] += count
+	seq := Sequence{db.ToTokens(raw), make(map[int]int)}
+	seq.Count[sec] = count
+	db.Sequences = append(db.Sequences, seq)
 }
