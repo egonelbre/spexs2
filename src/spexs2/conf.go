@@ -3,8 +3,11 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"log"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -30,7 +33,8 @@ const baseConfiguration = `{
 		"showheader" : true,
 		"header" : "",
 		"format" : ""
-	}
+	},
+	"aliases" : {}
 }`
 
 type FileGroup struct {
@@ -60,6 +64,46 @@ type Conf struct {
 		ShowHeader bool
 		Header     string
 		Format     string
+	}
+	Aliases map[string]struct {
+		Desc   string
+		Modify []string
+	}
+}
+
+func (conf *Conf) SetFQN(name string, value string) {
+	// extension.filter.pvalue.min
+	// convert to {"extension":{"filter":{"pvalue":{"min":value}}}}
+	// then apply as an json
+	names := strings.Split(name, ".")
+	js := value
+
+	_, err := strconv.ParseFloat(value, 64)
+	isNumeric := err == nil
+	isJson := len(value) > 1 && value[0] == '{'
+
+	if !isNumeric && !isJson {
+		// probably a string
+		js = `"` + value + `"`
+	}
+
+	for i := len(names) - 1; i >= 0; i -= 1 {
+		js = `{"` + names[i] + `":` + js + `}`
+	}
+
+	conf.ApplyJson(js)
+}
+
+func (conf *Conf) Set(ref string, value string) {
+	names := make([]string, 1)
+	names[0] = ref
+
+	if _, valid := conf.Aliases[ref]; valid {
+		names = conf.Aliases[ref].Modify
+	}
+
+	for _, name := range names {
+		conf.SetFQN(name, value)
 	}
 }
 
@@ -116,20 +160,18 @@ func NewConf(configs string) *Conf {
 		}
 	}
 
-	/*
-		regArg, _ := regexp.Compile("^\\s*-*(.*)=(.*)$")
+	regArg, _ := regexp.Compile("^\\s*-*(.*)=(.*)$")
 
-		for _, arg := range flag.Args() {
-			if !regArg.MatchString(arg) {
-				log.Fatal("Argument was not in correct form: ", arg)
-			}
-			tokens := regArg.FindStringSubmatch(arg)
-			name := tokens[1]
-			value := tokens[2]
-
-			conf.Set(name, value)
+	for _, arg := range flag.Args() {
+		if !regArg.MatchString(arg) {
+			log.Fatal("Argument was not in correct form: ", arg)
 		}
-	*/
+		tokens := regArg.FindStringSubmatch(arg)
+		name := tokens[1]
+		value := tokens[2]
+
+		conf.Set(name, value)
+	}
 
 	return conf
 }

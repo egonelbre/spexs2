@@ -9,19 +9,19 @@ import (
 type Priority struct {
 	token     chan int
 	items     []*Query
-	Fitness   Feature
+	Order     Feature
 	length    int
 	limit     int
 	ascending bool
 }
 
-func NewPriority(fitness Feature, limit int, ascending bool) *Priority {
+func NewPriority(order Feature, limit int, ascending bool) *Priority {
 	p := &Priority{}
 	p.token = make(chan int, 1)
 	p.items = make([]*Query, limit+100)
 	p.length = 0
 	p.limit = limit
-	p.Fitness = fitness
+	p.Order = order
 	p.token <- 1
 	p.ascending = ascending
 
@@ -85,8 +85,8 @@ func (p *Priority) Swap(i, j int) {
 }
 
 func (p *Priority) Less(i, j int) bool {
-	a, _ := p.items[i].Memoized(p.Fitness)
-	b, _ := p.items[i].Memoized(p.Fitness)
+	a, _ := p.items[i].Memoized(p.Order)
+	b, _ := p.items[j].Memoized(p.Order)
 	if p.ascending {
 		return a < b
 	}

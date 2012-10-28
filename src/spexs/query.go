@@ -145,6 +145,14 @@ func (q *Query) StringLong() string {
 	return q.string(false)
 }
 
+func (q *Query) StringRaw() string {
+	buf := bytes.NewBufferString("")
+	for _, tok := range q.Pat {
+		buf.WriteRune(rune(tok.Token))
+	}
+	return string(buf.Bytes())
+}
+
 func (q *Query) string(short bool) string {
 	buf := bytes.NewBufferString("")
 	db := q.Db

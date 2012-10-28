@@ -63,6 +63,7 @@ func (s *AppSetup) initInput() {
 func (s *AppSetup) initOutput() {
 	if s.conf.Output.Queue == "lifo" {
 		s.Out = pool.NewLifo()
+		print("lifo")
 		return
 	}
 	size := s.conf.Print.Count
