@@ -17,7 +17,7 @@
         }
     },
     "Output": {
-        "Order": "Matches(fore)",
+        "Order": "Hyper(fore, back)",
         "Sort": "desc",
         "Filter": {
         	"MatchesRatio(fore, back)" : {"min" : 2},
