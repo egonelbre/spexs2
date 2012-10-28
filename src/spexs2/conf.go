@@ -15,10 +15,7 @@ import (
 )
 
 const baseConfiguration = `{
-	"data" : {
-		"input" : "",
-		"reference" : ""
-	},
+	"data" : {},
 	"alphabet" : {
 		"separator" : "",
 		"groups" : {}
@@ -38,37 +35,36 @@ const baseConfiguration = `{
 		"format": "",
 		"queue" : ""
 	},
-	"aliases" : {
+	"print" : {
+		"count" : -1,
+		"showheader" : true,
+		"header" : "",
+		"format" : ""
 	}
 }`
 
 type Conf struct {
-	Data struct {
-		Input     string
-		Reference string
-	}
+	Data     map[string]struct{ Files []string }
 	Alphabet struct {
 		Separator string
 		Groups    map[string]struct{ Elements string }
 	}
 	Extension struct {
 		Method string
-		Args   map[string]extenders.Conf
-		Filter map[string]filters.Conf
+		Args   map[string]json.RawMessage
+		Filter map[string]json.RawMessage
 	}
 	Output struct {
 		Order  string
 		Sort   string
-		Args   map[string]map[string]interface{}
-		Filter map[string]filters.Conf
-		Count  int
-		Header string
-		Format string
+		Filter map[string]json.RawMessage
 		Queue  string
 	}
-	Aliases map[string]struct {
-		Desc   string
-		Modify []string
+	Print struct {
+		Count      int
+		ShowHeader bool
+		Header     string
+		Format     string
 	}
 }
 
@@ -80,42 +76,6 @@ func (conf *Conf) ApplyJson(js string) {
 	}
 }
 
-func (conf *Conf) SetFQN(name string, value string) {
-	// extension.filter.pvalue.min
-	// convert to {"extension":{"filter":{"pvalue":{"min":value}}}}
-	// then apply as an json
-	names := strings.Split(name, ".")
-	js := value
-
-	_, err := strconv.ParseFloat(value, 64)
-	isNumeric := err == nil
-	isJson := len(value) > 1 && value[0] == '{'
-
-	if !isNumeric && !isJson {
-		// probably a string
-		js = `"` + value + `"`
-	}
-
-	for i := len(names) - 1; i >= 0; i -= 1 {
-		js = `{"` + names[i] + `":` + js + `}`
-	}
-
-	conf.ApplyJson(js)
-}
-
-func (conf *Conf) Set(ref string, value string) {
-	names := make([]string, 1)
-	names[0] = ref
-
-	if _, valid := conf.Aliases[ref]; valid {
-		names = conf.Aliases[ref].Modify
-	}
-
-	for _, name := range names {
-		conf.SetFQN(name, value)
-	}
-}
-
 func readBaseConfiguration(config string) Conf {
 	var conf Conf
 	dec := json.NewDecoder(bytes.NewBufferString(config))
@@ -123,7 +83,6 @@ func readBaseConfiguration(config string) Conf {
 		log.Println("Error in base configuration")
 		log.Fatal(err)
 	}
-
 	return conf
 }
 
@@ -150,18 +109,20 @@ func ReadConfiguration(configs string) Conf {
 		}
 	}
 
-	regArg, _ := regexp.Compile("^\\s*-*(.*)=(.*)$")
+	/*
+		regArg, _ := regexp.Compile("^\\s*-*(.*)=(.*)$")
 
-	for _, arg := range flag.Args() {
-		if !regArg.MatchString(arg) {
-			log.Fatal("Argument was not in correct form: ", arg)
+		for _, arg := range flag.Args() {
+			if !regArg.MatchString(arg) {
+				log.Fatal("Argument was not in correct form: ", arg)
+			}
+			tokens := regArg.FindStringSubmatch(arg)
+			name := tokens[1]
+			value := tokens[2]
+
+			conf.Set(name, value)
 		}
-		tokens := regArg.FindStringSubmatch(arg)
-		name := tokens[1]
-		value := tokens[2]
-
-		conf.Set(name, value)
-	}
+	*/
 
 	return conf
 }
