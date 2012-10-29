@@ -8,7 +8,7 @@
         "Groups": {"." : {"elements":"ACDEFGHIKLMNPRQSTVWY"}}
     },
     "Extension": {
-        "Method": "Groupex",
+        "Method": "Group",
         "Filter": {
         	"PatGroups()" : {"max" : 3},
         	"PatLength()" : {"max" : 6},

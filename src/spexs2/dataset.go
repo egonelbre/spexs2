@@ -32,7 +32,7 @@ func CreateDatabase(conf *Conf) (*Database, *Dataset) {
 	ds := NewDataset()
 
 	for id, grp := range conf.Alphabet.Groups {
-		group := Group{}
+		group := TokenGroup{}
 
 		group.Name = id
 		group.FullName = "[" + grp.Elements + "]"

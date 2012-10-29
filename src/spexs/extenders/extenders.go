@@ -35,7 +35,7 @@ func extend(base *Query, db *Database, querys queryMap) {
 	}
 }
 
-func Simplex(base *Query) Querys {
+func Simple(base *Query) Querys {
 	querys := make(queryMap)
 	extend(base, base.Db, querys)
 	return toQuerys(querys)
@@ -54,7 +54,7 @@ func combine(base *Query, db *Database, querys queryMap, isStar bool) {
 	}
 }
 
-func Groupex(base *Query) Querys {
+func Group(base *Query) Querys {
 	querys := make(queryMap)
 	extend(base, base.Db, querys)
 	combine(base, base.Db, querys, false)
@@ -91,7 +91,7 @@ func starExtend(base *Query, db *Database, querys queryMap) {
 	}
 }
 
-func Starex(base *Query) Querys {
+func Star(base *Query) Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
 	stars := make(queryMap)

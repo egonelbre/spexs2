@@ -5,7 +5,7 @@ type Sequence struct {
 	Count  map[int]int
 }
 
-type Group struct {
+type TokenGroup struct {
 	Token    Token
 	Elems    []Token
 	Name     string
@@ -19,7 +19,7 @@ type TokenInfo struct {
 
 type Database struct {
 	Alphabet map[Token]TokenInfo
-	Groups   map[Token]Group
+	Groups   map[Token]TokenGroup
 
 	Sequences []Sequence
 	Total     []int // total for each section
@@ -33,7 +33,7 @@ type Database struct {
 func NewDatabase(estimatedSize int) *Database {
 	return &Database{
 		Alphabet: make(map[Token]TokenInfo),
-		Groups:   make(map[Token]Group),
+		Groups:   make(map[Token]TokenGroup),
 
 		Sequences: make([]Sequence, 0, estimatedSize),
 		Total:     make([]int, 0),
@@ -60,7 +60,7 @@ func (db *Database) nextToken() Token {
 	return newToken
 }
 
-func (db *Database) AddGroup(group Group) Token {
+func (db *Database) AddGroup(group TokenGroup) Token {
 	token := db.nextToken()
 	group.Token = token
 	db.Groups[token] = group
