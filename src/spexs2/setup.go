@@ -8,10 +8,10 @@ import (
 	"regexp"
 	. "spexs"
 
-	"spexs2/extenders"
-	"spexs2/features"
-	"spexs2/filters"
-	"spexs2/pool"
+	"spexs/extenders"
+	"spexs/features"
+	"spexs/filters"
+	"spexs/pool"
 )
 
 type Printer func(io.Writer, *Query)
