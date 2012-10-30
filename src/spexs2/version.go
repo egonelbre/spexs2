@@ -1,6 +1,6 @@
 package main
 
 const (
-	theVersion = "0.9.4-41-g03b4eb9-rev273"
-	theBuildTime="10/30/12 13:02:59"
+	theVersion = "0.9.4-42-g04bfe18-rev274"
+	theBuildTime="10/30/12 13:46:36"
 )

@@ -28,7 +28,7 @@ var Help = `
   NoEndingGroup   : removes patterns with ending group token
   	                (useful only in output.filter)
 
-  NoTokens : removes patterns contining tokens specified in "Tokens" argument
+  NoTokens : removes patterns containing tokens specified in "Tokens" argument
 
 :Feature:
   Any feature can be used as a filter

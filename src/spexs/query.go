@@ -3,6 +3,7 @@ package spexs
 import (
 	"bytes"
 	set "set/trie"
+	"unsafe"
 )
 
 type RegToken struct {
@@ -20,9 +21,11 @@ type Query struct {
 	Pat   []RegToken
 	Loc   *set.Set
 	Db    *Database
-	memo  map[*Feature]feature
+	memo  map[featureHash]feature
 	cache countCache
 }
+
+type featureHash unsafe.Pointer
 
 var PosOffset uint = 8
 
@@ -45,7 +48,7 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Pat[len(q.Pat)-1] = token
 		q.Db = parent.Db
 	}
-	q.memo = make(map[*Feature]feature)
+	q.memo = make(map[featureHash]feature)
 	q.Loc = set.New()
 	q.cache.reset()
 
@@ -72,12 +75,17 @@ func (q *Query) Len() int {
 	return len(q.Pat)
 }
 
+func hash(fn Feature) featureHash {
+	return featureHash(*(*unsafe.Pointer)(unsafe.Pointer(&fn)))
+}
+
 func (q *Query) Memoized(f Feature) (float64, string) {
-	if res, ok := q.memo[&f]; ok {
+	h := hash(f)
+	if res, ok := q.memo[h]; ok {
 		return res.Value, res.Info
 	}
 	val, info := f(q)
-	q.memo[&f] = feature{val, info}
+	q.memo[h] = feature{val, info}
 	return val, info
 }
 
