@@ -3,6 +3,6 @@
 SPEXS=../bin/spexs2
 
 time $SPEXS -stats \
-	-conf=data/proteins/conf.json \
-	inp=data/proteins/g21.inp \
-	ref=data/proteins/g27.ref
+	-conf=proteins/conf.json \
+	inp=proteins/g21.inp \
+	ref=proteins/g27.ref

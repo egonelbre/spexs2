@@ -75,12 +75,8 @@ func (q *Query) Len() int {
 	return len(q.Pat)
 }
 
-func hash(fn Feature) featureHash {
-	return featureHash(*(*unsafe.Pointer)(unsafe.Pointer(&fn)))
-}
-
 func (q *Query) Memoized(f Feature) (float64, string) {
-	h := hash(f)
+	h := featureHash(*(*unsafe.Pointer)(unsafe.Pointer(&f)))
 	if res, ok := q.memo[h]; ok {
 		return res.Value, res.Info
 	}

@@ -1,0 +1,35 @@
+{
+	"Data": {
+		"inp" : { 
+			"File" : "examples/dna/dna.small", 
+			"CountSeparator" : " "
+		}
+	},
+	"Alphabet": {
+		"Separator": ""
+	},
+	"Extension": {
+		"Method": "Star",
+		"Filter": {
+			"Matches(inp)" : {"min" : 3},
+			"NoStartingGroup" : {}
+		}
+	},
+	"Output": {
+		"Order": "Matches(inp)",
+		"Sort": "asc",
+		"Filter": {
+			"Matches(inp)" : {"min" : 3}
+		},
+		"Queue": ""
+	},
+	"Print": {
+		"Count": 10,
+		"ShowHeader": true,
+		"Header": "Pat\tOccs\tMatches\n",
+		"Format": "Pat?()\tOccs(inp)\tMatches(inp)\n"
+	},
+	"Aliases": {
+		"inp" : {"desc":"input file", "modify":["Data.inp.File"]}
+	}
+}

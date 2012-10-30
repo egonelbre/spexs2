@@ -1,0 +1,39 @@
+{
+	"Data" : {
+		"inp" : {"File":""},
+		"ref" : {"File":""}
+	},
+
+	"Alphabet" : {
+		"Separator" : " ",
+		"Groups" : {
+			"(bind)": {"Elements":"and or if then else the a my"}
+		}
+	},
+	"Extension" : {
+		"Method" : "Regex",
+		"Filter" : {
+			"PatGroups()" : {"max":3},
+			"PatLength()" : {"max":6},
+			"NoStartingGroup" : {}
+		}
+	},
+	"Output" : {
+		"Order" : "Matches(inp)",
+		"Sort" : "asc",
+		"Filter" : {
+			"PatLength()" : { "min" : 2},
+			"NoStartingGroup" : {},
+			"NoEndingGroup" : {}
+		}
+	},
+	"Print" : {
+		"ShowHeader" : true,
+		"Format": "'Pat?()'\t\tMatches(inp)\tMatches(ref)\tHyper(inp,ref)\n",
+		"Count": 100
+	},
+	"aliases" : {
+		"inp" : {"desc":"input file",            "modify":["Data.inp.File"]},
+		"ref" : {"desc":"reference file",        "modify":["Data.ref.File"]}
+	}
+}
