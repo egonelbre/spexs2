@@ -1,7 +1,7 @@
 package features
 
 import (
-	"errors"
+	"fmt"
 	"reflect"
 	. "spexs"
 	"utils"
@@ -15,7 +15,7 @@ var All = [...]CreateFunc{
 	// ratios and proportions
 	MatchesProp, MatchesRatio, OccsRatio, MatchesPropRatio,
 	// hypergeometrics
-	Hyper, HyperApprox, HyperDown,
+	Hyper, HyperApprox, HyperDown, HyperOptimal,
 	// pattern length related
 	PatLength, PatChars, PatGroups, PatStars,
 	// only strings
@@ -31,14 +31,14 @@ func Get(name string) (CreateFunc, bool) {
 	return nil, false
 }
 
-func CallCreateWithArgs(function CreateFunc, args [][]int) (Feature, error) {
+func CallCreateWithArgs(function CreateFunc, args []interface{}) (Feature, error) {
 	fn, fnType, ok := functionAndType(function)
 	if !ok {
-		return nil, errors.New("argument is not a function")
+		return nil, fmt.Errorf("Argument is not a function!")
 	}
 
 	if fnType.NumIn() != len(args) {
-		return nil, errors.New("invalid number of arguments")
+		return nil, fmt.Errorf("Invalid number of arguments, requires %v", fnType.NumIn())
 	}
 
 	arguments := make([]reflect.Value, fnType.NumIn())

@@ -1,38 +1,37 @@
 {
-	"data" : {
-		"input" : "",
-		"reference" : ""
+	"Data": {
+		"inp" : { "File" : "" }
 	},
-
-	"alphabet" : {
-		"separator" : " ",
-		"groups" : {}
+	"Alphabet": {
+		"Separator": " "
 	},
-
-	"extension" : {
-		"method" : "star",
-		"filter" : {
-			"pat-groups" : {"max": 3},
-			"pat-length" : {"max": 6},
-			"query-match-seqs" : {"min" : 10},
-			"no-starting-group" : {}
+	"Extension": {
+		"Method": "Star",
+		"Filter": {
+			"PatGroups()" : {"max" : 3},
+			"PatLength()" : {"max" : 6},
+			"Matches(inp)" : {"min" : 10},
+			"NoStartingGroup" : {}	
 		}
 	},
-	"output" : {
-		"order" : "match-hyper-optimal-pvalue",
-		"sort" : "desc",
-		"filter" : {
-			"query-match-seqs" : {"min" : 10},
-			"no-starting-group" : {},
-			"no-ending-group" : {},
-			"match-hyper-optimal-pvalue" : {"max": 0.003 }
+	"Output": {
+		"Order": "HyperOptimal(inp)",
+		"Sort": "desc",
+		"Filter": {
+			"Matches(inp)" : {"min" : 10},
+			"HyperOptimal(inp)" : {"max" : 1e-3},
+			"NoStartingGroup" : {},
+			"NoEndingGroup" : {}
 		},
-		"header": "<$fg/#fg>\t<$all/#all>\tp-value\tpattern\n",
-		"format": "<{match-hyper-optimal-matches}/{match-hyper-optimal-seqs}>\t<{query-match-seqs}/{query-seqs}>\t{match-hyper-optimal-pvalue}\t'{pat}'\n",
-		"count": 100
+		"Queue": ""
 	},
-	"aliases" : {
-		"inp" : {"desc":"input file",            "modify":["data.input"]},
-		"ref" : {"desc":"reference file",        "modify":["data.reference"]}
+	"Print": {
+		"Count": 100,
+		"ShowHeader": true,
+		"Header": "<$fg/#fg>\t<$all/#all>\tp-value\tpattern\n",
+		"Format": "HyperOptimal?(inp)\t<Matches(inp)/Seqs(inp)>\tHyperOptimal(inp)\tPat?()\n"
+	},
+	"Aliases": {
+		"inp" : {"desc":"input file", "modify":["Data.inp.File"]}
 	}
 }

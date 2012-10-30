@@ -94,7 +94,6 @@ func (q *countCache) reset() {
 func (q *Query) CacheValues() {
 	q.Matches()
 	q.Occs()
-	q.Loc = nil
 }
 
 func (q *Query) Matches() []int {

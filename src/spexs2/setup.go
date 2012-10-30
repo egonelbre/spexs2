@@ -46,10 +46,11 @@ func NewAppSetup(conf *Conf) *AppSetup {
 
 	features := s.Features
 	s.PostProcess = func(q *Query) error {
-		q.CacheValues()
 		for _, fn := range features {
 			q.Memoized(fn)
 		}
+		q.CacheValues()
+		q.Loc = nil
 		return nil
 	}
 
@@ -117,9 +118,9 @@ func (s *AppSetup) groupToIds(group string) []int {
 	return s.Dataset.Groups[group]
 }
 
-func (s *AppSetup) parseFeature(call string) (name string, args [][]int, info bool) {
+func (s *AppSetup) parseFeature(call string) (name string, args []interface{}, info bool) {
 	name, groups, info := parseCall(call)
-	args = make([][]int, len(groups))
+	args = make([]interface{}, len(groups))
 	for i, group := range groups {
 		args[i] = s.groupToIds(group)
 	}
