@@ -10,6 +10,7 @@ type CreateFunc func(Setup, []byte) Filter
 var All = [...]CreateFunc{
 	NoStartingGroup,
 	NoEndingGroup,
+	NoTokens,
 }
 
 func Get(name string) (CreateFunc, bool) {
@@ -26,6 +27,8 @@ var Help = `
   NoStartingGroup : removes patterns with starting group token
   NoEndingGroup   : removes patterns with ending group token
   	                (useful only in output.filter)
+
+  NoTokens : removes patterns contining tokens specified in "Tokens" argument
 
 :Feature:
   Any feature can be used as a filter
