@@ -18,17 +18,17 @@ func PrintHelp() {
 	lgh.Printf("Flags: \n")
 	flag.PrintDefaults()
 
-	lgh.Printf("\nExtenders #\n")
+	lgh.Printf("\n### Extenders\n")
 	lgh.Printf(extenders.Help)
 
-	lgh.Printf("\nFilters #\n")
+	lgh.Printf("\n### Filters\n")
 	lgh.Printf(filters.Help)
 
-	lgh.Printf("\nFeatures #\n")
+	lgh.Printf("\n### Features\n")
 	lgh.Printf(features.Help)
 
-	lgh.Printf("\nExamples: \n")
-	lgh.Printf("  spexs2 -conf=conf.json inp=data.dna ref=random.dna\n")
+	//lgh.Printf("\n### Examples\n")
+	//lgh.Printf("  spexs2 -conf=conf.json inp=data.dna ref=random.dna\n")
 
 	lgh.Printf("\n")
 }

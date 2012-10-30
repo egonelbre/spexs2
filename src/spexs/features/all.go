@@ -73,9 +73,9 @@ var Help = `
     ((Matches(A)+1)/(Total(A)+1))/((Matches(B)+1)/(Total(B)+1))
 
 :Statistics:
-  Hyper(fore, back) : hypergeometric p-value
-  HyperApprox(fore, back): approx. hypergeometric p-value (~5 sig. digits)
-  HyperDown(fore, back) : hypergeometric split down
+  Hyper(fore, back)       : hypergeometric p-value
+  HyperApprox(fore, back) : approx. hypergeometric p-value (~5 sig. digits)
+  HyperDown(fore, back)   : hypergeometric split down
 `
 
 func functionAndType(fn interface{}) (v reflect.Value, t reflect.Type, ok bool) {
