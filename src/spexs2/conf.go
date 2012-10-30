@@ -107,7 +107,7 @@ func NewConf(configFile string) *Conf {
 			log.Fatal("Argument was not in correct form: ", arg)
 		}
 		tokens := regArg.FindStringSubmatch(arg)
-		fmt.Printf("%+v\n", tokens)
+
 		replace, _ := regexp.Compile(`\$` + tokens[1] + `\$`)
 		replacement := ([]byte)(tokens[2])
 		data = replace.ReplaceAll(data, replacement)
