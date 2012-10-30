@@ -2,6 +2,20 @@ package features
 
 import . "spexs"
 
+// pattern as a string
+func Pat() Feature {
+	return func(q *Query) (float64, string) {
+		return 0.0, q.String()
+	}
+}
+
+// pattern as regular expression
+func PatRegex() Feature {
+	return func(q *Query) (float64, string) {
+		return 0.0, q.StringLong()
+	}
+}
+
 // length of the pattern
 func PatLength() Feature {
 	return func(q *Query) (float64, string) {

@@ -2,6 +2,19 @@ package features
 
 import . "spexs"
 
+// function to sum elements in arr by group
+func count(arr []int, group []int) int {
+	total := 0
+	for _, id := range group {
+		total += arr[id]
+	}
+	return total
+}
+
+func countf(arr []int, group []int) float64 {
+	return float64(count(arr, group))
+}
+
 // the count of sequences
 func Seqs(group []int) Feature {
 	return func(q *Query) (float64, string) {

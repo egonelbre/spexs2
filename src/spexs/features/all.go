@@ -1,5 +1,12 @@
 package features
 
+import (
+	"errors"
+	"reflect"
+	. "spexs"
+	"utils"
+)
+
 type CreateFunc interface{}
 
 var All = [...]CreateFunc{
@@ -13,6 +20,34 @@ var All = [...]CreateFunc{
 	PatLength, PatChars, PatGroups, PatStars,
 	// only strings
 	Pat, PatRegex,
+}
+
+func Get(name string) (CreateFunc, bool) {
+	for _, fn := range All {
+		if utils.FuncName(fn) == name {
+			return fn, true
+		}
+	}
+	return nil, false
+}
+
+func CallCreateWithArgs(function CreateFunc, args [][]int) (Feature, error) {
+	fn, fnType, ok := functionAndType(function)
+	if !ok {
+		return nil, errors.New("argument is not a function")
+	}
+
+	if fnType.NumIn() != len(args) {
+		return nil, errors.New("invalid number of arguments")
+	}
+
+	arguments := make([]reflect.Value, fnType.NumIn())
+	for i := range args {
+		arguments[i] = reflect.ValueOf(args[i])
+	}
+	result := fn.Call(arguments)
+	inter := result[0].Interface()
+	return inter.(Feature), nil
 }
 
 var Help = `
@@ -42,3 +77,13 @@ var Help = `
   HyperApprox(fore, back): approx. hypergeometric p-value (~5 sig. digits)
   HyperDown(fore, back) : hypergeometric split down
 `
+
+func functionAndType(fn interface{}) (v reflect.Value, t reflect.Type, ok bool) {
+	v = reflect.ValueOf(fn)
+	ok = v.Kind() == reflect.Func
+	if !ok {
+		return
+	}
+	t = v.Type()
+	return
+}

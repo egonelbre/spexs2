@@ -1,17 +1,32 @@
 package extenders
 
-import . "spexs"
+import (
+	. "spexs"
+	"utils"
+)
 
 type CreateFunc func(Setup, []byte) Extender
 
 var All = [...]Extender{
-	Simple, Group, Star, Regex,
+	Simple,
+	Group,
+	Star,
+	Regex,
 }
 
 func wrap(f Extender) CreateFunc {
 	return func(s Setup, data []byte) Extender {
 		return f
 	}
+}
+
+func Get(name string) (Extender, bool) {
+	for _, fn := range All {
+		if utils.FuncName(fn) == name {
+			return fn, true
+		}
+	}
+	return nil, false
 }
 
 var Help = `
