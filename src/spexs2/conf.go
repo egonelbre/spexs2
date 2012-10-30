@@ -38,8 +38,11 @@ const baseConfiguration = `{
 }`
 
 type FileGroup struct {
-	File  string
-	Files []string
+	File     string
+	Files    []string
+	FileList string
+
+	CountSeparator string
 }
 
 type Conf struct {

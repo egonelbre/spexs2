@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	. "spexs"
+	"strconv"
 	"strings"
 )
 
@@ -48,6 +49,35 @@ func CreateDatabase(conf *Conf) (*Database, *Dataset) {
 	return db, ds
 }
 
+func loadFileList(filename string) []string {
+	var (
+		file  *os.File
+		err   error
+		line  string
+		lines []string
+	)
+
+	lines = make([]string, 0)
+	if file, err = os.Open(filename); err != nil {
+		log.Println("Did not find file list:", filename)
+		log.Fatal(err)
+	}
+
+	reader := bufio.NewReader(file)
+	for err == nil {
+		if line, err = reader.ReadString('\n'); err != nil && err != io.EOF {
+			log.Fatal(err)
+		}
+
+		line = strings.TrimSpace(line)
+		if line != "" {
+			lines = append(lines, line)
+		}
+
+	}
+	return lines
+}
+
 func (ds *Dataset) AddFileGroups(db *Database, groups map[string]FileGroup) {
 	for group, filegroup := range groups {
 
@@ -57,9 +87,13 @@ func (ds *Dataset) AddFileGroups(db *Database, groups map[string]FileGroup) {
 		}
 		files = append(files, filegroup.Files...)
 
+		if filegroup.FileList != "" {
+			files = append(files, loadFileList(filegroup.FileList)...)
+		}
+
 		ids := make([]int, 0)
 		for _, file := range files {
-			id := ds.AddFile(db, file)
+			id := ds.AddFile(db, file, filegroup.CountSeparator)
 			ids = append(ids, id)
 		}
 		ds.Groups[group] = ids
@@ -79,7 +113,7 @@ func removeEmpty(names []string) []string {
 	return result[0:i]
 }
 
-func (ds *Dataset) AddFile(db *Database, filename string) int {
+func (ds *Dataset) AddFile(db *Database, filename string, countSeparator string) int {
 	var (
 		file   *os.File
 		reader *bufio.Reader
@@ -92,10 +126,22 @@ func (ds *Dataset) AddFile(db *Database, filename string) int {
 		log.Fatal(err)
 	}
 
-	section := db.MakeSection()
+	isCounted := countSeparator != ""
 
+	section := db.MakeSection()
 	reader = bufio.NewReader(file)
 	for err == nil {
+		count := 1
+
+		if isCounted {
+			if line, err = reader.ReadString(countSeparator[1]); err != nil && err != io.EOF {
+				log.Fatal(err)
+			}
+			if count, err = strconv.Atoi(line); err != nil {
+				log.Fatal(err)
+			}
+		}
+
 		if line, err = reader.ReadString('\n'); err != nil && err != io.EOF {
 			log.Fatal(err)
 		}
@@ -108,7 +154,7 @@ func (ds *Dataset) AddFile(db *Database, filename string) int {
 			continue
 		}
 
-		db.AddSequence(section, tokenNames, 1)
+		db.AddSequence(section, tokenNames, count)
 	}
 
 	name := path.Base(filename)
