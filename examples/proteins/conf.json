@@ -1,7 +1,7 @@
 {
 	"Data": {
-		"fore" : { "File" : "" },
-		"back" : { "File" : "" }
+		"fore" : { "File" : "$inp$" },
+		"back" : { "File" : "$ref$" }
 	},
 	"Alphabet": {
 		"Separator": "",
@@ -32,11 +32,5 @@
 		"ShowHeader": true,
 		"Header": "",
 		"Format": "Pat?()\tPatLength()\tPatGroups()\tPatChars()\tMatches(fore)\tMatches(back)\tMatchesRatio(fore,back)\tHyper(fore,back)\n"
-	},
-	"Aliases": {
-		"inp" : {"desc":"input file",            "modify":["data.fore.file"]},
-		"ref" : {"desc":"reference file",        "modify":["data.back.file"]},
-		"p-min" : {"desc":"minimum for p-value", "modify":["output.filter.p-value.min"]},
-		"p-max" : {"desc":"maximum for p-value", "modify":["output.filter.p-value.max"]}
 	}
 }

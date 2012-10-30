@@ -1,7 +1,7 @@
 {
 	"Data" : {
-		"inp" : {"File":""},
-		"ref" : {"File":""}
+		"inp" : {"File":"$inp$"},
+		"ref" : {"File":"$ref$"}
 	},
 
 	"Alphabet" : {
@@ -31,9 +31,5 @@
 		"ShowHeader" : true,
 		"Format": "'Pat?()'\t\tMatches(inp)\tMatches(ref)\tHyper(inp,ref)\n",
 		"Count": 100
-	},
-	"aliases" : {
-		"inp" : {"desc":"input file",            "modify":["Data.inp.File"]},
-		"ref" : {"desc":"reference file",        "modify":["Data.ref.File"]}
 	}
 }

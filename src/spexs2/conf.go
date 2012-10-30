@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
-	"strconv"
-	"strings"
 )
 
 const baseConfiguration = `{
@@ -68,54 +68,6 @@ type Conf struct {
 		Header     string
 		Format     string
 	}
-	Aliases map[string]struct {
-		Desc   string
-		Modify []string
-	}
-}
-
-func (conf *Conf) SetFQN(name string, value string) {
-	// extension.filter.pvalue.min
-	// convert to {"extension":{"filter":{"pvalue":{"min":value}}}}
-	// then apply as an json
-	names := strings.Split(name, ".")
-	js := value
-
-	_, err := strconv.ParseFloat(value, 64)
-	isNumeric := err == nil
-	isJson := len(value) > 1 && value[0] == '{'
-
-	if !isNumeric && !isJson {
-		// probably a string
-		js = `"` + value + `"`
-	}
-
-	for i := len(names) - 1; i >= 0; i -= 1 {
-		js = `{"` + names[i] + `":` + js + `}`
-	}
-
-	conf.ApplyJson(js)
-}
-
-func (conf *Conf) Set(ref string, value string) {
-	names := make([]string, 1)
-	names[0] = ref
-
-	if _, valid := conf.Aliases[ref]; valid {
-		names = conf.Aliases[ref].Modify
-	}
-
-	for _, name := range names {
-		conf.SetFQN(name, value)
-	}
-}
-
-func (conf *Conf) ApplyJson(js string) {
-	dec := json.NewDecoder(bytes.NewBufferString(js))
-	if err := dec.Decode(&conf); err != nil {
-		log.Println("Error in json:", js)
-		log.Fatal(err)
-	}
 }
 
 func (conf *Conf) WriteToFile(filename string) {
@@ -140,40 +92,34 @@ func readBaseConfiguration(config string) *Conf {
 	return conf
 }
 
-func NewConf(configs string) *Conf {
-	configFiles := strings.Split(configs, ",")
+func NewConf(configFile string) *Conf {
 	conf := readBaseConfiguration(baseConfiguration)
 
-	for _, configFile := range configFiles {
-		if configFile == "" {
-			continue
-		}
-
-		f, err := os.Open(configFile)
-		if err != nil {
-			log.Println("Unable to read configuration file: ", configFile)
-			continue
-		}
-
-		dec := json.NewDecoder(f)
-
-		if err = dec.Decode(conf); err != nil {
-			log.Println("Error in configuration file: ", configFile)
-			log.Fatal(err)
-		}
+	data, err := ioutil.ReadFile(configFile)
+	if err != nil {
+		log.Println("Unable to read configuration file: ", configFile)
+		log.Fatal(err)
 	}
 
-	regArg, _ := regexp.Compile("^\\s*-*(.*)=(.*)$")
-
+	regArg, _ := regexp.Compile(`^\s*(.*)=(.*)$`)
 	for _, arg := range flag.Args() {
 		if !regArg.MatchString(arg) {
 			log.Fatal("Argument was not in correct form: ", arg)
 		}
 		tokens := regArg.FindStringSubmatch(arg)
-		name := tokens[1]
-		value := tokens[2]
+		fmt.Printf("%+v\n", tokens)
+		replace, _ := regexp.Compile(`\$` + tokens[1] + `\$`)
+		replacement := ([]byte)(tokens[2])
+		data = replace.ReplaceAll(data, replacement)
+	}
 
-		conf.Set(name, value)
+	replace, _ := regexp.Compile(`\$[^\$]*\$`)
+	data = replace.ReplaceAll(data, []byte{})
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+	if err = dec.Decode(conf); err != nil {
+		log.Println("Error in configuration file: ", configFile)
+		log.Fatal(err)
 	}
 
 	return conf

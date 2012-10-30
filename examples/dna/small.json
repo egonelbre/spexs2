@@ -1,7 +1,7 @@
 {
 	"Data": {
 		"inp" : { 
-			"File" : "examples/dna/dna.small", 
+			"File" : "$inp$",
 			"CountSeparator" : " "
 		}
 	},
@@ -28,8 +28,5 @@
 		"ShowHeader": true,
 		"Header": "Pat\tOccs\tMatches\n",
 		"Format": "Pat?()\tOccs(inp)\tMatches(inp)\n"
-	},
-	"Aliases": {
-		"inp" : {"desc":"input file", "modify":["Data.inp.File"]}
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"Data": {
-		"inp" : { "File" : "" }
+		"inp" : { "File" : "$inp$" }
 	},
 	"Alphabet": {
 		"Separator": " "
@@ -30,8 +30,5 @@
 		"ShowHeader": true,
 		"Header": "<$fg/#fg>\t<$all/#all>\tp-value\tpattern\n",
 		"Format": "HyperOptimal?(inp)\t<Matches(inp)/Seqs(inp)>\tHyperOptimal(inp)\tPat?()\n"
-	},
-	"Aliases": {
-		"inp" : {"desc":"input file", "modify":["Data.inp.File"]}
 	}
 }
