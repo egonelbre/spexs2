@@ -137,9 +137,11 @@ func (ds *Dataset) AddFile(db *Database, filename string, countSeparator string)
 			if line, err = reader.ReadString(countSeparator[0]); err != nil && err != io.EOF {
 				log.Fatal(err)
 			}
-			line = line[:len(line)-1]
-			if count, err = strconv.Atoi(line); err != nil {
-				log.Fatal(err)
+			line = strings.TrimSpace(line)
+			if line != "" {
+				if count, err = strconv.Atoi(line); err != nil {
+					log.Fatal(err)
+				}
 			}
 		}
 
