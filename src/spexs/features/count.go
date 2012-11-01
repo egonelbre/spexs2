@@ -15,8 +15,8 @@ func countf(arr []int, group []int) float64 {
 	return float64(count(arr, group))
 }
 
-// the count of sequences
-func Seqs(group []int) Feature {
+// the total count of sequences
+func Total(group []int) Feature {
 	return func(q *Query) (float64, string) {
 		total := countf(q.Db.Total, group)
 		return total, ""
@@ -28,6 +28,30 @@ func Matches(group []int) Feature {
 	return func(q *Query) (float64, string) {
 		matches := q.Matches()
 		return countf(matches, group), ""
+	}
+}
+
+// the count of matching unique sequences
+func Seqs(group []int) Feature {
+	return func(q *Query) (float64, string) {
+		db := q.Db
+		counted := make(map[uint]bool, 30)
+		count := 0
+		for _, val := range q.Loc.Iter() {
+			i, _ := DecodePos(val)
+			if counted[i] {
+				continue
+			}
+			counted[i] = true
+			seq := db.Sequences[i]
+			for _, sec := range group {
+				if _, ok := seq.Count[sec]; ok {
+					count += 1
+					break
+				}
+			}
+		}
+		return float64(count), ""
 	}
 }
 

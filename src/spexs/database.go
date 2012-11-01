@@ -1,5 +1,7 @@
 package spexs
 
+import "bytes"
+
 type Sequence struct {
 	Tokens []Token
 	Count  map[int]int
@@ -27,6 +29,7 @@ type Database struct {
 	Separator string // separator for joining pattern
 
 	nameToToken map[string]Token
+	strToSeq    map[string]int
 	lastToken   Token
 }
 
@@ -40,6 +43,7 @@ func NewDatabase(estimatedSize int) *Database {
 
 		Separator: "",
 
+		strToSeq:    make(map[string]int),
 		nameToToken: make(map[string]Token),
 		lastToken:   Token(0),
 	}
@@ -114,7 +118,22 @@ func (db *Database) AddSequences(sec int, seqs [][]string, count []int) {
 
 func (db *Database) AddSequence(sec int, raw []string, count int) {
 	db.Total[sec] += count
-	seq := Sequence{db.ToTokens(raw), make(map[int]int)}
+	tokens := db.ToTokens(raw)
+	hash := hashTokens(tokens)
+	if si, ok := db.strToSeq[hash]; ok {
+		db.Sequences[si].Count[sec] += count
+		return
+	}
+	seq := Sequence{tokens, make(map[int]int)}
 	seq.Count[sec] = count
 	db.Sequences = append(db.Sequences, seq)
+	db.strToSeq[hash] = len(db.Sequences) - 1
+}
+
+func hashTokens(toks []Token) string {
+	var buf bytes.Buffer
+	for _, t := range toks {
+		buf.WriteRune(rune(t))
+	}
+	return string(buf.Bytes())
 }

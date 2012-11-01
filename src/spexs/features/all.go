@@ -11,7 +11,7 @@ type CreateFunc interface{}
 
 var All = [...]CreateFunc{
 	// simple counting
-	Seqs, Matches, Occs,
+	Total, Matches, Seqs, Occs,
 	// ratios and proportions
 	MatchesProp, MatchesRatio, OccsRatio, MatchesPropRatio,
 	// hypergeometrics
@@ -61,8 +61,9 @@ var Help = `
   PatStars()  : count of star tokens in pattern
 
 :Counting:
-  Seqs(group)    : total count of sequences
+  Total(group)   : total count of sequences
   Matches(group) : count of matching sequences
+  Seqs(group)    : count of unique sequences in matches
   Occs(group)    : count of occurences in the sequences
 
 :Ratios:

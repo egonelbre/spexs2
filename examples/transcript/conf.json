@@ -29,6 +29,6 @@
 		"Count": 100,
 		"ShowHeader": true,
 		"Header": "<$fg/#fg>\t<$all/#all>\tp-value\tpattern\n",
-		"Format": "HyperOptimal?(inp)\t<Matches(inp)/Seqs(inp)>\tHyperOptimal(inp)\tPat?()\n"
+		"Format": "HyperOptimal?(inp)\t<Matches(inp)/Total(inp)>\tHyperOptimal(inp)\tPat?()\n"
 	}
 }

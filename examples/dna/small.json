@@ -27,6 +27,6 @@
 		"Count": 10,
 		"ShowHeader": true,
 		"Header": "Pat\tOccs\tMatches\n",
-		"Format": "Pat?()\tOccs(inp)\tMatches(inp)\n"
+		"Format": "Pat?()\tOccs(inp)\tMatches(inp)\tSeqs(inp)\n"
 	}
 }
