@@ -104,13 +104,20 @@ func NewConf(configFile string) *Conf {
 		}
 		tokens := regArg.FindStringSubmatch(arg)
 
-		replace, _ := regexp.Compile(`\$` + tokens[1] + `\$`)
+		replace, _ := regexp.Compile(`\$` + tokens[1] + `(=[^$]*)?\$`)
 		replacement := ([]byte)(tokens[2])
 		data = replace.ReplaceAll(data, replacement)
 	}
 
-	replace, _ := regexp.Compile(`\$[^\$]*\$`)
-	data = replace.ReplaceAll(data, []byte{})
+	regDefaults, _ := regexp.Compile(`\$[^\$]+\$`)
+	regDefault, _ := regexp.Compile(`\$[^=]+=(.*)\$`)
+	data = regDefaults.ReplaceAllFunc(data, func(repl []byte) []byte {
+		defaults := regDefault.FindSubmatch(repl)
+		if defaults != nil {
+			return defaults[1]
+		}
+		return nil
+	})
 
 	dec := json.NewDecoder(bytes.NewReader(data))
 	if err = dec.Decode(conf); err != nil {

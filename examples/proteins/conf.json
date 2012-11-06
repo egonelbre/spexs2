@@ -17,12 +17,12 @@
 			"PatGroups()" : {"max" : 3},
 			"PatLength()" : {"max" : 6},
 			"Matches(fore)" : {"min" : 20},
-			"NoStartingGroup" : {}
+			"NoStartingGroup" : {"enabled" : "$enabled=true$"}
 		},
 		"Outputtable" : {
 			"MatchesRatio(fore, back)" : {"min" : 2},
 			"HyperApprox(fore, back)" : {"max" : 1e-3},
-			"NoStartingGroup" : {},
+			"NoStartingGroup" : {"enabled" : "$enabled=true$"},
 			"NoEndingGroup" : {}
 		}
 	},
