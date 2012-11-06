@@ -17,7 +17,7 @@
 			"PatGroups()" : {"max" : 3},
 			"PatLength()" : {"max" : 6},
 			"Matches(fore)" : {"min" : 20},
-			"NoStartingGroup" : {"enabled": "$nostart$"}
+			"NoStartingGroup" : {}
 		},
 		"Outputtable" : {
 			"MatchesRatio(fore, back)" : {"min" : 2},
@@ -27,7 +27,6 @@
 		}
 	},
 	"Output": {
-		"Method" : "Sorted",
 		"SortBy": ["-Hyper(fore, back)"],
 		"Count": 100
 	},

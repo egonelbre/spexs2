@@ -14,7 +14,8 @@ const baseConfiguration = `{
 	"Dataset" : {},
 	"Reader" : {
 		"Method" : "Delimited",
-		"Separator" : ""
+		"Separator" : "",
+		"CountSeparator" : ""
 	},
 	"Extension" : {
 		"Method" : "",
