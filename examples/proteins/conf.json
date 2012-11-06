@@ -1,36 +1,47 @@
 {
-	"Data": {
+	"Dataset": {
 		"fore" : { "File" : "$inp$" },
 		"back" : { "File" : "$ref$" }
 	},
-	"Alphabet": {
-		"Separator": "",
-		"Groups": {"." : {"elements":"ACDEFGHIKLMNPRQSTVWY"}}
+	"Reader" : {
+		"Method" : "Counted",
+		"Args" : {
+			"Separator" : "",
+			"CountSeparator": "\t"
+		}
 	},
 	"Extension": {
 		"Method": "Group",
-		"Filter": {
+		"Groups" : {
+			"." : { "elements" : "ACDEFGHIKLMNPRQSTVWY"}
+		},
+		"Extendable": {
 			"PatGroups()" : {"max" : 3},
 			"PatLength()" : {"max" : 6},
 			"Matches(fore)" : {"min" : 20},
 			"NoStartingGroup" : {}	
-		}
-	},
-	"Output": {
-		"Order": "Hyper(fore, back)",
-		"Sort": "desc",
-		"Filter": {
+		},
+		"Outputtable" : {
 			"MatchesRatio(fore, back)" : {"min" : 2},
 			"HyperApprox(fore, back)" : {"max" : 1e-3},
 			"NoStartingGroup" : {},
 			"NoEndingGroup" : {}
-		},
-		"Queue": ""
+		}
 	},
-	"Print": {
-		"Count": 100,
-		"ShowHeader": true,
-		"Header": "",
-		"Format": "Pat?()\tPatLength()\tPatGroups()\tPatChars()\tMatches(fore)\tMatches(back)\tMatchesRatio(fore,back)\tHyper(fore,back)\n"
+	"Output": {
+		"Method" : "Sorted",
+		"Args" : {
+			"SortBy": "Hyper(fore, back)",
+			"Order": "desc",
+			"Count": 100,
+		}
+	},
+	"Printer" : {
+		"Method" : "Formatted",
+		"Args" : {
+			"ShowHeader": true,
+			"Header": "",
+			"Format": "Pat?()\tPatLength()\tPatGroups()\tPatChars()\tMatches(fore)\tMatches(back)\tMatchesRatio(fore,back)\tHyper(fore,back)\n"
+		}
 	}
 }
