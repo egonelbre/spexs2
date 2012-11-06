@@ -1,35 +1,39 @@
 {
-	"Data": {
+	"Dataset": {
 		"fore" : { "File" : "$inp$" },
 		"back" : { "File" : "$ref$" }
 	},
-	"Alphabet": {
-		"Separator": "",
-		"Groups": {"." : {"elements":"ACDEFGHIKLMNPRQSTVWY"}}
+	"Reader" : {
+		"Method" : "Delimited",
+		"Separator" : "",
+		"CountSeparator": ""
 	},
 	"Extension": {
 		"Method": "Group",
-		"Filter": {
+		"Groups" : {
+			"." : { "elements" : "ACDEFGHIKLMNPRQSTVWY"}
+		},
+		"Extendable": {
 			"PatGroups()" : {"max" : 3},
 			"PatLength()" : {"max" : 6},
 			"Matches(fore)" : {"min" : 20},
-			"NoStartingGroup" : {}	
-		}
-	},
-	"Output": {
-		"Order": "Hyper(fore, back)",
-		"Sort": "desc",
-		"Filter": {
+			"NoStartingGroup" : {}
+		},
+		"Outputtable" : {
 			"MatchesRatio(fore, back)" : {"min" : 2},
 			"HyperApprox(fore, back)" : {"max" : 1e-3},
 			"NoStartingGroup" : {},
 			"NoEndingGroup" : {}
-		},
-		"Queue": ""
+		}
 	},
-	"Print": {
-		"Count": 100,
+	"Output": {
+		"SortBy": ["-Hyper(fore, back)"],
+		"Count": 100
+	},
+	"Printer" : {
+		"Method" : "Formatted",
 		"ShowHeader": true,
+		"Reverse": true,
 		"Header": "",
 		"Format": "Pat?()\tPatLength()\tPatGroups()\tPatChars()\tMatches(fore)\tMatches(back)\tMatchesRatio(fore,back)\tHyper(fore,back)\n"
 	}

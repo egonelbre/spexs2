@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"regexp"
 	. "spexs"
 
 	"spexs/extenders"
-	"spexs/features"
 	"spexs/filters"
 	"spexs/pool"
 )
@@ -58,21 +56,19 @@ func NewAppSetup(conf *Conf) *AppSetup {
 }
 
 func (s *AppSetup) initInput() {
+	info("init input")
 	s.In = pool.NewLifo()
 }
 
 func (s *AppSetup) initOutput() {
-	if s.conf.Output.Queue == "lifo" {
-		s.Out = pool.NewLifo()
-		print("lifo")
-		return
-	}
-	size := s.conf.Print.Count
-	asc := s.conf.Output.Sort == "asc"
-	s.Out = pool.NewPriority(s.Order, size, asc)
+	info("init output")
+	size := s.conf.Output.Count
+	s.Out = pool.NewPriority(s.Order, size)
 }
 
 func (s *AppSetup) initExtender() {
+	info("init extender")
+
 	if s.conf.Extension.Method == "" {
 		log.Fatal("Extender not defined!")
 	}
@@ -93,93 +89,41 @@ func (s *AppSetup) initExtender() {
 	s.Extender = extender
 }
 
-func parseCall(call string) (name string, groups []string, info bool) {
-	regNameArgs, _ := regexp.Compile(`([a-zA-Z0-9]+)(\??)\((.*)\)`)
-	regArgs, _ := regexp.Compile("~?[@a-zA-Z0-9]+")
-	tokens := regNameArgs.FindStringSubmatch(call)
-	if tokens == nil {
-		log.Fatalf("Invalid name: %v", call)
-	}
-	name = tokens[1]
-	info = (tokens[2] == "?")
-	groups = regArgs.FindAllString(tokens[3], -1)
-	return
-}
-
-func (s *AppSetup) groupToIds(group string) []int {
-	if group == "@" {
-		ids := make([]int, len(s.Dataset.Files))
-		for i, _ := range ids {
-			ids[i] = i
-		}
-		return ids
-	}
-
-	return s.Dataset.Groups[group]
-}
-
-func (s *AppSetup) parseFeature(call string) (name string, args []interface{}, info bool) {
-	name, groups, info := parseCall(call)
-	args = make([]interface{}, len(groups))
-	for i, group := range groups {
-		args[i] = s.groupToIds(group)
-	}
-	return
-}
-
-func (s *AppSetup) makeFeature(call string) Feature {
-	feature, _ := s.makeFeatureEx(call)
-	return feature
-}
-
-func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
-	name, args, info := s.parseFeature(call)
-
-	normalized := fmt.Sprintf("%+v%+v", name, args)
-	if feature, ok := s.Features[normalized]; ok {
-		return feature, info
-	}
-
-	create, ok := features.Get(name)
-	if !ok {
-		log.Fatal("No feature named ", name)
-	}
-
-	feature, err := features.CallCreateWithArgs(create, args)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	s.Features[normalized] = feature
-	return feature, info
-}
-
-func (s *AppSetup) makeFilter(name string, data json.RawMessage) Filter {
+func (s *AppSetup) makeFilter(name string, data json.RawMessage) (Filter, error) {
+	info("make filter " + name)
 	bytes, _ := data.MarshalJSON()
+
+	if isDisabled(bytes) {
+		return nil, fmt.Errorf("filter is disabled")
+	}
 
 	createFilter, ok := filters.Get(name)
 	if ok {
-		return createFilter(s.Setup, bytes)
+		return createFilter(s.Setup, bytes), nil
 	}
 
 	// didn't find filter, let's create it from feature
 	feature := s.makeFeature(name)
 	filter := filters.FeatureFilter(feature, bytes)
-	return filter
+	return filter, nil
 }
 
 func (s *AppSetup) makeFilters(conf map[string]json.RawMessage) Filter {
+	info("make filters")
 	fns := make([]Filter, 0)
 	for name, data := range conf {
-		fn := s.makeFilter(name, data)
-		fns = append(fns, fn)
+		fn, err := s.makeFilter(name, data)
+		if err == nil {
+			fns = append(fns, fn)
+		}
 	}
 	return filters.Compose(fns)
 }
 
 func (s *AppSetup) initFilters() {
-	s.Extendable = s.makeFilters(s.conf.Extension.Filter)
-	s.Outputtable = s.makeFilters(s.conf.Output.Filter)
+	info("init filters")
+	s.Extendable = s.makeFilters(s.conf.Extension.Extendable)
+	s.Outputtable = s.makeFilters(s.conf.Extension.Outputtable)
 }
 
 func lengthFitness(q *Query) float64 {
@@ -187,7 +131,8 @@ func lengthFitness(q *Query) float64 {
 }
 
 func (s *AppSetup) initOrder() {
-	order := s.conf.Output.Order
+	info("init output order", s.conf.Output.SortBy[0])
+	order := s.conf.Output.SortBy[0]
 	if order == "" {
 		log.Fatal("Output ordering not defined!")
 	}

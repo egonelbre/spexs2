@@ -28,11 +28,10 @@ func NewDataset() *Dataset {
 
 func CreateDatabase(conf *Conf) (*Database, *Dataset) {
 	db := NewDatabase(1024)
-	db.Separator = conf.Alphabet.Separator
+	db.Separator = conf.Reader.Separator
 
 	ds := NewDataset()
-
-	for id, grp := range conf.Alphabet.Groups {
+	for id, grp := range conf.Extension.Groups {
 		group := TokenGroup{}
 
 		group.Name = id
@@ -45,7 +44,7 @@ func CreateDatabase(conf *Conf) (*Database, *Dataset) {
 		db.AddGroup(group)
 	}
 
-	ds.AddFileGroups(db, conf.Data)
+	ds.AddFileGroups(db, conf.Dataset, conf.Reader.CountSeparator)
 	return db, ds
 }
 
@@ -78,7 +77,7 @@ func loadFileList(filename string) []string {
 	return lines
 }
 
-func (ds *Dataset) AddFileGroups(db *Database, groups map[string]FileGroup) {
+func (ds *Dataset) AddFileGroups(db *Database, groups map[string]FileGroup, countSeparator string) {
 	for group, filegroup := range groups {
 
 		files := make([]string, 0)
@@ -93,7 +92,7 @@ func (ds *Dataset) AddFileGroups(db *Database, groups map[string]FileGroup) {
 
 		ids := make([]int, 0)
 		for _, file := range files {
-			id := ds.AddFile(db, file, filegroup.CountSeparator)
+			id := ds.AddFile(db, file, countSeparator)
 			ids = append(ids, id)
 		}
 		ds.Groups[group] = ids
@@ -120,7 +119,6 @@ func (ds *Dataset) AddFile(db *Database, filename string, countSeparator string)
 		line   string
 		err    error
 	)
-
 	if file, err = os.Open(filename); err != nil {
 		log.Println("Did not find data file:", filename)
 		log.Fatal(err)

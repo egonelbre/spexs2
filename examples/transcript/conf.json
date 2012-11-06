@@ -1,33 +1,32 @@
 {
-	"Data": {
+	"Dataset": {
 		"inp" : { "File" : "$inp$" }
 	},
-	"Alphabet": {
-		"Separator": " "
+	"Reader": {
+		"Method" : "Delimited",
+		"Separator": " ",
+		"CountSeparator" : ""
 	},
 	"Extension": {
 		"Method": "Star",
-		"Filter": {
+		"Extendable": {
 			"PatGroups()" : {"max" : 3},
 			"PatLength()" : {"max" : 6},
 			"Matches(inp)" : {"min" : 10},
-			"NoStartingGroup" : {}	
-		}
-	},
-	"Output": {
-		"Order": "HyperOptimal(inp)",
-		"Sort": "desc",
-		"Filter": {
+			"NoStartingGroup" : {}
+		},
+		"Outputtable": {
 			"Matches(inp)" : {"min" : 10},
 			"HyperOptimal(inp)" : {"max" : 1e-3},
 			"NoStartingGroup" : {},
 			"NoEndingGroup" : {}
-		},
-		"Queue": ""
+		}
 	},
-	"Print": {
-		"Count": 100,
-		"ShowHeader": true,
+	"Output": {
+		"SortBy": ["-HyperOptimal(inp)"],
+		"Count": 100
+	},
+	"Printer": {
 		"Header": "<$fg/#fg>\t<$all/#all>\tp-value\tpattern\n",
 		"Format": "HyperOptimal?(inp)\t<Matches(inp)/Total(inp)>\tHyperOptimal(inp)\tPat?()\n"
 	}

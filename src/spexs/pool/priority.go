@@ -7,15 +7,14 @@ import (
 )
 
 type Priority struct {
-	token     chan int
-	items     []*Query
-	Order     Feature
-	length    int
-	limit     int
-	ascending bool
+	token  chan int
+	items  []*Query
+	Order  Feature
+	length int
+	limit  int
 }
 
-func NewPriority(order Feature, limit int, ascending bool) *Priority {
+func NewPriority(order Feature, limit int) *Priority {
 	p := &Priority{}
 	p.token = make(chan int, 1)
 	p.items = make([]*Query, limit+100)
@@ -23,7 +22,6 @@ func NewPriority(order Feature, limit int, ascending bool) *Priority {
 	p.limit = limit
 	p.Order = order
 	p.token <- 1
-	p.ascending = ascending
 
 	heap.Init(p)
 	return p
@@ -87,10 +85,7 @@ func (p *Priority) Swap(i, j int) {
 func (p *Priority) Less(i, j int) bool {
 	a, _ := p.items[i].Memoized(p.Order)
 	b, _ := p.items[j].Memoized(p.Order)
-	if p.ascending {
-		return a < b
-	}
-	return a > b
+	return a < b
 }
 
 // heap.Interface

@@ -98,7 +98,7 @@ func main() {
 
 	endStats()
 
-	limit := conf.Print.Count
+	limit := conf.Output.Count
 	setup.Printer(os.Stdout, nil)
 
 	info("getting best results")

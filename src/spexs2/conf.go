@@ -11,59 +11,56 @@ import (
 )
 
 const baseConfiguration = `{
-	"data" : {},
-	"alphabet" : {
-		"separator" : "",
-		"groups" : {}
+	"Dataset" : {},
+	"Reader" : {
+		"Method" : "Delimited",
+		"Separator" : "",
+		"CountSeparator" : ""
 	},
-	"extension" : {
-		"method" : "",
-		"args" : {},
-		"filter" : {}
+	"Extension" : {
+		"Method" : "",
+		"Groups" : {},
+		"Extendable" : {},
+		"Outputtable" : {}
 	},
-	"output" : {
-		"order" : "",
-		"sort" : "desc",
-		"filter" : {},
-		"queue" : ""
+	"Output" : {
+		"Method" : "Sorted",
+		"Count" : -1
 	},
-	"print" : {
-		"count" : -1,
-		"showheader" : true,
-		"header" : "",
-		"format" : ""
-	},
-	"aliases" : {}
+	"Print" : {
+		"ShowHeader" : true
+	}
 }`
 
 type FileGroup struct {
 	File     string
 	Files    []string
 	FileList string
-
-	CountSeparator string
 }
 
 type Conf struct {
-	Data     map[string]FileGroup
-	Alphabet struct {
-		Separator string
-		Groups    map[string]struct{ Elements string }
+	Dataset map[string]FileGroup
+	Reader  struct {
+		Method         string
+		Separator      string
+		CountSeparator string
 	}
 	Extension struct {
 		Method string
-		Args   json.RawMessage
-		Filter map[string]json.RawMessage
+		Groups map[string]struct{ Elements string }
+
+		Extendable  map[string]json.RawMessage
+		Outputtable map[string]json.RawMessage
 	}
 	Output struct {
-		Order  string
-		Sort   string
-		Filter map[string]json.RawMessage
-		Queue  string
+		Method string
+		SortBy []string
+		Count  int
 	}
-	Print struct {
-		Count      int
+	Printer struct {
+		Method     string
 		ShowHeader bool
+		Reverse    bool
 		Header     string
 		Format     string
 	}
