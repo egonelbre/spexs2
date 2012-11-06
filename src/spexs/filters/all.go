@@ -24,11 +24,11 @@ func Get(name string) (CreateFunc, bool) {
 
 var Help = `
 :Pattern:
-  NoStartingGroup : removes patterns with starting group token
-  NoEndingGroup   : removes patterns with ending group token
+  NoStartingGroup() : removes patterns with starting group token
+  NoEndingGroup()   : removes patterns with ending group token
   	                (useful only in output.filter)
 
-  NoTokens : removes patterns containing tokens specified in "Tokens" argument
+  NoTokens() : removes patterns ending with tokens specified in "Tokens" argument
 
 :Feature:
   Any feature can be used as a filter

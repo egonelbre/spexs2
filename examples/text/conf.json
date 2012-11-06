@@ -16,12 +16,12 @@
 		"Extendable" : {
 			"PatGroups()" : {"max":3},
 			"PatLength()" : {"max":6},
-			"NoStartingGroup" : {}
+			"NoStartingGroup()" : {}
 		},
 		"Outputtable" : {
 			"PatLength()" : { "min" : 2},
-			"NoStartingGroup" : {},
-			"NoEndingGroup" : {}
+			"NoStartingGroup()" : {},
+			"NoEndingGroup()" : {}
 		}
 	},
 	"Output" : {

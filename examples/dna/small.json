@@ -10,7 +10,7 @@
 		"Method": "Star",
 		"Extendable": {
 			"Matches(inp)" : {"min" : 3},
-			"NoStartingGroup" : {}
+			"NoStartingGroup()" : {}
 		},
 		"Outputtable": {
 			"Matches(inp)" : {"min" : 3}

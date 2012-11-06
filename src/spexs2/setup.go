@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"regexp"
 	. "spexs"
 
 	"spexs/extenders"
@@ -97,7 +98,9 @@ func (s *AppSetup) makeFilter(name string, data json.RawMessage) (Filter, error)
 		return nil, fmt.Errorf("filter is disabled")
 	}
 
-	createFilter, ok := filters.Get(name)
+	regRemoveParens, _ := regexp.Compile(`\(.*\)`)
+	filterName := regRemoveParens.ReplaceAllString(name, "")
+	createFilter, ok := filters.Get(filterName)
 	if ok {
 		return createFilter(s.Setup, bytes), nil
 	}
