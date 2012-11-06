@@ -23,7 +23,7 @@ const baseConfiguration = `{
 		"Outputtable" : {}
 	},
 	"Output" : {
-		"Sort" : "desc",
+		"Method" : "Sorted",
 		"Count" : -1
 	},
 	"Print" : {
@@ -53,8 +53,7 @@ type Conf struct {
 	}
 	Output struct {
 		Method string
-		SortBy string
-		Order  string
+		SortBy []string
 		Count  int
 	}
 	Printer struct {

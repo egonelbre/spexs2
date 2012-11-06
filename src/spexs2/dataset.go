@@ -119,7 +119,6 @@ func (ds *Dataset) AddFile(db *Database, filename string, countSeparator string)
 		line   string
 		err    error
 	)
-
 	if file, err = os.Open(filename); err != nil {
 		log.Println("Did not find data file:", filename)
 		log.Fatal(err)

@@ -4,9 +4,9 @@
 		"back" : { "File" : "$ref$" }
 	},
 	"Reader" : {
-		"Method" : "Counted",
+		"Method" : "Delimited",
 		"Separator" : "",
-		"CountSeparator": "\t"
+		"CountSeparator": ""
 	},
 	"Extension": {
 		"Method": "Group",
@@ -17,7 +17,7 @@
 			"PatGroups()" : {"max" : 3},
 			"PatLength()" : {"max" : 6},
 			"Matches(fore)" : {"min" : 20},
-			"NoStartingGroup" : {"enabled": true}
+			"NoStartingGroup" : {"enabled": "$nostart$"}
 		},
 		"Outputtable" : {
 			"MatchesRatio(fore, back)" : {"min" : 2},
