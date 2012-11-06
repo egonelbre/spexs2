@@ -62,13 +62,8 @@ func (s *AppSetup) initInput() {
 }
 
 func (s *AppSetup) initOutput() {
-	if s.conf.Output.Queue == "lifo" {
-		s.Out = pool.NewLifo()
-		print("lifo")
-		return
-	}
-	size := s.conf.Print.Count
-	asc := s.conf.Output.Sort == "asc"
+	size := s.conf.Output.Count
+	asc := s.conf.Output.Order == "asc"
 	s.Out = pool.NewPriority(s.Order, size, asc)
 }
 
@@ -154,32 +149,51 @@ func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 	return feature, info
 }
 
-func (s *AppSetup) makeFilter(name string, data json.RawMessage) Filter {
+func isDisabled(data []byte) bool {
+	var enabled struct{ Enabled *string }
+	err := json.Unmarshal(data, &enabled)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if (enabled.Enabled != nil) && (*enabled.Enabled == "false") {
+		return true
+	}
+	return false
+}
+
+func (s *AppSetup) makeFilter(name string, data json.RawMessage) (Filter, error) {
 	bytes, _ := data.MarshalJSON()
+
+	if isDisabled(bytes) {
+		return nil, fmt.Errorf("filter is disabled")
+	}
 
 	createFilter, ok := filters.Get(name)
 	if ok {
-		return createFilter(s.Setup, bytes)
+		return createFilter(s.Setup, bytes), nil
 	}
 
 	// didn't find filter, let's create it from feature
 	feature := s.makeFeature(name)
 	filter := filters.FeatureFilter(feature, bytes)
-	return filter
+	return filter, nil
 }
 
 func (s *AppSetup) makeFilters(conf map[string]json.RawMessage) Filter {
 	fns := make([]Filter, 0)
 	for name, data := range conf {
-		fn := s.makeFilter(name, data)
-		fns = append(fns, fn)
+		fn, err := s.makeFilter(name, data)
+		if err == nil {
+			fns = append(fns, fn)
+		}
 	}
 	return filters.Compose(fns)
 }
 
 func (s *AppSetup) initFilters() {
-	s.Extendable = s.makeFilters(s.conf.Extension.Filter)
-	s.Outputtable = s.makeFilters(s.conf.Output.Filter)
+	s.Extendable = s.makeFilters(s.conf.Extension.Extendable)
+	s.Outputtable = s.makeFilters(s.conf.Extension.Outputtable)
 }
 
 func lengthFitness(q *Query) float64 {

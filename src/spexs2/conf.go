@@ -60,6 +60,7 @@ type Conf struct {
 	Printer struct {
 		Method     string
 		ShowHeader bool
+		Reverse    bool
 		Header     string
 		Format     string
 	}

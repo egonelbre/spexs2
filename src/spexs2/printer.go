@@ -12,9 +12,9 @@ import (
 type strFeature func(*Query) string
 
 func (s *AppSetup) initPrinter() {
-	format := s.conf.Print.Format
-	header := s.conf.Print.Header
-	showHeader := s.conf.Print.ShowHeader
+	format := s.conf.Printer.Format
+	header := s.conf.Printer.Header
+	showHeader := s.conf.Printer.ShowHeader
 
 	if header == "" {
 		regHdr, _ := regexp.Compile(`[\{\}]`)
