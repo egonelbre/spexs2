@@ -17,7 +17,7 @@
 		}		
 	},
 	"Output": {
-		"SortBy": ["Matches(inp)"],
+		"SortBy": ["Seqs(inp)", "Occs(inp)","Matches(inp)"],
 		"Count" : 10
 	},
 	"Printer": {

@@ -20,7 +20,7 @@ type AppSetup struct {
 
 	conf *Conf
 
-	Order   Feature
+	Order   []Feature
 	Printer Printer
 
 	Features map[string]Feature
@@ -33,6 +33,7 @@ func NewAppSetup(conf *Conf) *AppSetup {
 
 	s.Db, s.Dataset = CreateDatabase(conf)
 
+	s.Order = make([]Feature, 0)
 	s.Features = make(map[string]Feature)
 
 	s.initInput()
@@ -134,10 +135,8 @@ func lengthFitness(q *Query) float64 {
 }
 
 func (s *AppSetup) initOrder() {
-	info("init output order", s.conf.Output.SortBy[0])
-	order := s.conf.Output.SortBy[0]
-	if order == "" {
-		log.Fatal("Output ordering not defined!")
+	for _, order := range s.conf.Output.SortBy {
+		fn := s.makeFeature(order)
+		s.Order = append(s.Order, fn)
 	}
-	s.Order = s.makeFeature(order)
 }

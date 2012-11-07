@@ -9,12 +9,12 @@ import (
 type Priority struct {
 	token  chan int
 	items  []*Query
-	Order  Feature
+	Order  []Feature
 	length int
 	limit  int
 }
 
-func NewPriority(order Feature, limit int) *Priority {
+func NewPriority(order []Feature, limit int) *Priority {
 	p := &Priority{}
 	p.token = make(chan int, 1)
 	p.items = make([]*Query, limit+100)
@@ -83,9 +83,17 @@ func (p *Priority) Swap(i, j int) {
 }
 
 func (p *Priority) Less(i, j int) bool {
-	a, _ := p.items[i].Memoized(p.Order)
-	b, _ := p.items[j].Memoized(p.Order)
-	return a < b
+	a := p.items[i]
+	b := p.items[j]
+	for _, fn := range p.Order {
+		aval, _ := a.Memoized(fn)
+		bval, _ := b.Memoized(fn)
+
+		if aval != bval {
+			return aval < bval
+		}
+	}
+	return false
 }
 
 // heap.Interface
