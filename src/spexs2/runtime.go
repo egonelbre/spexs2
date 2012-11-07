@@ -92,7 +92,7 @@ func runStats(setup *AppSetup) {
 			}
 
 			runtime.ReadMemStats(m)
-			lg.Printf("%v\t%v\t%v\t%v\n", m.Alloc/mb, m.TotalAlloc/mb, counter, seq)
+			lg.Printf("%v\t%v\t%v\t%v\t%v\t\n", m.Alloc/mb, m.TotalAlloc/mb, counter, setup.Out.Len(), seq)
 		}
 	}()
 

@@ -10,6 +10,7 @@ type Priority struct {
 	token  chan int
 	items  []*Query
 	Order  []Feature
+	Worst  *Query
 	length int
 	limit  int
 }
@@ -43,11 +44,16 @@ func (p *Priority) Take() (*Query, bool) {
 }
 
 func (p *Priority) Put(pat *Query) {
+	/*worst := p.Worst
+	if worst != nil && p.less(pat, worst) {
+		return
+	}*/
+
 	<-p.token
 	heap.Push(p, pat)
-	//if p.limit > 0 && p.Len() > p.limit {
-	//	heap.Pop(p)
-	//}
+	/*if p.limit > 0 && p.Len() > p.limit {
+		p.Worst = heap.Pop(p).(*Query)
+	}*/
 	p.token <- 1
 }
 
@@ -82,9 +88,7 @@ func (p *Priority) Swap(i, j int) {
 	p.items[i], p.items[j] = p.items[j], p.items[i]
 }
 
-func (p *Priority) Less(i, j int) bool {
-	a := p.items[i]
-	b := p.items[j]
+func (p *Priority) less(a *Query, b *Query) bool {
 	for _, fn := range p.Order {
 		aval, _ := a.Memoized(fn)
 		bval, _ := b.Memoized(fn)
@@ -94,6 +98,10 @@ func (p *Priority) Less(i, j int) bool {
 		}
 	}
 	return false
+}
+
+func (p *Priority) Less(i, j int) bool {
+	return p.less(p.items[i], p.items[j])
 }
 
 // heap.Interface
