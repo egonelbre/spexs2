@@ -18,7 +18,7 @@ var (
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
 	live             *bool   = flag.Bool("live", false, "print live output")
 	configs          *string = flag.String("conf", "", "configuration file(s), comma-delimited")
-	writeConf        *string = flag.String("writeconf", "", "write empty conf file")
+	writeConf        *string = flag.String("writeconf", "", "write conf file")
 
 	stats       *bool = flag.Bool("stats", false, "print memory/extension statistics")
 	procs       *int  = flag.Int("procs", 16, "goroutines for extending")
