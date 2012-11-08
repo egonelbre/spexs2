@@ -8,6 +8,7 @@ type Querys []*Query
 type Pooler interface {
 	Take() (*Query, bool)
 	Put(*Query)
+	Values() []*Query
 	Len() int
 }
 

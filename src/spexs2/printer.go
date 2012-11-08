@@ -55,14 +55,7 @@ func (s *AppSetup) initPrinter() {
 		log.Fatal(err)
 	}
 
-	s.Printer = func(out io.Writer, q *Query) {
-		if q == nil {
-			if showHeader {
-				fmt.Print(header)
-			}
-			return
-		}
-
+	printQuery := func(out io.Writer, q *Query) {
 		values := make(map[string]string)
 		for name, fn := range features {
 			values[name] = fn(q)
@@ -73,5 +66,19 @@ func (s *AppSetup) initPrinter() {
 			log.Println("Unable to output pattern.")
 			log.Fatal(err)
 		}
+	}
+
+	s.Printer = func(out io.Writer, pool Pooler) {
+		values := pool.Values()
+		info("printing results")
+
+		if showHeader {
+			fmt.Fprint(out, header)
+		}
+		for _, q := range values {
+			printQuery(out, q)
+		}
+
+		info("done")
 	}
 }

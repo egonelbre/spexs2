@@ -13,15 +13,17 @@ import (
 	"spexs/pool"
 )
 
-type Printer func(io.Writer, *Query)
+type Printer func(io.Writer, Pooler)
 
 type AppSetup struct {
 	Setup
 
 	conf *Conf
 
-	Order   []Feature
-	Printer Printer
+	Order []Feature
+
+	Printer    Printer
+	printQuery func(io.Writer, *Query)
 
 	Features map[string]Feature
 	Dataset  *Dataset

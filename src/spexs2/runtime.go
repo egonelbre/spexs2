@@ -115,7 +115,7 @@ func setupLiveView(setup *AppSetup) {
 	setup.Outputtable = func(q *Query) bool {
 		result := out(q)
 		if result {
-			setup.Printer(os.Stderr, q)
+			setup.printQuery(os.Stderr, q)
 		}
 		return result
 	}

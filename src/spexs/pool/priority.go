@@ -75,6 +75,10 @@ func (p *Priority) Bottom(n int) []*Query {
 	return p.items[first:p.length]
 }
 
+func (p *Priority) Values() []*Query {
+	return p.Bottom(p.limit)
+}
+
 func (p *Priority) Heapify() {
 	heap.Init(p)
 }

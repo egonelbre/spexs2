@@ -21,8 +21,6 @@ func attachDebugger(s *AppSetup) {
 					fmt.Fprintf(dbg.Logout, "\tE:%v\tO:%v\n",
 						s.Extendable(extended),
 						s.Outputtable(extended))
-					fmt.Fprintf(dbg.Logout, "      ")
-					s.Printer(dbg.Logout, extended)
 				}
 			}
 		})
