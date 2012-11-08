@@ -68,6 +68,8 @@ func (s *AppSetup) initPrinter() {
 		}
 	}
 
+	s.printQuery = printQuery
+
 	s.Printer = func(out io.Writer, pool Pooler) {
 		values := pool.Values()
 		info("printing results")
@@ -75,8 +77,16 @@ func (s *AppSetup) initPrinter() {
 		if showHeader {
 			fmt.Fprint(out, header)
 		}
-		for _, q := range values {
-			printQuery(out, q)
+
+		if !s.conf.Printer.Reverse {
+			for _, q := range values {
+				printQuery(out, q)
+			}
+		} else {
+			for i := len(values) - 1; i >= 0; i -= 1 {
+				q := values[i]
+				printQuery(out, q)
+			}
 		}
 
 		info("done")

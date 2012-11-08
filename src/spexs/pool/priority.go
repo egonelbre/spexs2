@@ -72,7 +72,13 @@ func (p *Priority) Bottom(n int) []*Query {
 	if first < 0 {
 		first = 0
 	}
-	return p.items[first:p.length]
+	items := p.items[first:p.length]
+	n = len(items)
+	result := make([]*Query, n)
+	for i := 0; i < n; i += 1 {
+		result[i] = items[n-i-1]
+	}
+	return result
 }
 
 func (p *Priority) Values() []*Query {
