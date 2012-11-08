@@ -44,16 +44,16 @@ func (p *Priority) Take() (*Query, bool) {
 }
 
 func (p *Priority) Put(pat *Query) {
-	/*worst := p.Worst
+	worst := p.Worst
 	if worst != nil && p.less(pat, worst) {
 		return
-	}*/
+	}
 
 	<-p.token
 	heap.Push(p, pat)
-	/*if p.limit > 0 && p.Len() > p.limit {
+	if p.limit > 0 && p.Len() > p.limit {
 		p.Worst = heap.Pop(p).(*Query)
-	}*/
+	}
 	p.token <- 1
 }
 
