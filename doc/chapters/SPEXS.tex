@@ -1,25 +1,46 @@
 \chapter{SPEXS}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+SPEXS is an pattern discovery algorithm described by Vilo et al.
+This algorithm finds patterns from a sequence.
+We take this as our basis for developing a new parallel algorithm.
+In this chapter we describe original algorithm so that we can
+later show the changes made to this algorithm.
 
 \section{Algorithm}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+We describe the general representation of the SPEXS algorithm. 
+The original algorithm was as follows:
 
+\begin{verbatim}
+TODO: format nicely
+Algorithm 3.19 The SPEXS algorithm
+Input: StringS, pattern class P, output criteria, search order, and ﬁtness measureF
+Output: Patterns \pi from pattern class P fulﬁlling all the criteria, and output in the order
+of ﬁtnessF
+Method:
+1. Convert input sequences into a single sequence, initiate the data structures
+2.Root  new node
+3.Root:label = \eps
+4.Root:pos  (1; 2; : : : ; n) // Assume empty pattern to match everywhere
+5.enqueue(Q; Root; order)
+6. whileN  dequeue(Q)
+7. Create all possible extensionsP 2 P ofN usingN :pos andS
+8. foreach extensionP ofN
+9. if patternP and position listP:pos fulﬁll the criteria
+10. then
+11.N :child  P
+12. calculateF(P; S)
+13.enqueue(Q; P; order) // Insert toQ for further extensions
+14. ifP fulﬁlls the output criteria storeP into output queueO
+15. end
+16. Report the list of top-ranking patterns from output queueO
+\end{verbatim}
+
+The main idea of the algorithm is that first we generate a 
+pattern and a query that match all possible positions in 
+the sequence. We then put this query into a queue for extending.
+
+Extending a query means finding all querys whose patterns length
+is longer by 1. If any of the querys is fit by some criteria
+it will be put into the main queue, for further extension, 
+and output queue for possible result.

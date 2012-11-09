@@ -1,44 +1,66 @@
 \chapter{Definitions}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Pattern discovery is a problem of finding interesting patterns in
+some dataset. We discuss the algorithm in terms of DFAs and
+show how this can help to discover patterns in sequences.
 
-\section{Strings}
+\section{Sequence}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+We use $\Sigma$ to denote the set of tokens in the dataset, an /em{alphabet}. 
+The \em{size} of the alphabet is $|\Sigma|$. \em{Tokens} can be numbers, 
+letters, words or sentences - any symbol.
 
-\section{Patterns}
+Any \em{sequence} $S=a_1 a_2 ... a_n, \forall i \in \Sigma$ is called a \em{sequence} 
+over the token set $\Sigma$. If the length of the
+string is $0$, it is called an empty string or $\epsilon$.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\section{Pattern}
 
-\section{Pattern classes}
+A \em{pattern} is a structure that defines a set of structures $\Gamma$.
+We denote the set that a pattern defines as $x(\Gamma)}$.
+If a structure $\alpha$ \em{matches} a pattern $\Gamma$, it means that
+$\alpha \in x(\Gamma)$.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The most common form of such structures are regular expressions. 
+
+\section{Deterministic finite automaton}
+
+A \em{deterministic finite automaton} (henceforth \em{DFA}) is an 
+finite state machine (henceforth \em{FSM}) that accepts or rejects
+a sequence of tokens.
+
+Both patterns and sequences can be represented by DFAs and hence
+is a good abstraction for both. This also means that if our algorithm
+works on DFAs it must work on any other dataset that is defined
+by DFAs.
+
+\section{Dataset}
+
+A dataset is a set of DFAs. In practice it may be more comfortable
+to view it as a set of sequence because of it's simpler structure.
+
+\section{Query}
+
+A \em{query} is a compound structure that has information about a
+pattern and it's matches in a dataset. The information about a
+match is the ending states where a pattern matches a DFA.
+
+On sequences this means the ending positions of the pattern 
+in the sequence.
+
+\section{Query interestingness}
+
+\em{Query feature} is a function of the query. It gives 
+information about the query such as the pattern representation, 
+length, number of matches in the dataset.
+\em{Query interestingness} is a function of the query whose
+results are well-ordered. This functions result allows to
+say whether one query is more interesting than the other.
+For convenience it is useful to represent that value in
+\Real.
 
 \section{Pattern discovery problem}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\em{Pattern discovery problem} is a process of finding
+most interesting querys by some interestingness measure.
+
