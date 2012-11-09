@@ -91,6 +91,10 @@ func readBaseConfiguration(config string) *Conf {
 func NewConf(configFile string) *Conf {
 	conf := readBaseConfiguration(baseConfiguration)
 
+	if configFile == "" {
+		return conf
+	}
+
 	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		log.Println("Unable to read configuration file: ", configFile)
