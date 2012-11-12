@@ -5,7 +5,8 @@
 temp/**
 pkg/**
 bin/**
-doc/build/**
+
+!doc/**
 
 *.prof
 *.sublime-project
