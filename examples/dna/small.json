@@ -1,0 +1,29 @@
+{
+	"Dataset": {
+		"inp" : { "File" : "$inp$" }
+	},
+	"Reader" : {
+		"Separator": "",
+		"CountSeparator" : " "
+	},
+	"Extension": {
+		"Method": "Star",
+		"Extendable": {
+			"Matches(inp)" : {"min" : 3},
+			"NoStartingGroup()" : {}
+		},
+		"Outputtable": {
+			"Matches(inp)" : {"min" : 3}
+		}		
+	},
+	"Output": {
+		"SortBy": ["Seqs(inp)", "Occs(inp)","Matches(inp)"],
+		"Count" : 10
+	},
+	"Printer": {
+		"Method" : "Formatted",
+		"ShowHeader": true,
+		"Header": "Pat\tOccs\tMatches\n",
+		"Format": "Pat?()\tOccs(inp)\tMatches(inp)\tSeqs(inp)\n"
+	}
+}

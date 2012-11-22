@@ -1,59 +1,43 @@
 package filters
 
 import (
-	"errors"
+	"encoding/json"
+	"log"
 	"math"
 	. "spexs"
-	"spexs/features"
-	"utils"
 )
 
-type floatConf struct{ Min, Max float64 }
+type minmax struct{ Min, Max float64 }
 
-func makeFilter(feature features.Func, config interface{}) (f Func, err error) {
-	err = nil
-	var conf floatConf
+func FeatureFilter(feature Feature, data []byte) Filter {
+	var conf struct{ Min, Max float64 }
 	conf.Min = math.NaN()
 	conf.Max = math.NaN()
 
-	utils.ApplyObject(&config, &conf)
+	err := json.Unmarshal(data, &conf)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	min, max := conf.Min, conf.Max
 	low, high := !math.IsNaN(conf.Min), !math.IsNaN(conf.Max)
 
-	f = nil
 	if low && high {
-		f = func(p *Query, ref *Database) bool {
-			v := feature(p, ref)
-			return (v <= max) && (v >= min)
+		return func(q *Query) bool {
+			val, _ := q.Memoized(feature)
+			return (min <= val) && (val <= max)
 		}
 	} else if low {
-		f = func(p *Query, ref *Database) bool {
-			return feature(p, ref) >= min
+		return func(q *Query) bool {
+			val, _ := q.Memoized(feature)
+			return min <= val
 		}
 	} else if high {
-		f = func(p *Query, ref *Database) bool {
-			return feature(p, ref) <= max
+		return func(q *Query) bool {
+			val, _ := q.Memoized(feature)
+			return val <= max
 		}
 	}
 
-	if f == nil {
-		return trueFilter, errors.New("Neither min or max was defined for filter.")
-	}
-
-	return f, nil
-}
-
-func wrap(f features.Func) CreateFunc {
-	return func(conf Conf, setup Setup) (Func, error) {
-		return makeFilter(f, conf)
-	}
-}
-
-func getFeatureFilter(name string) (*Desc, bool) {
-	f, valid := features.Get(name)
-	if !valid {
-		return nil, false
-	}
-	return &Desc{f.Name, f.Desc, wrap(f.Func)}, true
+	return func(q *Query) bool { return true }
 }

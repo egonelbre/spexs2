@@ -1,0 +1,35 @@
+{
+	"Dataset" : {
+		"inp" : {"File":"$inp$"},
+		"ref" : {"File":"$ref$"}
+	},
+
+	"Reader" : {
+		"Method" : "Delimited",
+		"Separator" : " "
+	},
+	"Extension" : {
+		"Method" : "Regex",
+		"Groups" : {
+			"(bind)": {"Elements":"and or if then else the a my"}
+		},
+		"Extendable" : {
+			"PatGroups()" : {"max":3},
+			"PatLength()" : {"max":6},
+			"NoStartingGroup()" : {}
+		},
+		"Outputtable" : {
+			"PatLength()" : { "min" : 2},
+			"NoStartingGroup()" : {},
+			"NoEndingGroup()" : {}
+		}
+	},
+	"Output" : {
+		"SortBy" : ["Matches(inp)"],
+		"Count" : 100
+	},
+	"Printer" : {
+		"ShowHeader" : true,
+		"Format": "'Pat?()'\t\tMatches(inp)\tMatches(ref)\tHyper(inp,ref)\n"
+	}
+}

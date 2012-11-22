@@ -63,6 +63,17 @@ func (q *Lifo) Put(val *spexs.Query) {
 	atomic.CompareAndSwapPointer(&q.tail, t, n)
 }
 
+func (q *Lifo) Values() []*spexs.Query {
+	res := make([]*spexs.Query, q.Len())
+	v, ok := q.Take()
+	i := 0
+	for ok {
+		res[i] = v
+		v, ok = q.Take()
+	}
+	return res
+}
+
 func (p *Lifo) Len() int {
 	return 1
 }

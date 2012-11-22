@@ -8,32 +8,34 @@ type Querys []*Query
 type Pooler interface {
 	Take() (*Query, bool)
 	Put(*Query)
+	Values() []*Query
 	Len() int
 }
 
-type ExtenderFunc func(p *Query, db *Database) Querys
-type FilterFunc func(p *Query, db *Database) bool
-type FitnessFunc func(p *Query) float64
-type PostProcessFunc func(p *Query, s *Setup) error
+type Extender func(p *Query) Querys
+type Filter func(p *Query) bool
+type PostProcess func(p *Query) error
+type Feature func(p *Query) (float64, string)
 
 type Setup struct {
-	DB  *Database
+	Db  *Database
 	Out Pooler
 	In  Pooler
 
-	Extender ExtenderFunc
+	Extender Extender
 
-	Extendable  FilterFunc
-	Outputtable FilterFunc
+	Extendable  Filter
+	Outputtable Filter
 
-	PostProcess PostProcessFunc
+	PostProcess PostProcess
 }
 
 func prepareSpexs(s *Setup) {
 	maxSeq := 0
-	for _, seq := range s.DB.Sequences {
-		if seq.Len > maxSeq {
-			maxSeq = seq.Len
+	for _, seq := range s.Db.Sequences {
+		length := len(seq.Tokens)
+		if length > maxSeq {
+			maxSeq = length
 		}
 	}
 
@@ -44,7 +46,7 @@ func prepareSpexs(s *Setup) {
 		}
 	}
 
-	s.In.Put(NewEmptyQuery(s.DB))
+	s.In.Put(NewEmptyQuery(s.Db))
 }
 
 func Run(s *Setup) {
@@ -55,32 +57,19 @@ func Run(s *Setup) {
 			return
 		}
 
-		extensions := s.Extender(p, s.DB)
+		extensions := s.Extender(p)
 		for _, extended := range extensions {
-			if s.Extendable(extended, s.DB) {
+			if s.Extendable(extended) {
 				s.In.Put(extended)
 			}
-			if s.Outputtable(extended, s.DB) {
+			if s.Outputtable(extended) {
 				s.Out.Put(extended)
 			}
 		}
 
-		if s.PostProcess(p, s) != nil {
+		if s.PostProcess(p) != nil {
 			break
 		}
-	}
-}
-
-func Parallel(f func(), routines int) {
-	stop := make(chan int, routines)
-	for i := 0; i < routines; i += 1 {
-		go func(rtn int) {
-			defer func() { stop <- 1 }()
-			f()
-		}(i)
-	}
-	for i := 0; i < routines; i += 1 {
-		<-stop
 	}
 }
 
@@ -109,17 +98,17 @@ func RunParallel(s *Setup, routines int) {
 					counter <- 1
 				}
 
-				extensions := s.Extender(p, s.DB)
+				extensions := s.Extender(p)
 				for _, extended := range extensions {
-					if s.Extendable(extended, s.DB) {
+					if s.Extendable(extended) {
 						s.In.Put(extended)
 					}
-					if s.Outputtable(extended, s.DB) {
+					if s.Outputtable(extended) {
 						s.Out.Put(extended)
 					}
 				}
 
-				if s.PostProcess(p, s) != nil {
+				if s.PostProcess(p) != nil {
 					break
 				}
 			}

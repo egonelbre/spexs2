@@ -3,5 +3,5 @@
 SPEXS=../bin/spexs2
 
 time $SPEXS -stats \
-	-conf=data/transcript/conf.json \
-	inp=data/transcript/transcripts.inp
+	-conf=transcript/conf.json \
+	inp=transcript/transcripts.inp

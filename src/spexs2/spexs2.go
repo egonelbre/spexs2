@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	. "spexs"
-	"spexs/pool"
 	"time"
 )
 
@@ -19,6 +18,7 @@ var (
 	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
 	live             *bool   = flag.Bool("live", false, "print live output")
 	configs          *string = flag.String("conf", "", "configuration file(s), comma-delimited")
+	writeConf        *string = flag.String("writeconf", "", "write conf file")
 
 	stats       *bool = flag.Bool("stats", false, "print memory/extension statistics")
 	procs       *int  = flag.Int("procs", 16, "goroutines for extending")
@@ -52,16 +52,21 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *configs == "" {
-		fmt.Fprintf(os.Stderr, "Configuration file is required!\n")
+	conf := NewConf(*configs)
+
+	if *writeConf != "" {
+		conf.WriteToFile(*writeConf)
 		return
 	}
 
-	conf := ReadConfiguration(*configs)
+	if *configs == "" {
+		log.Fatal("Configuration file is required!")
+		return
+	}
 
 	info("reading input")
 
-	setup := CreateSetup(conf)
+	setup := NewAppSetup(conf)
 
 	// defined in runtime.go
 	setupRuntime()
@@ -72,7 +77,7 @@ func main() {
 
 	ifthen := func(val bool, f func(*AppSetup)) {
 		if val {
-			f(&setup)
+			f(setup)
 		}
 	}
 
@@ -92,39 +97,6 @@ func main() {
 
 	endStats()
 
-	limit := conf.Output.Count
-	setup.Printer(os.Stdout, nil, setup.DB)
-
-	info("getting best results")
-
-	best := setup.Out.(*pool.Priority).Bottom(limit)
-
 	info("printing results")
-	for _, node := range best {
-		setup.Printer(os.Stdout, node, setup.DB)
-	}
-
-	info("done")
-
-	/*
-
-		if conf.Output.Queue != "lifo" {
-			info("sorting results")
-
-			limit := conf.Output.Count
-			if limit > 0 {
-				for setup.Out.Len() > limit {
-					setup.Out.Take()
-				}
-			}
-		}
-
-		info("printing results")
-
-		setup.Printer(os.Stdout, nil, setup.Ref)
-		node, ok := setup.Out.Take()
-		for ok {
-			setup.Printer(os.Stdout, node, setup.Ref)
-			node, ok = setup.Out.Take()
-		}*/
+	setup.Printer(os.Stdout, setup.Out)
 }

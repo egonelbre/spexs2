@@ -2,45 +2,34 @@ package filters
 
 import (
 	. "spexs"
-	"strings"
 	"utils"
 )
 
-var All = [...]Desc{
-	{"no-starting-group",
-		"does not allow pattern to start with group",
-		func(conf Conf, setup Setup) (Func, error) {
-			return func(q *Query, db *Database) bool {
-				e := q.Pat[0]
-				return !(e.IsGroup || e.IsStar)
-			}, nil
-		}},
-	{"no-ending-group",
-		"does not allow pattern to end with group",
-		func(conf Conf, setup Setup) (Func, error) {
-			return func(q *Query, db *Database) bool {
-				e := q.Pat[len(q.Pat)-1]
-				return !e.IsGroup
-			}, nil
-		}},
-	{"no-ending-tokens",
-		"does not allow pattern to end with token",
-		func(conf Conf, setup Setup) (Func, error) {
-			var filt struct{ Tokens string }
-			utils.ApplyObject(&conf, &filt)
+type CreateFunc func(Setup, []byte) Filter
 
-			line := strings.TrimSpace(filt.Tokens)
-			tokenNames := strings.Split(line, setup.DB.Separator)
-			tokens := setup.DB.ToTokens(tokenNames)
-
-			contains := make(map[Token]bool, len(tokens))
-			for _, token := range tokens {
-				contains[token] = true
-			}
-
-			return func(q *Query, db *Database) bool {
-				e := q.Pat[len(q.Pat)-1]
-				return !contains[e.Token]
-			}, nil
-		}},
+var All = [...]CreateFunc{
+	NoStartingGroup,
+	NoEndingGroup,
+	NoTokens,
 }
+
+func Get(name string) (CreateFunc, bool) {
+	for _, fn := range All {
+		if utils.FuncName(fn) == name {
+			return fn, true
+		}
+	}
+	return nil, false
+}
+
+var Help = `
+:Pattern:
+  NoStartingGroup() : removes patterns with starting group token
+  NoEndingGroup()   : removes patterns with ending group token
+  	                (useful only in output.filter)
+
+  NoTokens() : removes patterns ending with tokens specified in "Tokens" argument
+
+:Feature:
+  Any feature can be used as a filter
+`

@@ -7,7 +7,7 @@ import (
 )
 
 func pat(s string) *Query {
-	r := NewPattern(0, nil)
+	r := NewQuery(nil, RegToken{})
 	return add(r, s)
 }
 
@@ -16,10 +16,8 @@ func add(base *Query, s string) *Query {
 		return base
 	}
 	rune, size := utf8.DecodeRuneInString(s)
-	n := NewPattern(Token(rune), base)
-	if rune == 'X' {
-		n.IsStar = true
-	}
+	token := RegToken{Token(rune), false, rune == 'X'}
+	n := NewQuery(base, token)
 	return add(n, s[size:])
 }
 
@@ -28,7 +26,7 @@ func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
 	if ok != expectedOk {
 		t.Errorf("didn't get correct ok value, got='%v', expected='%v', str='%s'", ok, expectedOk, expected)
 	}
-	if ok && val.String() != expected {
+	if ok && val.StringRaw() != expected {
 		t.Errorf("didn't get correct value, got='%s', expected='%s'", val, expected)
 	}
 }
@@ -52,10 +50,11 @@ func TestFifo(t *testing.T) {
 }
 
 func TestPriority(t *testing.T) {
-	lenFitness := func(p *Query) float64 {
-		return float64(len(p.String()))
+	lenFeature := func(q *Query) (float64, string) {
+		return float64(q.Len()), ""
 	}
-	p := NewPriority(lenFitness, 100, true)
+
+	p := NewPriority(lenFeature, 0, true)
 
 	p.Put(pat("bc"))
 	p.Put(pat("defg"))

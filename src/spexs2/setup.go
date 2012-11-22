@@ -1,117 +1,144 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
+	"regexp"
 	. "spexs"
 
 	"spexs/extenders"
 	"spexs/filters"
-	"spexs/fitnesses"
 	"spexs/pool"
 )
 
-const MAX_POOL_SIZE = 1024 * 1024 * 1024
-
-type TrieFitnessCreator func(interface{}) FitnessFunc
-type TrieExtenderCreator func(interface{}) ExtenderFunc
-
-type PrinterFunc func(io.Writer, *Query, *Database)
+type Printer func(io.Writer, Pooler)
 
 type AppSetup struct {
 	Setup
-	Fitness FitnessFunc
-	Printer PrinterFunc
+
+	conf *Conf
+
+	Order []Feature
+
+	Printer    Printer
+	printQuery func(io.Writer, *Query)
+
+	Features map[string]Feature
+	Dataset  *Dataset
 }
 
-func lengthFitness(p *Query) float64 {
-	return 1 / float64(p.Len())
-}
+func NewAppSetup(conf *Conf) *AppSetup {
+	s := &AppSetup{}
+	s.conf = conf
 
-type PatternFilterCreator func(limit int) FilterFunc
+	s.Db, s.Dataset = CreateDatabase(conf)
 
-func CreateInput(conf Conf, setup AppSetup) Pooler {
-	//in := NewPriorityPool(lengthFitness, MAX_POOL_SIZE, true)
-	in := pool.NewLifo()
-	return in
-}
+	s.Order = make([]Feature, 0)
+	s.Features = make(map[string]Feature)
 
-func CreateOutput(conf Conf, setup AppSetup, f FitnessFunc) Pooler {
-	if conf.Output.Queue == "lifo" {
-		return pool.NewLifo()
-	}
-	size := conf.Output.Count
-	if size < 0 {
-		size = MAX_POOL_SIZE
-	}
-	return pool.NewPriority(f, size, conf.Output.Sort == "asc")
-}
+	s.initInput()
+	s.initOrder()
+	s.initOutput()
 
-func CreateSetup(conf Conf) AppSetup {
-	var s AppSetup
-	s.DB = CreateDatabase(conf)
+	s.initExtender()
+	s.initFilters()
+	s.initPrinter()
 
-	s.In = CreateInput(conf, s)
-	s.Fitness = CreateFitness(conf, s)
-	s.Out = CreateOutput(conf, s, s.Fitness)
-
-	s.Extender = CreateExtender(conf, s)
-	s.Extendable = CreateFilter(conf.Extension.Filter, s)
-	s.Outputtable = CreateFilter(conf.Output.Filter, s)
-
-	s.PostProcess = func(q *Query, s *Setup) error {
-		q.CacheValues(s.DB)
+	features := s.Features
+	s.PostProcess = func(q *Query) error {
+		for _, fn := range features {
+			q.Memoized(fn)
+		}
+		q.CacheValues()
+		q.Loc = nil
 		return nil
 	}
-
-	s.Printer = CreatePrinter(conf, s)
 
 	return s
 }
 
-func CreateExtender(conf Conf, setup AppSetup) ExtenderFunc {
-	if conf.Extension.Method == "" {
+func (s *AppSetup) initInput() {
+	info("init input")
+	s.In = pool.NewLifo()
+}
+
+func (s *AppSetup) initOutput() {
+	info("init output")
+	size := s.conf.Output.Count
+	s.Out = pool.NewPriority(s.Order, size)
+}
+
+func (s *AppSetup) initExtender() {
+	info("init extender")
+
+	if s.conf.Extension.Method == "" {
 		log.Fatal("Extender not defined!")
 	}
 
-	extender, valid := extenders.Get(conf.Extension.Method)
-	if !valid {
-		log.Fatal("No extender named: ", conf.Extension.Method)
+	method := s.conf.Extension.Method
+	extender, ok := extenders.Get(method)
+	if !ok {
+		log.Fatal("No extender named: ", method)
 	}
 
-	args := conf.Extension.Args[conf.Extension.Method]
+	/*args := conf.Extension.Args[conf.Extension.Method]
 
 	ext, err := extender.Create(args)
 	if err != nil {
 		log.Fatal(err)
-	}
-	return ExtenderFunc(ext)
+	}*/
+
+	s.Extender = extender
 }
 
-func CreateFilter(conf map[string]filters.Conf, setup AppSetup) FilterFunc {
-	f, err := filters.Compose(conf, setup.Setup)
-	if err != nil {
-		log.Fatal(err)
+func (s *AppSetup) makeFilter(name string, data json.RawMessage) (Filter, error) {
+	info("make filter " + name)
+	bytes, _ := data.MarshalJSON()
+
+	if isDisabled(bytes) {
+		return nil, fmt.Errorf("filter is disabled")
 	}
-	return FilterFunc(f)
+
+	regRemoveParens, _ := regexp.Compile(`\(.*\)`)
+	filterName := regRemoveParens.ReplaceAllString(name, "")
+	createFilter, ok := filters.Get(filterName)
+	if ok {
+		return createFilter(s.Setup, bytes), nil
+	}
+
+	// didn't find filter, let's create it from feature
+	feature := s.makeFeature(name)
+	filter := filters.FeatureFilter(feature, bytes)
+	return filter, nil
 }
 
-func CreateFitness(conf Conf, setup AppSetup) FitnessFunc {
-	if conf.Output.Order == "" {
-		log.Fatal("Output ordering not defined!")
+func (s *AppSetup) makeFilters(conf map[string]json.RawMessage) Filter {
+	info("make filters")
+	fns := make([]Filter, 0)
+	for name, data := range conf {
+		fn, err := s.makeFilter(name, data)
+		if err == nil {
+			fns = append(fns, fn)
+		}
 	}
+	return filters.Compose(fns)
+}
 
-	fitness, valid := fitnesses.Get(conf.Output.Order)
-	if !valid {
-		log.Fatal("No ordering/fitness named: ", conf.Output.Order)
-	}
-	args := conf.Output.Args[conf.Output.Order]
-	fit, err := fitness.Create(args)
-	if err != nil {
-		log.Fatal(err)
-	}
+func (s *AppSetup) initFilters() {
+	info("init filters")
+	s.Extendable = s.makeFilters(s.conf.Extension.Extendable)
+	s.Outputtable = s.makeFilters(s.conf.Extension.Outputtable)
+}
 
-	return func(q *Query) float64 {
-		return fit(q, setup.DB)
+func lengthFitness(q *Query) float64 {
+	return 1 / float64(q.Len())
+}
+
+func (s *AppSetup) initOrder() {
+	for _, order := range s.conf.Output.SortBy {
+		fn := s.makeFeature(order)
+		s.Order = append(s.Order, fn)
 	}
 }

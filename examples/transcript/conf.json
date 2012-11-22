@@ -1,0 +1,33 @@
+{
+	"Dataset": {
+		"inp" : { "File" : "$inp$" }
+	},
+	"Reader": {
+		"Method" : "Delimited",
+		"Separator": " ",
+		"CountSeparator" : ""
+	},
+	"Extension": {
+		"Method": "Star",
+		"Extendable": {
+			"PatGroups()" : {"max" : 3},
+			"PatLength()" : {"max" : 6},
+			"Matches(inp)" : {"min" : 10},
+			"NoStartingGroup" : {}
+		},
+		"Outputtable": {
+			"Matches(inp)" : {"min" : 10},
+			"HyperOptimal(inp)" : {"max" : 1e-3},
+			"NoStartingGroup" : {},
+			"NoEndingGroup" : {}
+		}
+	},
+	"Output": {
+		"SortBy": ["-HyperOptimal(inp)"],
+		"Count": 100
+	},
+	"Printer": {
+		"Header": "<$fg/#fg>\t<$all/#all>\tp-value\tpattern\n",
+		"Format": "HyperOptimal?(inp)\t<Matches(inp)/Total(inp)>\tHyperOptimal(inp)\tPat?()\n"
+	}
+}
