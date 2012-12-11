@@ -14,7 +14,7 @@ type Pooler interface {
 
 type Extender func(p *Query) Querys
 type Filter func(p *Query) bool
-type PostProcess func(p *Query) error
+type ProcessQuery func(p *Query) error
 type Feature func(p *Query) (float64, string)
 
 type Setup struct {
@@ -27,7 +27,8 @@ type Setup struct {
 	Extendable  Filter
 	Outputtable Filter
 
-	PostProcess PostProcess
+	PreProcess  ProcessQuery
+	PostProcess ProcessQuery
 }
 
 func prepareSpexs(s *Setup) {
@@ -100,14 +101,22 @@ func RunParallel(s *Setup, routines int) {
 
 				extensions := s.Extender(p)
 				for _, extended := range extensions {
+					processed := false
 					if s.Extendable(extended) {
+						if !processed {
+							s.PreProcess(extended)
+							processed = true
+						}
 						s.In.Put(extended)
 					}
 					if s.Outputtable(extended) {
+						if !processed {
+							s.PreProcess(extended)
+							processed = true
+						}
 						s.Out.Put(extended)
 					}
 				}
-
 				if s.PostProcess(p) != nil {
 					break
 				}

@@ -51,33 +51,40 @@ func (s *AppSetup) makeFeature(call string) Feature {
 }
 
 func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
-	name, args, info, positive := s.parseFeature(call)
+	info("  feature: parse " + call)
+	name, args, isInfo, positive := s.parseFeature(call)
 
-	normalized := fmt.Sprintf("%+v%+v", name, args)
+	bit := 0
+	if positive {
+		bit = 1
+	}
+	normalized := fmt.Sprintf("%+v%+v%v", name, args, bit)
 	if feature, ok := s.Features[normalized]; ok {
-		return feature, info
+		info("    cached:" + normalized)
+		return feature, isInfo
 	}
 
+	info("    make new: " + normalized)
 	create, ok := features.Get(name)
 	if !ok {
 		log.Fatal("No feature named ", name)
 	}
 
-	feature, err := features.CallCreateWithArgs(create, args)
+	createdFn, err := features.CallCreateWithArgs(create, args)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	s.Features[normalized] = feature
-
+	feature := createdFn
 	if !positive {
-		return func(q *Query) (float64, string) {
-			v, info := q.Memoized(feature)
+		feature = func(q *Query) (float64, string) {
+			v, info := q.Memoized(createdFn)
 			return -v, info
-		}, info
+		}
 	}
 
-	return feature, info
+	s.Features[normalized] = feature
+	return feature, isInfo
 }
 
 func isDisabled(data []byte) bool {
