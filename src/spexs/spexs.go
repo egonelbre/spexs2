@@ -105,11 +105,19 @@ func RunParallel(s *Setup, routines int) {
 
 				extensions := s.Extender(p)
 				for _, extended := range extensions {
-					s.PreProcess(extended)
+					processed := false
 					if s.Extendable(extended) {
+						if !processed {
+							s.PreProcess(extended)
+							processed = true
+						}
 						s.In.Put(extended)
 					}
 					if s.Outputtable(extended) {
+						if !processed {
+							s.PreProcess(extended)
+							processed = true
+						}
 						s.Out.Put(extended)
 					}
 				}
