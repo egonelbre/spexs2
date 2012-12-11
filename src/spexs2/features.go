@@ -51,6 +51,7 @@ func (s *AppSetup) makeFeature(call string) Feature {
 }
 
 func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
+	info("  feature: parse " + call)
 	name, args, isInfo, positive := s.parseFeature(call)
 
 	bit := 0
@@ -60,9 +61,11 @@ func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 
 	normalized := fmt.Sprintf("%+v%+v%+v", name, args, bit)
 	if feature, ok := s.Features[normalized]; ok {
+		info("    cached:"+normalized)
 		return feature, isInfo
 	}
 
+	info("    make new: " + normalized)
 	create, ok := features.Get(name)
 	if !ok {
 		log.Fatal("No feature named ", name)
@@ -84,6 +87,7 @@ func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 		feature = Feature{normalized, negFeatFn}
 	}
 
+	s.Features[normalized] = feature
 	return feature, isInfo
 }
 

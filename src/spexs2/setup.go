@@ -47,11 +47,14 @@ func NewAppSetup(conf *Conf) *AppSetup {
 	s.initPrinter()
 
 	features := s.Features
-	s.PostProcess = func(q *Query) error {
+	s.PreProcess = func(q *Query) error {
+		q.CacheValues()
 		for _, fn := range features {
 			q.Memoized(fn)
 		}
-		q.CacheValues()
+		return nil
+	}
+	s.PostProcess = func(q *Query) error {
 		q.Loc = nil
 		return nil
 	}
