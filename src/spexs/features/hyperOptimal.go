@@ -21,7 +21,7 @@ func uniquePositions(q *Query) []uint {
 	return uniq(positions)
 }
 
-func HyperOptimal(fore []int) Feature {
+func HyperOptimal(fore []int) FeatureFunc {
 	return func(q *Query) (float64, string) {
 		db := q.Db
 		positions := uniquePositions(q)

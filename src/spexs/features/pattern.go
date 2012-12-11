@@ -3,21 +3,21 @@ package features
 import . "spexs"
 
 // pattern as a string
-func Pat() Feature {
+func Pat() FeatureFunc {
 	return func(q *Query) (float64, string) {
 		return 0.0, q.String()
 	}
 }
 
 // pattern as regular expression
-func PatRegex() Feature {
+func PatRegex() FeatureFunc {
 	return func(q *Query) (float64, string) {
 		return 0.0, q.StringLong()
 	}
 }
 
 // length of the pattern
-func PatLength() Feature {
+func PatLength() FeatureFunc {
 	return func(q *Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
@@ -31,7 +31,7 @@ func PatLength() Feature {
 }
 
 // count of characters
-func PatChars() Feature {
+func PatChars() FeatureFunc {
 	return func(q *Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
@@ -44,7 +44,7 @@ func PatChars() Feature {
 }
 
 // count of groups
-func PatGroups() Feature {
+func PatGroups() FeatureFunc {
 	return func(q *Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
@@ -57,7 +57,7 @@ func PatGroups() Feature {
 }
 
 // count of stars
-func PatStars() Feature {
+func PatStars() FeatureFunc {
 	return func(q *Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
