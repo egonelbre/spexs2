@@ -58,10 +58,9 @@ func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 	if positive {
 		bit = 1
 	}
-
-	normalized := fmt.Sprintf("%+v%+v%+v", name, args, bit)
+	normalized := fmt.Sprintf("%+v%+v%v", name, args, bit)
 	if feature, ok := s.Features[normalized]; ok {
-		info("    cached:"+normalized)
+		info("    cached:" + normalized)
 		return feature, isInfo
 	}
 
@@ -71,20 +70,17 @@ func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 		log.Fatal("No feature named ", name)
 	}
 
-	featFn, err := features.CallCreateWithArgs(create, args)
+	createdFn, err := features.CallCreateWithArgs(create, args)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var feature Feature
-	if positive {
-		feature = Feature{normalized, featFn}
-	} else {
-		negFeatFn := func(q *Query) (float64, string) {
-			v, info := featFn(q)
+	feature := createdFn
+	if !positive {
+		feature = func(q *Query) (float64, string) {
+			v, info := q.Memoized(createdFn)
 			return -v, info
 		}
-		feature = Feature{normalized, negFeatFn}
 	}
 
 	s.Features[normalized] = feature

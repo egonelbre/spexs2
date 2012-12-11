@@ -31,7 +31,7 @@ func Get(name string) (CreateFunc, bool) {
 	return nil, false
 }
 
-func CallCreateWithArgs(function CreateFunc, args []interface{}) (FeatureFunc, error) {
+func CallCreateWithArgs(function CreateFunc, args []interface{}) (Feature, error) {
 	fn, fnType, ok := functionAndType(function)
 	if !ok {
 		return nil, fmt.Errorf("Argument is not a function!")
@@ -47,7 +47,7 @@ func CallCreateWithArgs(function CreateFunc, args []interface{}) (FeatureFunc, e
 	}
 	result := fn.Call(arguments)
 	inter := result[0].Interface()
-	return inter.(FeatureFunc), nil
+	return inter.(Feature), nil
 }
 
 var Help = `

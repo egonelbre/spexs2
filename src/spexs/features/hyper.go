@@ -6,7 +6,7 @@ import (
 )
 
 // hypergeometric split p-value
-func Hyper(fore []int, back []int) FeatureFunc {
+func Hyper(fore []int, back []int) Feature {
 	return func(q *Query) (float64, string) {
 		totalFore := count(q.Db.Total, fore)
 		totalBack := count(q.Db.Total, back)
@@ -20,7 +20,7 @@ func Hyper(fore []int, back []int) FeatureFunc {
 }
 
 // approximate hypergeometric split p-value (~5 significant digits)
-func HyperApprox(fore []int, back []int) FeatureFunc {
+func HyperApprox(fore []int, back []int) Feature {
 	return func(q *Query) (float64, string) {
 		totalFore := count(q.Db.Total, fore)
 		totalBack := count(q.Db.Total, back)
@@ -34,7 +34,7 @@ func HyperApprox(fore []int, back []int) FeatureFunc {
 }
 
 // hypergeometric split down p-value
-func HyperDown(fore []int, back []int) FeatureFunc {
+func HyperDown(fore []int, back []int) Feature {
 	return func(q *Query) (float64, string) {
 		totalFore := count(q.Db.Total, fore)
 		totalBack := count(q.Db.Total, back)
