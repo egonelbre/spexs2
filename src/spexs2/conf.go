@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
+	"launchpad.net/rjson"
 	"flag"
 	"io/ioutil"
 	"log"
@@ -49,8 +49,8 @@ type Conf struct {
 		Method string
 		Groups map[string]struct{ Elements string }
 
-		Extendable  map[string]json.RawMessage
-		Outputtable map[string]json.RawMessage
+		Extendable  map[string]rjson.RawMessage
+		Outputtable map[string]rjson.RawMessage
 	}
 	Output struct {
 		Method string
@@ -72,7 +72,7 @@ func (conf *Conf) WriteToFile(filename string) {
 		log.Fatal(err)
 	}
 
-	enc := json.NewEncoder(file)
+	enc := rjson.NewEncoder(file)
 	if err = enc.Encode(&conf); err != nil {
 		log.Fatal(err)
 	}
@@ -80,7 +80,7 @@ func (conf *Conf) WriteToFile(filename string) {
 
 func readBaseConfiguration(config string) *Conf {
 	conf := &Conf{}
-	dec := json.NewDecoder(bytes.NewBufferString(config))
+	dec := rjson.NewDecoder(bytes.NewBufferString(config))
 	if err := dec.Decode(conf); err != nil {
 		log.Println("Error in base configuration")
 		log.Fatal(err)
@@ -123,7 +123,7 @@ func NewConf(configFile string) *Conf {
 		return nil
 	})
 
-	dec := json.NewDecoder(bytes.NewReader(data))
+	dec := rjson.NewDecoder(bytes.NewReader(data))
 	if err = dec.Decode(conf); err != nil {
 		log.Println("Error in configuration file: ", configFile)
 		log.Fatal(err)

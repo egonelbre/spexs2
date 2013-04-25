@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json"
+	"launchpad.net/rjson"
 	"fmt"
 	"io"
 	"log"
@@ -96,7 +96,7 @@ func (s *AppSetup) initExtender() {
 	s.Extender = extender
 }
 
-func (s *AppSetup) makeFilter(name string, data json.RawMessage) (Filter, error) {
+func (s *AppSetup) makeFilter(name string, data rjson.RawMessage) (Filter, error) {
 	info("make filter " + name)
 	bytes, _ := data.MarshalJSON()
 
@@ -117,7 +117,7 @@ func (s *AppSetup) makeFilter(name string, data json.RawMessage) (Filter, error)
 	return filter, nil
 }
 
-func (s *AppSetup) makeFilters(conf map[string]json.RawMessage) Filter {
+func (s *AppSetup) makeFilters(conf map[string]rjson.RawMessage) Filter {
 	info("make filters")
 	fns := make([]Filter, 0)
 	for name, data := range conf {

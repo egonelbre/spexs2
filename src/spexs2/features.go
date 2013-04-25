@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json"
+	"launchpad.net/rjson"
 	"fmt"
 	"log"
 	"regexp"
@@ -89,7 +89,7 @@ func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 
 func isDisabled(data []byte) bool {
 	var enabled struct{ Enabled *string }
-	err := json.Unmarshal(data, &enabled)
+	err := rjson.Unmarshal(data, &enabled)
 	if err != nil {
 		log.Fatal(err)
 	}
