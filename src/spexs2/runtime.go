@@ -48,24 +48,21 @@ func setMemLimit(setup *AppSetup) {
 
 func attachMemProfiler(setup *AppSetup) {
 	filename := *memprofile
-	profile := 0
-	count := 0
 	limit := *memsteps
+
+	count := 0
 
 	ext := setup.Extender
 
 	setup.Extender = func(q *Query) Querys {
-		if count == limit {
-			f, err := os.Create(filename + string(profile))
+		if count >= limit {
+			f, err := os.Create(filename)
 			if err != nil {
 				log.Fatal(err)
 			}
 			pprof.WriteHeapProfile(f)
 			f.Close()
-			lg.Printf("Wrote memory profile %v!\n", profile)
-
-			profile += 1
-			count = 0
+			log.Fatal("Wrote memory profile!")
 		}
 		count += 1
 		return ext(q)
