@@ -6,8 +6,8 @@ type Token uint
 type Querys []*Query
 
 type Pooler interface {
-	Take() (*Query, bool)
-	Put(*Query)
+	Pop() (*Query, bool)
+	Push(*Query)
 	Values() []*Query
 	Len() int
 }
@@ -47,24 +47,24 @@ func prepareSpexs(s *Setup) {
 		}
 	}
 
-	s.In.Put(NewEmptyQuery(s.Db))
+	s.In.Push(NewEmptyQuery(s.Db))
 }
 
 func Run(s *Setup) {
 	prepareSpexs(s)
 	for {
-		p, valid := s.In.Take()
-		if !valid {
+		p, ok := s.In.Pop()
+		if !ok {
 			return
 		}
 
 		extensions := s.Extender(p)
 		for _, extended := range extensions {
 			if s.Extendable(extended) {
-				s.In.Put(extended)
+				s.In.Push(extended)
 			}
 			if s.Outputtable(extended) {
-				s.Out.Put(extended)
+				s.Out.Push(extended)
 			}
 		}
 
@@ -84,10 +84,10 @@ func RunParallel(s *Setup, routines int) {
 		go func(rtn int) {
 		main:
 			for {
-				p, valid := s.In.Take()
-				for !valid {
-					p, valid = s.In.Take()
-					if valid {
+				p, ok := s.In.Pop()
+				for !ok {
+					p, ok = s.In.Pop()
+					if ok {
 						break
 					}
 					counter <- -1
@@ -107,14 +107,14 @@ func RunParallel(s *Setup, routines int) {
 							s.PreProcess(extended)
 							processed = true
 						}
-						s.In.Put(extended)
+						s.In.Push(extended)
 					}
 					if s.Outputtable(extended) {
 						if !processed {
 							s.PreProcess(extended)
 							processed = true
 						}
-						s.Out.Put(extended)
+						s.Out.Push(extended)
 					}
 				}
 				if s.PostProcess(p) != nil {

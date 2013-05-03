@@ -1,41 +1,139 @@
+// CookieJar - A contestant's algorithm toolbox
+// Copyright (c) 2013 Peter Szilagyi. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright notice,
+//       this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// Alternatively, the CookieJar toolbox may be used in accordance with the terms
+// and conditions contained in a signed written agreement between you and the
+// author(s).
+//
+// Author: peterke@gmail.com (Peter Szilagyi)
+
+// Package queue implements a FIFO (first in first out) data structure supporting
+// arbitrary types (even a mixture).
+//
+// Internally it uses a dynamically growing circular slice of blocks, resulting
+// in faster resizes than a simple dynamic array/slice would allow.
 package pool
 
 import (
-	"container/list"
 	"spexs"
+	"sync"
 )
 
-type Fifo struct {
-	token chan int
-	list  *list.List
+// First in, first out data structure.
+type Queue struct {
+	m       sync.Mutex
+	tailIdx int
+	headIdx int
+	tailOff int
+	headOff int
+
+	blocks [][]*spexs.Query
+	head   []*spexs.Query
+	tail   []*spexs.Query
 }
 
-func NewFifo() *Fifo {
-	p := &Fifo{}
-	p.token = make(chan int, 1)
-	p.list = list.New()
-	p.token <- 1
-	return p
+// Creates a new, empty queue.
+func NewQueue() *Queue {
+	result := new(Queue)
+	result.blocks = [][]*spexs.Query{make([]*spexs.Query, blockSize)}
+	result.head = result.blocks[0]
+	result.tail = result.blocks[0]
+	return result
 }
 
-func (p *Fifo) Take() (*spexs.Query, bool) {
-	<-p.token
-	if p.list.Len() == 0 {
-		p.token <- 1
+// Pushes a new element into the queue, expanding it if necessary.
+func (q *Queue) Push(data *spexs.Query) {
+	q.m.Lock()
+	q.tail[q.tailOff] = data
+	q.tailOff++
+	if q.tailOff == blockSize {
+		q.tailOff = 0
+		q.tailIdx = (q.tailIdx + 1) % len(q.blocks)
+
+		// If we wrapped over to the end, insert a new block and update indices
+		if q.tailIdx == q.headIdx {
+			buffer := make([][]*spexs.Query, len(q.blocks)+1)
+			copy(buffer[:q.tailIdx], q.blocks[:q.tailIdx])
+			buffer[q.tailIdx] = make([]*spexs.Query, blockSize)
+			copy(buffer[q.tailIdx+1:], q.blocks[q.tailIdx:])
+			q.blocks = buffer
+			q.headIdx++
+			q.head = q.blocks[q.headIdx]
+		}
+		q.tail = q.blocks[q.tailIdx]
+	}
+	q.m.Unlock()
+}
+
+// Pops out an element from the queue. Note, no bounds checking are done.
+func (q *Queue) Pop() (res *spexs.Query, ok bool) {
+	q.m.Lock()
+	if q.headIdx == q.tailIdx && q.headOff == q.tailOff {
+		q.m.Unlock()
 		return nil, false
 	}
-	tmp := p.list.Front()
-	p.list.Remove(tmp)
-	p.token <- 1
-	return tmp.Value.(*spexs.Query), true
+	res, q.head[q.headOff] = q.head[q.headOff], nil
+	q.headOff++
+	if q.headOff == blockSize {
+		q.headOff = 0
+		q.headIdx = (q.headIdx + 1) % len(q.blocks)
+		q.head = q.blocks[q.headIdx]
+	}
+	q.m.Unlock()
+	return res, true
 }
 
-func (p *Fifo) Put(pat *spexs.Query) {
-	<-p.token
-	p.list.PushBack(pat)
-	p.token <- 1
+// Checks whether the queue is empty.
+func (q *Queue) Empty() bool {
+	q.m.Lock()
+	r := q.headIdx == q.tailIdx && q.headOff == q.tailOff
+	q.m.Unlock()
+	return r
 }
 
-func (p *Fifo) Len() int {
-	return p.list.Len()
+// Returns the number of elements in the queue.
+func (q *Queue) Len() (size int) {
+	q.m.Lock()
+	if q.tailIdx > q.headIdx {
+		size = (q.tailIdx-q.headIdx)*blockSize - q.headOff + q.tailOff
+	} else if q.tailIdx < q.headIdx {
+		size = (len(q.blocks)-q.headIdx+q.tailIdx)*blockSize - q.headOff + q.tailOff
+	} else {
+		size = q.tailOff - q.headOff
+	}
+	q.m.Unlock()
+	return size
+}
+
+// Returns all values in an array
+func (q *Queue) Values() []*spexs.Query {
+	q.m.Lock()
+	r := make([]*spexs.Query, 0, q.Len())
+	for !q.Empty() {
+		v, _ := q.Pop()
+		r = append(r, v)
+	}
+	q.m.Unlock()
+	return r
 }

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"launchpad.net/rjson"
 	"fmt"
 	"io"
+	"launchpad.net/rjson"
 	"log"
 	"regexp"
 	. "spexs"
@@ -64,7 +64,7 @@ func NewAppSetup(conf *Conf) *AppSetup {
 
 func (s *AppSetup) initInput() {
 	info("init input")
-	s.In = pool.NewLifo()
+	s.In = pool.NewStack()
 }
 
 func (s *AppSetup) initOutput() {

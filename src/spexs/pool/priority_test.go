@@ -21,8 +21,8 @@ func add(base *Query, s string) *Query {
 	return add(n, s[size:])
 }
 
-func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
-	val, ok := p.Take()
+func testPop(t *testing.T, p Pooler, expected string, expectedOk bool) {
+	val, ok := p.Pop()
 	if ok != expectedOk {
 		t.Errorf("didn't get correct ok value, got='%v', expected='%v', str='%s'", ok, expectedOk, expected)
 	}
@@ -32,21 +32,21 @@ func testTake(t *testing.T, p Pooler, expected string, expectedOk bool) {
 }
 
 func TestFifo(t *testing.T) {
-	p := NewFifo()
+	p := NewQueue()
 
-	p.Put(pat("alpha"))
-	p.Put(pat("beta"))
+	p.Push(pat("alpha"))
+	p.Push(pat("beta"))
 
-	testTake(t, p, "alpha", true)
-	testTake(t, p, "beta", true)
+	testPop(t, p, "alpha", true)
+	testPop(t, p, "beta", true)
 
-	p.Put(pat("gamma"))
-	p.Put(pat("delta"))
+	p.Push(pat("gamma"))
+	p.Push(pat("delta"))
 
-	testTake(t, p, "gamma", true)
-	testTake(t, p, "delta", true)
-	testTake(t, p, "", false)
-	testTake(t, p, "", false)
+	testPop(t, p, "gamma", true)
+	testPop(t, p, "delta", true)
+	testPop(t, p, "", false)
+	testPop(t, p, "", false)
 }
 
 func TestPriority(t *testing.T) {
@@ -56,21 +56,21 @@ func TestPriority(t *testing.T) {
 
 	p := NewPriority(lenFeature, 0, true)
 
-	p.Put(pat("bc"))
-	p.Put(pat("defg"))
-	p.Put(pat("a"))
-	p.Put(pat("def"))
+	p.Push(pat("bc"))
+	p.Push(pat("defg"))
+	p.Push(pat("a"))
+	p.Push(pat("def"))
 
-	testTake(t, p, "a", true)
-	testTake(t, p, "bc", true)
+	testPop(t, p, "a", true)
+	testPop(t, p, "bc", true)
 
-	p.Put(pat("x"))
-	p.Put(pat("defgh"))
+	p.Push(pat("x"))
+	p.Push(pat("defgh"))
 
-	testTake(t, p, "x", true)
-	testTake(t, p, "def", true)
-	testTake(t, p, "defg", true)
-	testTake(t, p, "defgh", true)
+	testPop(t, p, "x", true)
+	testPop(t, p, "def", true)
+	testPop(t, p, "defg", true)
+	testPop(t, p, "defgh", true)
 
-	testTake(t, p, "", false)
+	testPop(t, p, "", false)
 }

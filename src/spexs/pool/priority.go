@@ -15,6 +15,8 @@ type Priority struct {
 	limit  int
 }
 
+type priorityIntf Priority
+
 func NewPriority(order []Feature, limit int) *Priority {
 	p := &Priority{}
 	p.token = make(chan int, 1)
@@ -24,7 +26,7 @@ func NewPriority(order []Feature, limit int) *Priority {
 	p.Order = order
 	p.token <- 1
 
-	heap.Init(p)
+	heap.Init((*priorityIntf)(p))
 	return p
 }
 
@@ -32,33 +34,33 @@ func (p *Priority) IsEmpty() bool {
 	return p.length == 0
 }
 
-func (p *Priority) Take() (*Query, bool) {
+func (p *Priority) Pop() (*Query, bool) {
 	<-p.token
 	if p.IsEmpty() {
 		p.token <- 1
 		return nil, false
 	}
-	v := heap.Pop(p)
+	v := heap.Pop((*priorityIntf)(p))
 	p.token <- 1
 	return v.(*Query), true
 }
 
-func (p *Priority) Put(pat *Query) {
+func (p *Priority) Push(pat *Query) {
 	worst := p.Worst
 	if worst != nil && p.less(pat, worst) {
 		return
 	}
 
 	<-p.token
-	heap.Push(p, pat)
+	heap.Push((*priorityIntf)(p), pat)
 	if p.limit > 0 && p.Len() > p.limit {
-		p.Worst = heap.Pop(p).(*Query)
+		p.Worst = heap.Pop((*priorityIntf)(p)).(*Query)
 	}
 	p.token <- 1
 }
 
 func (p *Priority) Top(n int) []*Query {
-	sort.Sort(p)
+	sort.Sort((*priorityIntf)(p))
 	last := n
 	if last > p.length {
 		last = p.length
@@ -67,7 +69,7 @@ func (p *Priority) Top(n int) []*Query {
 }
 
 func (p *Priority) Bottom(n int) []*Query {
-	sort.Sort(p)
+	sort.Sort((*priorityIntf)(p))
 	first := p.length - n
 	if first < 0 {
 		first = 0
@@ -86,16 +88,7 @@ func (p *Priority) Values() []*Query {
 }
 
 func (p *Priority) Heapify() {
-	heap.Init(p)
-}
-
-// sort.Interface
-func (p *Priority) Len() int {
-	return p.length
-}
-
-func (p *Priority) Swap(i, j int) {
-	p.items[i], p.items[j] = p.items[j], p.items[i]
+	heap.Init((*priorityIntf)(p))
 }
 
 func (p *Priority) less(a *Query, b *Query) bool {
@@ -110,12 +103,25 @@ func (p *Priority) less(a *Query, b *Query) bool {
 	return false
 }
 
-func (p *Priority) Less(i, j int) bool {
-	return p.less(p.items[i], p.items[j])
+// sort.Interface
+func (p *Priority) Len() int {
+	return p.length
+}
+
+func (p *priorityIntf) Len() int {
+	return p.length
+}
+
+func (p *priorityIntf) Swap(i, j int) {
+	p.items[i], p.items[j] = p.items[j], p.items[i]
+}
+
+func (p *priorityIntf) Less(i, j int) bool {
+	return (*Priority)(p).less(p.items[i], p.items[j])
 }
 
 // heap.Interface
-func (p *Priority) Push(x interface{}) {
+func (p *priorityIntf) Push(x interface{}) {
 	if p.length+1 > len(p.items) {
 		tmp := make([]*Query, len(p.items)+50000)
 		copy(tmp, p.items)
@@ -126,7 +132,7 @@ func (p *Priority) Push(x interface{}) {
 	p.length += 1
 }
 
-func (p *Priority) Pop() interface{} {
+func (p *priorityIntf) Pop() interface{} {
 	r := p.items[p.length-1]
 	p.length -= 1
 	return r

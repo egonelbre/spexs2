@@ -1,79 +1,125 @@
+// CookieJar - A contestant's algorithm toolbox
+// Copyright (c) 2013 Peter Szilagyi. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright notice,
+//       this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+//
+// Alternatively, the CookieJar toolbox may be used in accordance with the terms
+// and conditions contained in a signed written agreement between you and the
+// author(s).
+//
+// Author: peterke@gmail.com (Peter Szilagyi)
+
+// Package stack implements a LIFO (last in first out) data structure supporting
+// arbitrary types (even a mixture).
+//
+// Internally it uses a dynamically growing slice of blocks, resulting in faster
+// resizes than a simple dynamic array/slice would allow.
 package pool
 
 import (
 	"spexs"
-	"sync/atomic"
-	"unsafe"
+	"sync"
 )
 
-// based on https://github.com/fmstephe/lfqueue
+// Last in, first out data structure.
+type Stack struct {
+	m        sync.Mutex
+	size     int
+	capacity int
+	offset   int
 
-type node struct {
-	val *spexs.Query
-	nxt unsafe.Pointer
+	blocks [][]*spexs.Query
+	active []*spexs.Query
 }
 
-type Lifo struct {
-	head unsafe.Pointer
-	tail unsafe.Pointer
+// Creates a new, empty stack.
+func NewStack() *Stack {
+	result := new(Stack)
+	result.active = make([]*spexs.Query, blockSize)
+	result.blocks = [][]*spexs.Query{result.active}
+	result.capacity = blockSize
+	return result
 }
 
-func NewLifo() (q *Lifo) {
-	q = new(Lifo)
-	n := unsafe.Pointer(new(node))
-	q.head = n
-	q.tail = n
-	return
-}
-
-func (q *Lifo) Take() (val *spexs.Query, success bool) {
-	var h, t, n unsafe.Pointer
-	for {
-		h = q.head
-		t = q.tail
-		n = ((*node)(h)).nxt
-		if h == t {
-			if n == nil {
-				return nil, false
-			} else {
-				atomic.CompareAndSwapPointer(&q.tail, t, n)
-			}
-		} else {
-			val = ((*node)(n)).val // Enq(...) write to val may not be visible
-			if atomic.CompareAndSwapPointer(&q.head, h, n) {
-				return val, true
-			}
-		}
+// Pushes a value onto the stack, expanding it if necessary.
+func (s *Stack) Push(data *spexs.Query) {
+	s.m.Lock()
+	if s.size == s.capacity {
+		s.active = make([]*spexs.Query, blockSize)
+		s.blocks = append(s.blocks, s.active)
+		s.capacity += blockSize
+		s.offset = 0
+	} else if s.offset == blockSize {
+		s.active = s.blocks[s.size/blockSize]
+		s.offset = 0
 	}
-	panic("Unreachable")
+	s.active[s.offset] = data
+	s.offset++
+	s.size++
+	s.m.Unlock()
 }
 
-func (q *Lifo) Put(val *spexs.Query) {
-	var t, n unsafe.Pointer
-	n = unsafe.Pointer(&node{val: val, nxt: nil})
-	for {
-		t = q.tail
-		nxt := ((*node)(t)).nxt
-		if nxt != nil {
-			atomic.CompareAndSwapPointer(&q.tail, t, nxt)
-		} else if atomic.CompareAndSwapPointer(&((*node)(t)).nxt, nil, n) {
-			break
-		}
+// Pops a value off the stack and returns it. Currently no shrinking is done.
+func (s *Stack) Pop() (res *spexs.Query, ok bool) {
+	s.m.Lock()
+	if s.size == 0 {
+		s.m.Unlock()
+		return nil, false
 	}
-	atomic.CompareAndSwapPointer(&q.tail, t, n)
-}
-
-func (q *Lifo) Values() []*spexs.Query {
-	res := make([]*spexs.Query, q.Len())
-	v, ok := q.Take()
-	i := 0
-	for ok {
-		res[i] = v
-		v, ok = q.Take()
+	s.size--
+	s.offset--
+	if s.offset < 0 {
+		s.offset = blockSize - 1
+		s.active = s.blocks[s.size/blockSize]
 	}
-	return res
+	res, s.active[s.offset] = s.active[s.offset], nil
+	s.m.Unlock()
+	return res, true
 }
 
-func (p *Lifo) Len() int {
-	return 1
+// Checks whether the stack is empty or not.
+func (s *Stack) Empty() bool {
+	s.m.Lock()
+	r := s.size == 0
+	s.m.Unlock()
+	return r
+}
+
+// Returns all values in an array
+func (s *Stack) Values() []*spexs.Query {
+	s.m.Lock()
+	r := make([]*spexs.Query, 0, s.Len())
+	for !s.Empty() {
+		v, _ := s.Pop()
+		r = append(r, v)
+	}
+	s.m.Unlock()
+	return r
+}
+
+// Returns the number of elements in the stack.
+func (s *Stack) Len() int {
+	s.m.Lock()
+	r := s.size
+	s.m.Unlock()
+	return r
 }
