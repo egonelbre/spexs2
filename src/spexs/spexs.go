@@ -62,9 +62,9 @@ func Run(s *Setup) {
 		for _, extended := range extensions {
 			if s.Extendable(extended) {
 				s.In.Push(extended)
-			}
-			if s.Outputtable(extended) {
-				s.Out.Push(extended)
+				if s.Outputtable(extended) {
+					s.Out.Push(extended)
+				}
 			}
 		}
 
@@ -101,20 +101,12 @@ func RunParallel(s *Setup, routines int) {
 
 				extensions := s.Extender(p)
 				for _, extended := range extensions {
-					processed := false
 					if s.Extendable(extended) {
-						if !processed {
-							s.PreProcess(extended)
-							processed = true
-						}
+						s.PreProcess(extended)
 						s.In.Push(extended)
-					}
-					if s.Outputtable(extended) {
-						if !processed {
-							s.PreProcess(extended)
-							processed = true
+						if s.Outputtable(extended) {
+							s.Out.Push(extended)
 						}
-						s.Out.Push(extended)
 					}
 				}
 				if s.PostProcess(p) != nil {

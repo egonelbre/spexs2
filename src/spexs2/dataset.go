@@ -127,7 +127,7 @@ func (ds *Dataset) AddFile(db *Database, filename string, countSeparator string)
 	isCounted := countSeparator != ""
 
 	section := db.MakeSection()
-	reader = bufio.NewReader(file)
+	reader = bufio.NewReaderSize(file, 5*1024*1024)
 	for err == nil {
 		count := 1
 
