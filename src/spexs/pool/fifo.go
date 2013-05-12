@@ -37,12 +37,10 @@ package pool
 
 import (
 	"spexs"
-	"sync"
 )
 
 // First in, first out data structure.
 type Queue struct {
-	m       sync.Mutex
 	tailIdx int
 	headIdx int
 	tailOff int
@@ -64,7 +62,6 @@ func NewQueue() *Queue {
 
 // Pushes a new element into the queue, expanding it if necessary.
 func (q *Queue) Push(data *spexs.Query) {
-	q.m.Lock()
 	q.tail[q.tailOff] = data
 	q.tailOff++
 	if q.tailOff == blockSize {
@@ -83,14 +80,11 @@ func (q *Queue) Push(data *spexs.Query) {
 		}
 		q.tail = q.blocks[q.tailIdx]
 	}
-	q.m.Unlock()
 }
 
 // Pops out an element from the queue. Note, no bounds checking are done.
 func (q *Queue) Pop() (res *spexs.Query, ok bool) {
-	q.m.Lock()
 	if q.headIdx == q.tailIdx && q.headOff == q.tailOff {
-		q.m.Unlock()
 		return nil, false
 	}
 	res, q.head[q.headOff] = q.head[q.headOff], nil
@@ -100,21 +94,17 @@ func (q *Queue) Pop() (res *spexs.Query, ok bool) {
 		q.headIdx = (q.headIdx + 1) % len(q.blocks)
 		q.head = q.blocks[q.headIdx]
 	}
-	q.m.Unlock()
 	return res, true
 }
 
 // Checks whether the queue is empty.
 func (q *Queue) Empty() bool {
-	q.m.Lock()
 	r := q.headIdx == q.tailIdx && q.headOff == q.tailOff
-	q.m.Unlock()
 	return r
 }
 
 // Returns the number of elements in the queue.
 func (q *Queue) Len() (size int) {
-	q.m.Lock()
 	if q.tailIdx > q.headIdx {
 		size = (q.tailIdx-q.headIdx)*blockSize - q.headOff + q.tailOff
 	} else if q.tailIdx < q.headIdx {
@@ -122,18 +112,15 @@ func (q *Queue) Len() (size int) {
 	} else {
 		size = q.tailOff - q.headOff
 	}
-	q.m.Unlock()
 	return size
 }
 
 // Returns all values in an array
 func (q *Queue) Values() []*spexs.Query {
-	q.m.Lock()
 	r := make([]*spexs.Query, 0, q.Len())
 	for !q.Empty() {
 		v, _ := q.Pop()
 		r = append(r, v)
 	}
-	q.m.Unlock()
 	return r
 }

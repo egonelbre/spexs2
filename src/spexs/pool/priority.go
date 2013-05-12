@@ -7,7 +7,6 @@ import (
 )
 
 type Priority struct {
-	token  chan int
 	items  []*Query
 	Order  []Feature
 	Worst  *Query
@@ -19,29 +18,24 @@ type priorityIntf Priority
 
 func NewPriority(order []Feature, limit int) *Priority {
 	p := &Priority{}
-	p.token = make(chan int, 1)
 	p.items = make([]*Query, limit+100)
 	p.length = 0
 	p.limit = limit
 	p.Order = order
-	p.token <- 1
 
 	heap.Init((*priorityIntf)(p))
 	return p
 }
 
-func (p *Priority) IsEmpty() bool {
+func (p *Priority) Empty() bool {
 	return p.length == 0
 }
 
 func (p *Priority) Pop() (*Query, bool) {
-	<-p.token
-	if p.IsEmpty() {
-		p.token <- 1
+	if p.Empty() {
 		return nil, false
 	}
 	v := heap.Pop((*priorityIntf)(p))
-	p.token <- 1
 	return v.(*Query), true
 }
 
@@ -51,12 +45,10 @@ func (p *Priority) Push(pat *Query) {
 		return
 	}
 
-	<-p.token
 	heap.Push((*priorityIntf)(p), pat)
 	if p.limit > 0 && p.Len() > p.limit {
 		p.Worst = heap.Pop((*priorityIntf)(p)).(*Query)
 	}
-	p.token <- 1
 }
 
 func (p *Priority) Top(n int) []*Query {

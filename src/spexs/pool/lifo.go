@@ -37,12 +37,10 @@ package pool
 
 import (
 	"spexs"
-	"sync"
 )
 
 // Last in, first out data structure.
 type Stack struct {
-	m        sync.Mutex
 	size     int
 	capacity int
 	offset   int
@@ -62,7 +60,6 @@ func NewStack() *Stack {
 
 // Pushes a value onto the stack, expanding it if necessary.
 func (s *Stack) Push(data *spexs.Query) {
-	s.m.Lock()
 	if s.size == s.capacity {
 		s.active = make([]*spexs.Query, blockSize)
 		s.blocks = append(s.blocks, s.active)
@@ -75,14 +72,11 @@ func (s *Stack) Push(data *spexs.Query) {
 	s.active[s.offset] = data
 	s.offset++
 	s.size++
-	s.m.Unlock()
 }
 
 // Pops a value off the stack and returns it. Currently no shrinking is done.
 func (s *Stack) Pop() (res *spexs.Query, ok bool) {
-	s.m.Lock()
 	if s.size == 0 {
-		s.m.Unlock()
 		return nil, false
 	}
 	s.size--
@@ -92,34 +86,27 @@ func (s *Stack) Pop() (res *spexs.Query, ok bool) {
 		s.active = s.blocks[s.size/blockSize]
 	}
 	res, s.active[s.offset] = s.active[s.offset], nil
-	s.m.Unlock()
 	return res, true
 }
 
 // Checks whether the stack is empty or not.
 func (s *Stack) Empty() bool {
-	s.m.Lock()
 	r := s.size == 0
-	s.m.Unlock()
 	return r
 }
 
 // Returns all values in an array
 func (s *Stack) Values() []*spexs.Query {
-	s.m.Lock()
 	r := make([]*spexs.Query, 0, s.Len())
 	for !s.Empty() {
 		v, _ := s.Pop()
 		r = append(r, v)
 	}
-	s.m.Unlock()
 	return r
 }
 
 // Returns the number of elements in the stack.
 func (s *Stack) Len() int {
-	s.m.Lock()
 	r := s.size
-	s.m.Unlock()
 	return r
 }

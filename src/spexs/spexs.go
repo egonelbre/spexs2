@@ -1,6 +1,9 @@
 package spexs
 
-import "time"
+import (
+	"sync"
+	"utils"
+)
 
 type Token uint
 type Querys []*Query
@@ -10,6 +13,7 @@ type Pooler interface {
 	Push(*Query)
 	Values() []*Query
 	Len() int
+	Empty() bool
 }
 
 type Extender func(p *Query) Querys
@@ -77,52 +81,70 @@ func Run(s *Setup) {
 func RunParallel(s *Setup, routines int) {
 	prepareSpexs(s)
 
-	quit := make(chan int, routines)
-	counter := make(chan int, routines)
+	wg := sync.WaitGroup{}
+
+	allDone := false
+	m, out := &sync.Mutex{}, &sync.Mutex{}
+
+	added := utils.NewSem(1)
+	workers := 0
 
 	for i := 0; i < routines; i += 1 {
-		go func(rtn int) {
-		main:
+		wg.Add(1)
+
+		go func() {
 			for {
-				p, ok := s.In.Pop()
-				for !ok {
-					p, ok = s.In.Pop()
-					if ok {
-						break
-					}
-					counter <- -1
-					select {
-					case <-time.After(100 * time.Millisecond):
-					case <-quit:
-						break main
-					}
-					counter <- 1
+				added.Wait()
+				m.Lock()
+				if allDone {
+					added.Signal()
+					m.Unlock()
+					break
 				}
+
+				p, ok := s.In.Pop()
+				if !ok {
+					m.Unlock()
+					continue
+				}
+				workers += 1
+				m.Unlock()
 
 				extensions := s.Extender(p)
 				for _, extended := range extensions {
 					if s.Extendable(extended) {
 						s.PreProcess(extended)
+
+						m.Lock()
 						s.In.Push(extended)
+						m.Unlock()
+
+						added.Signal()
+
 						if s.Outputtable(extended) {
+							out.Lock()
 							s.Out.Push(extended)
+							out.Unlock()
 						}
 					}
 				}
-				if s.PostProcess(p) != nil {
+
+				m.Lock()
+				workers -= 1
+				allDone = workers == 0 && s.In.Empty()
+				needToTerminate := s.PostProcess(p) != nil
+
+				if allDone || needToTerminate {
+					added.Signal()
+					m.Unlock()
 					break
 				}
+				m.Unlock()
 			}
-		}(i)
+
+			wg.Done()
+		}()
 	}
 
-	count := routines
-	for count > 0 {
-		value := <-counter
-		count += value
-	}
-
-	for i := 0; i < routines; i += 1 {
-		quit <- 1
-	}
+	wg.Wait()
 }
