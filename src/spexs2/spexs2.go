@@ -66,8 +66,6 @@ func main() {
 
 	info("reading input")
 
-	starting := time.Now()
-
 	setup := NewAppSetup(conf)
 
 	// defined in runtime.go
@@ -91,8 +89,6 @@ func main() {
 
 	info("running spexs")
 
-	running := time.Now()
-
 	if *procs <= 1 {
 		Run(&setup.Setup)
 	} else {
@@ -101,10 +97,6 @@ func main() {
 
 	endStats()
 
-	finished := time.Now()
-
 	info("printing results")
-	// setup.Printer(os.Stdout, setup.Out)
-
-	fmt.Printf("total: %v, db-read: %v, spexs: %v", finished.Sub(starting), running.Sub(starting), finished.Sub(running))
+	setup.Printer(os.Stdout, setup.Out)
 }

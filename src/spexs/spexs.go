@@ -1,9 +1,6 @@
 package spexs
 
-import (
-	"sync"
-	"utils"
-)
+import "sync"
 
 type Token uint
 type Querys []*Query
@@ -78,6 +75,8 @@ func Run(s *Setup) {
 	}
 }
 
+type signal struct{}
+
 func RunParallel(s *Setup, routines int) {
 	prepareSpexs(s)
 
@@ -86,7 +85,8 @@ func RunParallel(s *Setup, routines int) {
 	allDone := false
 	m, out := &sync.Mutex{}, &sync.Mutex{}
 
-	added := utils.NewSem(1)
+	added := make(chan signal, 1e9)
+	added <- signal{}
 	workers := 0
 
 	for i := 0; i < routines; i += 1 {
@@ -94,10 +94,10 @@ func RunParallel(s *Setup, routines int) {
 
 		go func() {
 			for {
-				added.Wait()
+				<-added
 				m.Lock()
 				if allDone {
-					added.Signal()
+					added <- signal{}
 					m.Unlock()
 					break
 				}
@@ -119,7 +119,7 @@ func RunParallel(s *Setup, routines int) {
 						s.In.Push(extended)
 						m.Unlock()
 
-						added.Signal()
+						added <- signal{}
 
 						if s.Outputtable(extended) {
 							out.Lock()
@@ -135,7 +135,7 @@ func RunParallel(s *Setup, routines int) {
 				needToTerminate := s.PostProcess(p) != nil
 
 				if allDone || needToTerminate {
-					added.Signal()
+					added <- signal{}
 					m.Unlock()
 					break
 				}
