@@ -1,38 +1,37 @@
 package utils
 
-type signal struct{}
+import "sync"
 
 type Sem struct {
-	some  chan signal
-	none  chan signal
-	count uint32
+	mutex sync.Mutex
+	delay sync.Mutex
+	count int32
 }
 
-func NewSem(n uint32) *Sem {
-	s := Sem{make(chan signal, 1), make(chan signal, 1), n}
-	if n == 0 {
-		s.none <- signal{}
-	} else {
-		s.some <- signal{}
-	}
-	return &s
+func NewSem(n int32) *Sem {
+	s := &Sem{}
+	s.delay.Lock()
+	s.count = n
+	return s
 }
 
 func (s *Sem) Wait() {
-	<-s.some
-	s.count--
-	if s.count == 0 {
-		s.none <- signal{}
-	} else {
-		s.some <- signal{}
+	s.mutex.Lock()
+	s.count -= 1
+	if s.count < 0 {
+		s.mutex.Unlock()
+		s.delay.Lock()
 	}
+	s.mutex.Unlock()
+	return
 }
 
 func (s *Sem) Signal() {
-	select {
-	case <-s.some:
-	case <-s.none:
+	s.mutex.Lock()
+	s.count += 1
+	if s.count <= 0 {
+		s.delay.Unlock()
+	} else {
+		s.mutex.Unlock()
 	}
-	s.count++
-	s.some <- signal{}
 }
