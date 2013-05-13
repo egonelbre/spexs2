@@ -16,7 +16,7 @@
 		"Extendable": {
 			"PatLength()" : {"max" : 7},
 			"PatGroups()" : {"max" : 3},
-			"Matches(fore)" : {"min" : 300},
+			"Matches(fore)" : {"min" : 250},
 			"NoStartingGroup()" : {},
 			"NoTokens()" : {"Tokens":"E"},
 		},
@@ -27,14 +27,14 @@
 		}
 	},
 	"Output": {
-		"SortBy": ["MatchesPropRatio(fore,back)", "Matches(fore)"],
-		"Count": 100
+		"SortBy": ["-Hyper(fore,back)", "Matches(fore)"],
+		"Count": 20
 	},
 	"Printer" : {
 		"Method" : "Formatted",
 		"ShowHeader": true,
 		"Reverse": true,
 		"Header": "",
-		"Format": "Pat?()\t\tMatches(fore)/Total(fore)\tMatches(back)/Total(back)\tMatchesPropRatio(fore,back)\n"
+		"Format": "Pat?()\t\tMatches(fore)/Total(fore)\tMatches(back)/Total(back)\tMatchesPropRatio(fore,back)\tHyper(fore,back)\n"
 	}
 }
