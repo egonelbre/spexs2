@@ -11,6 +11,7 @@ var All = [...]Extender{
 	Simple,
 	Group,
 	Star,
+	StarExact,
 	Regex,
 }
 
@@ -33,5 +34,7 @@ var Help = `
   Simple : uses the sequence tokens to discover the patterns  ( ACCT )
   Group : uses additionally defined groups in Alphabet.Groups ( AC[CT]T )
   Star : uses matching anything in the pattern ( AC.*T )
+  StarExact : uses unoptimized version of Star, matches more exactly ( AC.*T )
+              corresponds to all the regular expression matches
   Regex : uses both group and star token in the pattern ( A[CT].*T )
 `

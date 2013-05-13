@@ -2,18 +2,22 @@
 ;; immediately with the results shown on the
 ;; right.
 
-(defn- group-map-by [g f coll]
-  "Returns a map of the elements of coll keyed by the result of 
-  g on each element. The value at each key will be a vector of the
-  corresponding mapped elements by f, in the order they appeared in coll."
-  (persistent!
-   (reduce (fn [ret x]
-             (let [k (g x)]
-               (assoc! ret k (conj (get ret k []) (f x)))))
-           (transient {}) coll)))
+;; Anything you type in here will be executed
+;; immediately with the results shown on the
+;; right.
 
-; ===================================
-; Define structures for the algorithm
+(require '[ clojure.core.reducers :as r ])
+
+; a parallel grouping function
+(defn group-map-by [g f coll]
+  (r/fold 
+   (r/monoid (partial merge-with into) (constantly {}))
+   (fn [ret x]
+     (let [k (g x)]
+       (assoc ret k (conj (get ret k []) (f x)))))
+   coll))
+
+; these are the minimal requirements for a dataset
 (defprotocol Dataset
   "This is interface for searching data in datasets"
   (all   [this] "return all possible positions on the dataset")
@@ -22,25 +26,36 @@
 (defrecord Query [pattern positions])
 (defrecord Step [token position])
 
-(defn empty-query [dataset]
+; create an empty query for a dataset
+(defn- empty-query [dataset]
   (Query. [] (all dataset)))
 
+; create a child query for parent given a token and positions
 (defn- child-query [parent [token positions]]
   (Query. (conj (:pattern parent) token) positions))
 
-; extender is a function that returns a dictionary token -> positions
-; eg. {t1 [p1 p2 p3] t2 [p4 p5 p6]}
-; where t_ are tokens, p_ are positions
+; simple extension function
+(defn walk-extend [dataset positions]
+  (let [steps (mapcat #(walk dataset %) positions)]
+    (group-map-by :token :position steps)))
 
+; group extender
+(defn- select-merged [m ks]
+  (mapcat second (select-keys m ks)))
+
+(defn extend-grouper [extend groups]
+  (fn [dataset positions]
+    (let [ extended (extend dataset)
+           groupings (for [[token items] groups] 
+                        [token (select-merged extended items)])]
+      (apply merge extended groupings))))
+
+; function to combine multiple extension functions
 (defn combine-extenders [extenders]
   (fn [dataset positions] 
     (apply merge-with concat (map #(% dataset positions) extenders))))
 
-(defn walk-extend [dataset positions]
-  (let [steps (mapcat #(walk dataset %) positions)]
-   (group-map-by :token :position steps)))
-
-; recursive spexs algorithm
+; spexs algorithm
 (defn spexs-step [ds q extend]
   (map #(child-query q %) (extend ds (:positions q))))
 
@@ -63,9 +78,8 @@
           (recur new-in new-out))
         out))))
 
-; ===================================
-; Example implementation of a Dataset
 
+; here is an example how to implement a dataset
 (defn- posify [row-index row-item]
   (map (fn [pos] [row-index pos]) (range (count row-item))))
 
@@ -84,7 +98,7 @@
 ; example
 (def example (SequenceDataset. ["ACGT" "CGATA" "AGCTTCGA" "GCGTAA"]))
 
-(spexs {:dataset example :input [] :output [] 
+(spexs {:dataset example :in [] :out [] 
         :extend walk-extend
         :extend? #(> (count (:positions %)) 3) 
         :output? #(> (count (:pattern %)) 2)})

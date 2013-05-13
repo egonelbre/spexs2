@@ -99,6 +99,31 @@ func Star(base *Query) Querys {
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 
+func starExactExtend(base *Query, db *Database, querys queryMap) {
+	for _, val := range base.Loc.Iter() {
+		i, pos := DecodePos(val)
+		var q *Query
+		token, ok, next := db.GetToken(i, pos)
+		for ok {
+			q, ok = querys[token]
+			if !ok {
+				q = NewQuery(base, RegToken{token, false, true})
+				querys[token] = q
+			}
+			q.Loc.Add(EncodePos(i, next))
+			token, ok, next = db.GetToken(i, next)
+		}
+	}
+}
+
+func StarExact(base *Query) Querys {
+	patterns := make(queryMap)
+	extend(base, base.Db, patterns)
+	stars := make(queryMap)
+	starExactExtend(base, base.Db, stars)
+	return append(toQuerys(patterns), toQuerys(stars)...)
+}
+
 func Regex(base *Query) Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
