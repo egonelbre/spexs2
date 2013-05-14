@@ -13,7 +13,7 @@ var All = [...]Extender{
 	Star,
 	StarGreedy,
 	Regex,
-	RegexGreedy
+	RegexGreedy,
 }
 
 func wrap(f Extender) CreateFunc {

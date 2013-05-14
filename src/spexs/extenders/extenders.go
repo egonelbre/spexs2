@@ -95,8 +95,18 @@ func StarGreedy(base *Query) Querys {
 }
 
 func starExtend(base *Query, db *Database, querys queryMap) {
+	firstPos := make(map[uint]uint, base.Loc.Len())
+
 	for _, val := range base.Loc.Iter() {
 		i, pos := DecodePos(val)
+
+		v, ok := firstPos[i]
+		if !ok || v > pos {
+			firstPos[i] = pos
+		}
+	}
+
+	for i, pos := range firstPos {
 		var q *Query
 		token, ok, next := db.GetToken(i, pos)
 		for ok {
