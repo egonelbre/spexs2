@@ -61,19 +61,14 @@ func Group(base *Query) Querys {
 	return toQuerys(querys)
 }
 
-func max(a uint, b uint) uint {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 func starGreedyExtend(base *Query, db *Database, querys queryMap) {
 	lastPos := make(map[uint]uint, base.Loc.Len())
 
 	for _, val := range base.Loc.Iter() {
 		i, pos := DecodePos(val)
-		lastPos[i] = max(lastPos[i], pos)
+		if lastPos[i] < pos {
+			lastPos[i] = pos
+		}
 	}
 
 	for i, last := range lastPos {
@@ -91,7 +86,7 @@ func starGreedyExtend(base *Query, db *Database, querys queryMap) {
 	}
 }
 
-func Star(base *Query) Querys {
+func StarGreedy(base *Query) Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
 	stars := make(queryMap)
@@ -99,7 +94,7 @@ func Star(base *Query) Querys {
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 
-func starExactExtend(base *Query, db *Database, querys queryMap) {
+func starExtend(base *Query, db *Database, querys queryMap) {
 	for _, val := range base.Loc.Iter() {
 		i, pos := DecodePos(val)
 		var q *Query
@@ -116,11 +111,11 @@ func starExactExtend(base *Query, db *Database, querys queryMap) {
 	}
 }
 
-func StarExact(base *Query) Querys {
+func Star(base *Query) Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
 	stars := make(queryMap)
-	starExactExtend(base, base.Db, stars)
+	starExtend(base, base.Db, stars)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 

@@ -9,7 +9,7 @@
 		"CountSeparator": ""
 	},
 	"Extension": {
-		"Method": "StarExact",
+		"Method": "Star",
 		"Groups" : {
 			"." : { "elements" : "ABCDFGHIXYZ"}
 		},
