@@ -128,3 +128,13 @@ func Regex(base *Query) Querys {
 	combine(base, base.Db, stars, true)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }
+
+func RegexGreedy(base *Query) Querys {
+	patterns := make(queryMap)
+	extend(base, base.Db, patterns)
+	combine(base, base.Db, patterns, false)
+	stars := make(queryMap)
+	starGreedyExtend(base, base.Db, stars)
+	combine(base, base.Db, stars, true)
+	return append(toQuerys(patterns), toQuerys(stars)...)
+}

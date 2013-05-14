@@ -13,6 +13,7 @@ var All = [...]Extender{
 	Star,
 	StarGreedy,
 	Regex,
+	RegexGreedy
 }
 
 func wrap(f Extender) CreateFunc {
@@ -36,4 +37,5 @@ var Help = `
   Star : uses matching anything in the pattern ( AC.*T )
   StarGreedy : matches greedily anything in the pattern ( AC.*T )
   Regex : uses both group and star token in the pattern ( A[CT].*T )
+  RegexGreedy : uses both group and star token in the pattern ( A[CT].*T )
 `
