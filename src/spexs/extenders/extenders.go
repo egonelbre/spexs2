@@ -68,7 +68,7 @@ func max(a uint, b uint) uint {
 	return b
 }
 
-func starExtend(base *Query, db *Database, querys queryMap) {
+func starGreedyExtend(base *Query, db *Database, querys queryMap) {
 	lastPos := make(map[uint]uint, base.Loc.Len())
 
 	for _, val := range base.Loc.Iter() {
@@ -95,7 +95,7 @@ func Star(base *Query) Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
 	stars := make(queryMap)
-	starExtend(base, base.Db, stars)
+	starGreedyExtend(base, base.Db, stars)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 
