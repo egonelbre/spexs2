@@ -10,6 +10,8 @@ temp/**
 pkg/**
 bin/**
 
+autoVersion.go
+
 !doc/**
 
 *.prof

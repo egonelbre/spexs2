@@ -5,7 +5,7 @@ export GOBIN=`pwd`/bin
 REVS=`git log --oneline | wc -l | sed "s/ //g"`
 VERSION=`git describe --tags --long`
 TIME=`date +%D\\ %H:%M:%S`
-echo -e "package main\n\nconst (\n\ttheVersion = \"$VERSION-rev$REVS\"\n\ttheBuildTime=\"$TIME\"\n)" > src/spexs2/version.go
+echo -e "package main\n\nfunc init(){\n\ttheVersion = \"$VERSION-rev$REVS\"\n\ttheBuildTime=\"$TIME\"\n}\n" > src/spexs2/autoVersion.go
 
 go install spexs
 go install spexs2
