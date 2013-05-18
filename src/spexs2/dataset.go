@@ -30,21 +30,37 @@ func CreateDatabase(conf *Conf) (*Database, *Dataset) {
 	db := NewDatabase(1024)
 	db.Separator = conf.Reader.Separator
 
+	skip := make(map[string]bool)
+	tokenNames := strings.Split(conf.Reader.Skip, db.Separator)
+	for _, name := range tokenNames {
+		skip[name] = true
+	}
+
 	ds := NewDataset()
 	for id, grp := range conf.Extension.Groups {
-		group := TokenGroup{}
+		group := &TokenGroup{}
 
 		group.Name = id
 		group.FullName = "[" + grp.Elements + "]"
 
 		tokenNames := strings.Split(grp.Elements, db.Separator)
-		tokenNames = removeEmpty(tokenNames)
+		tokenNames = removeInvalid(tokenNames, skip)
 		group.Elems = db.ToTokens(tokenNames)
 
 		db.AddGroup(group)
 	}
 
-	ds.AddFileGroups(db, conf.Dataset, conf.Reader.CountSeparator)
+	ds.AddFileGroups(db, conf.Dataset, conf.Reader.CountSeparator, skip)
+
+	tokens := 0
+	for _, ti := range db.Alphabet {
+		tokens += ti.Count
+	}
+
+	for _, ti := range db.Alphabet {
+		log.Printf("Token: %v\t%v\tp:%v\n", ti.Name, ti.Count, float64(ti.Count)/float64(tokens))
+	}
+
 	return db, ds
 }
 
@@ -77,7 +93,7 @@ func loadFileList(filename string) []string {
 	return lines
 }
 
-func (ds *Dataset) AddFileGroups(db *Database, groups map[string]FileGroup, countSeparator string) {
+func (ds *Dataset) AddFileGroups(db *Database, groups map[string]FileGroup, countSeparator string, skip map[string]bool) {
 	for group, filegroup := range groups {
 
 		files := make([]string, 0)
@@ -92,27 +108,32 @@ func (ds *Dataset) AddFileGroups(db *Database, groups map[string]FileGroup, coun
 
 		ids := make([]int, 0)
 		for _, file := range files {
-			id := ds.AddFile(db, file, countSeparator)
+			id := ds.AddFile(db, file, countSeparator, skip)
 			ids = append(ids, id)
 		}
 		ds.Groups[group] = ids
 	}
 }
 
-func removeEmpty(names []string) []string {
+func removeInvalid(names []string, skip map[string]bool) []string {
 	result := make([]string, len(names))
 	i := 0
 	for _, name := range names {
 		trimmed := strings.TrimSpace(name)
-		if trimmed != "" {
-			result[i] = trimmed
-			i += 1
+		if trimmed == "" {
+			continue
 		}
+		if skip[trimmed] {
+			continue
+		}
+
+		result[i] = trimmed
+		i += 1
 	}
 	return result[0:i]
 }
 
-func (ds *Dataset) AddFile(db *Database, filename string, countSeparator string) int {
+func (ds *Dataset) AddFile(db *Database, filename string, countSeparator string, skip map[string]bool) int {
 	var (
 		file   *os.File
 		reader *bufio.Reader
@@ -149,7 +170,7 @@ func (ds *Dataset) AddFile(db *Database, filename string, countSeparator string)
 
 		line = strings.TrimSpace(line)
 		tokenNames := strings.Split(line, db.Separator)
-		tokenNames = removeEmpty(tokenNames)
+		tokenNames = removeInvalid(tokenNames, skip)
 
 		if len(tokenNames) <= 0 {
 			continue

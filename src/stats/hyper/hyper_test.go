@@ -48,8 +48,9 @@ func testHyper(t *testing.T, fn splitFunc, epsilon float64) {
 	for i, test := range tests {
 		p := fn(test.o, test.r, test.O, test.R)
 
-		if math.Abs(p-test.result) > epsilon {
-			t.Errorf("fail %v: got %v, expected %v, \nerr=%v", i, p, test.result, math.Abs(p-test.result))
+		diff := math.Abs(p / test.result - 1)
+		if diff > epsilon {
+			t.Errorf("fail %v: got %v, expected %v, \nerr=%v", i, p, test.result, diff)
 		}
 	}
 }

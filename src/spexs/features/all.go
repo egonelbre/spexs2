@@ -14,6 +14,8 @@ var All = [...]CreateFunc{
 	Total, Matches, Seqs, Occs,
 	// ratios and proportions
 	MatchesProp, MatchesRatio, OccsRatio, MatchesPropRatio,
+	// binomial
+	Binom,
 	// hypergeometrics
 	Hyper, HyperApprox, HyperDown, HyperOptimal,
 	// pattern length related

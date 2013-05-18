@@ -1,31 +1,36 @@
 package binom
 
 import (
-	. "math"
+	"math"
 	"testing"
 )
 
 type test struct {
-	x, N   int
+	k, n   int
 	p      float64
 	result float64
 }
 
 func TestP(t *testing.T) {
 	// verification result was calculated with
-	// binomial(N, x) * p^x * p^(N-x)
+	// pbinom(k, N, p, lower.tail=F, log.P = F)
 
 	tests := [...]test{
-		{0, 4, 0.25, 81.0 / 256.0},
-		{1, 4, 0.25, 27.0 / 64.0},
-		{2, 4, 0.25, 27.0 / 128.0},
+		{0, 4, 0.25, 0.6835937},
+		{5, 100, 0.01, 0.0005345345},
+		{10, 100, 0.01, 6.25552e-9},
+		{39, 98, 23.0/1000.0, 3.883636e-39},
 	}
 
-	for i, test := range tests {
-		p := P(test.x, test.N, test.p)
+	for _, test := range tests {
+		p := P(test.k, test.n, test.p)
+		if math.IsNaN(p) {
+			t.Errorf("got NaN from: k=%v N=%v p=%v", test.k, test.n, test.p)
+		}
 
-		if Abs(p-test.result) > 1e-6 {
-			t.Errorf("fail %v: got %v, expected %v, \nerr=%v", i, p, test.result, Abs(p-test.result))
+		diff := math.Abs(1 - p/test.result)
+		if diff > 1e-5 {
+			t.Errorf("failed k=%v N=%v p=%v: got %v, expected %v, \nerr=%v", test.k, test.n, test.p, p, test.result, diff)
 		}
 	}
 }

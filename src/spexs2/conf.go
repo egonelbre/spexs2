@@ -15,7 +15,8 @@ const baseConfiguration = `{
 	"Reader" : {
 		"Method" : "Delimited",
 		"Separator" : "",
-		"CountSeparator" : ""
+		"CountSeparator" : "",
+		"Skip" : ""
 	},
 	"Extension" : {
 		"Method" : "",
@@ -44,6 +45,7 @@ type Conf struct {
 		Method         string
 		Separator      string
 		CountSeparator string
+		Skip           string
 	}
 	Extension struct {
 		Method string

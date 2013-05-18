@@ -21,8 +21,9 @@ type Query struct {
 	Pat   []RegToken
 	Loc   *set.Set
 	Db    *Database
+	Prob  float64
 	memo  map[featureHash]feature
-	cache countCache
+	cache queryCache
 }
 
 type featureHash unsafe.Pointer
@@ -42,6 +43,7 @@ func NewQuery(parent *Query, token RegToken) *Query {
 
 	q.Pat = nil
 	q.Db = nil
+	q.Prob = 1
 	if parent != nil {
 		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)
@@ -85,12 +87,12 @@ func (q *Query) Memoized(f Feature) (float64, string) {
 	return val, info
 }
 
-type countCache struct {
+type queryCache struct {
 	count []int
 	occs  []int
 }
 
-func (q *countCache) reset() {
+func (q *queryCache) reset() {
 	q.count = nil
 	q.occs = nil
 }
