@@ -6,7 +6,6 @@
 	"Reader" : {
 		"Method" : "Delimited",
 		"Separator" : "",
-		"CountSeparator": "",
 		"Skip": "_"
 	},
 	"Extension": {
@@ -19,7 +18,6 @@
 			"PatLength()" : {"max" : 15},
 			"Matches(fore)" : {"min" : 20},
 			"NoStartingGroup()" : {},
-			"NoTokens()" : {"Tokens":"_"}
 		},
 		"Outputtable" : {
 			"MatchesPropRatio(fore,back)" : {"min": 2},
@@ -36,6 +34,7 @@
 		"Method" : "Formatted",
 		"ShowHeader": true,
 		"Reverse": false,
+		"Header": "Pattern\tCluster\tBackground\tRatio\tBinomial Prob.\n",
 		"Format": "Pat?()\tMatches(fore)/Occs(fore)\tMatches(back)/Occs(back)\tMatchesPropRatio(fore,back)\tBinom(fore, back)\n"
 	}
 }
