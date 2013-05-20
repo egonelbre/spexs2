@@ -2,7 +2,7 @@ package spexs
 
 import (
 	"bytes"
-	set "set/trie"
+	set "set/rle"
 	"unsafe"
 )
 
