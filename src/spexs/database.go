@@ -115,23 +115,6 @@ func (db *Database) Occs(s set.Set) []int {
 	return count
 }
 
-func (db *Database) Seqs(s set.Set) []int {
-	counted := make(map[int]bool, 30)
-	count := make([]int, len(db.Total))
-	for _, p := range s.Iter() {
-		si := db.PosToSequence[p]
-		if counted[si] {
-			continue
-		}
-		counted[si] = true
-		seq := db.Sequences[si]
-		for sec, _ := range seq.Count {
-			count[sec] += 1
-		}
-	}
-	return count
-}
-
 func (db *Database) AddGroup(group *TokenGroup) Token {
 	token := db.mkNewToken()
 	group.Token = token

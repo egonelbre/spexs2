@@ -34,8 +34,22 @@ func Matches(group []int) Feature {
 // the count of matching unique sequences
 func Seqs(group []int) Feature {
 	return func(q *Query) (float64, string) {
-		seqs := q.Db.Seqs(q.Loc)
-		return countf(seqs, group), ""
+		db := q.Db
+
+		counted := make(map[int]bool, 30)
+		count := make([]int, len(db.Total))
+		for _, p := range q.Loc.Iter() {
+			si := db.PosToSequence[p]
+			if counted[si] {
+				continue
+			}
+			counted[si] = true
+			seq := db.Sequences[si]
+			for sec, _ := range seq.Count {
+				count[sec] += 1
+			}
+		}
+		return countf(count, group), ""
 	}
 }
 
