@@ -36,13 +36,13 @@ func New() *Set {
 	return &Set{make(map[uint]bitvector, initSize)}
 }
 
-func (set *Set) Add(val uint) {
-	idx, bits := decompose(val)
+func (set *Set) Add(val int) {
+	idx, bits := decompose(uint(val))
 	set.data[idx] |= bits
 }
 
-func (set *Set) Contains(val uint) bool {
-	idx, bits := decompose(val)
+func (set *Set) Contains(val int) bool {
+	idx, bits := decompose(uint(val))
 	return set.data[idx]&bits != 0
 }
 
@@ -54,13 +54,13 @@ func (set *Set) Len() int {
 	return count
 }
 
-func (set *Set) Iter() []uint {
-	iter := make([]uint, set.Len())
+func (set *Set) Iter() []int {
+	iter := make([]int, set.Len())
 	i := 0
 	for val, bits := range set.data {
 		for k := uint(0); bits > 0; k += 1 {
 			if bits&(1<<k) > 0 {
-				iter[i] = compose(val, k)
+				iter[i] = int(compose(val, k))
 				bits = bits &^ (1 << k)
 				i += 1
 			}

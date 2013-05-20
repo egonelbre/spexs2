@@ -52,15 +52,8 @@ func CreateDatabase(conf *Conf) (*Database, *Dataset) {
 
 	ds.AddFileGroups(db, conf.Dataset, conf.Reader.CountSeparator, skip)
 
-	tokens := 0
-	for _, ti := range db.Alphabet {
-		tokens += ti.Count
-	}
-
-	for _, ti := range db.Alphabet {
-		log.Printf("Token: %v\t%v\tp:%v\n", ti.Name, ti.Count, float64(ti.Count)/float64(tokens))
-	}
-
+	log.Printf("Alphabet size: %v\n", len(db.Alphabet))
+	
 	return db, ds
 }
 

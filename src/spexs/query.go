@@ -28,16 +28,6 @@ type Query struct {
 
 type featureHash unsafe.Pointer
 
-var PosOffset uint = 8
-
-func EncodePos(idx uint, pos uint) uint {
-	return (idx << PosOffset) | pos
-}
-
-func DecodePos(val uint) (uint, uint) {
-	return val >> PosOffset, val & ((1 << PosOffset) - 1)
-}
-
 func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
 
@@ -60,16 +50,7 @@ func NewQuery(parent *Query, token RegToken) *Query {
 func NewEmptyQuery(db *Database) *Query {
 	q := NewQuery(nil, RegToken{})
 	q.Db = db
-	for idx, _ := range db.Sequences {
-		i := uint(idx)
-		last := uint(0)
-		_, ok, next := db.GetToken(i, last)
-		for ok {
-			q.Loc.Add(EncodePos(i, last))
-			last = next
-			_, ok, next = db.GetToken(i, next)
-		}
-	}
+	db.AddAllPositions(q.Loc)
 	return q
 }
 
@@ -104,23 +85,7 @@ func (q *Query) CacheValues() {
 
 func (q *Query) Matches() []int {
 	if q.cache.count == nil {
-		db := q.Db
-		counted := make(map[uint]bool, q.Loc.Len())
-		count := make([]int, len(db.Total))
-
-		for _, val := range q.Loc.Iter() {
-			i, _ := DecodePos(val)
-			if counted[i] {
-				continue
-			}
-			counted[i] = true
-
-			seq := db.Sequences[i]
-			for sec, c := range seq.Count {
-				count[sec] += c
-			}
-		}
-
+		count := q.Db.Matches(q.Loc)
 		q.cache.count = count
 	}
 	return q.cache.count
@@ -128,15 +93,7 @@ func (q *Query) Matches() []int {
 
 func (q *Query) Occs() []int {
 	if q.cache.occs == nil {
-		db := q.Db
-		count := make([]int, len(db.Total))
-		for _, val := range q.Loc.Iter() {
-			i, _ := DecodePos(val)
-			seq := db.Sequences[i]
-			for sec, c := range seq.Count {
-				count[sec] += c
-			}
-		}
+		count := q.Db.Occs(q.Loc)
 		q.cache.occs = count
 	}
 	return q.cache.occs

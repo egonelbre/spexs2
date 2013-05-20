@@ -17,7 +17,7 @@ var All = [...]CreateFunc{
 	// binomial
 	Binom,
 	// hypergeometrics
-	Hyper, HyperApprox, HyperDown, HyperOptimal,
+	Hyper, HyperApprox, HyperDown, // HyperOptimal,
 	// pattern length related
 	PatLength, PatChars, PatGroups, PatStars,
 	// only strings
@@ -79,6 +79,7 @@ var Help = `
 
 :Statistics:
   // fore and back refer to datasets
+  Binom(fore, back)       : binomial p-value
   Hyper(fore, back)       : hypergeometric p-value
   HyperApprox(fore, back) : approx. hypergeometric p-value (~5 sig. digits)
   HyperDown(fore, back)   : hypergeometric split down

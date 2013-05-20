@@ -25,8 +25,8 @@ func New() *Set {
 	return &Set{make(map[majkey]map[minkey]bitmap)}
 }
 
-func (set *Set) Add(value uint) {
-	maj, min, bits := decompose(value)
+func (set *Set) Add(value int) {
+	maj, min, bits := decompose(uint(value))
 
 	first, exists := set.root[maj]
 	if !exists {
@@ -37,8 +37,8 @@ func (set *Set) Add(value uint) {
 	first[min] |= bits
 }
 
-func (set *Set) Contains(value uint) bool {
-	maj, min, bits := decompose(value)
+func (set *Set) Contains(value int) bool {
+	maj, min, bits := decompose(uint(value))
 	mmin, exists := set.root[maj]
 	if !exists {
 		return false
@@ -46,14 +46,14 @@ func (set *Set) Contains(value uint) bool {
 	return mmin[min]&bits != 0
 }
 
-func (set *Set) Iter() []uint {
-	iter := make([]uint, set.Len())
+func (set *Set) Iter() []int {
+	iter := make([]int, set.Len())
 	i := 0
 	for maj, mmin := range set.root {
 		for min, bits := range mmin {
 			for k := uint(0); bits > 0; k += 1 {
 				if bits&(1<<k) > 0 {
-					iter[i] = compose(maj, min, k)
+					iter[i] = int(compose(maj, min, k))
 					bits = bits &^ (1 << k)
 					i += 1
 				}

@@ -1,20 +1,20 @@
 package hash
 
 type Set struct {
-	data map[uint]bool
+	data map[uint]struct{}
 }
 
 const initSize = 30
 
 func New() *Set {
-	return &Set{make(map[uint]bool, initSize)}
+	return &Set{make(map[int]struct{}, initSize)}
 }
 
-func (set *Set) Add(val uint) {
-	set.data[val] = true
+func (set *Set) Add(val int) {
+	set.data[val] = struct{}{}
 }
 
-func (set *Set) Contains(val uint) bool {
+func (set *Set) Contains(val int) bool {
 	exists, ok := set.data[val]
 	return exists && ok
 }
@@ -23,8 +23,8 @@ func (set *Set) Len() int {
 	return len(set.data)
 }
 
-func (set *Set) Iter() []uint {
-	iter := make([]uint, set.Len())
+func (set *Set) Iter() []int {
+	iter := make([]int, set.Len())
 	i := 0
 	for val := range set.data {
 		iter[i] = val
