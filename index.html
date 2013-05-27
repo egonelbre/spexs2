@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Spexs : an exhaustive sequence pattern search tool" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Spexs</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/egonelbre/spexs">View on GitHub</a>
+
+          <h1 id="project_title">Spexs</h1>
+          <h2 id="project_tagline">an exhaustive sequence pattern search tool</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/egonelbre/spexs/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/egonelbre/spexs/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>Quick introduction</h3>
+
+<p>What's <strong>spexs</strong>? It's easier to show what it actually does. To start you need a set of sequences - it can be a sequence of letters or words. For let's imagine we have a data set of events some of them lead to errors and some of them ended normally:</p>
+
+<pre><code># without errors
+AIBBFCACCADAHABXCHCG
+GBACDBHBDAIBHYDIHAAADAFAHFGGDBFFYFZBFBAGDIDDX
+CAGZHGBAXHFIGBAFBIABDYBABBFDBAFGGAAAAHHC
+CGDCHHAAAABFBDBCHBBFGICDBGGDGCDFIFADCA
+... snip ...
+# with errors
+ADDDBBCYDFCCHXFDDXBAYDYBHACAZE
+DXFDIHBXYDBFGGCBHAYBDHZE
+IXBBXHBBACYCFHADHGFDACDHCGYABYBHADZE
+AHAFFFGABIXBCAYCBBHBDCDDXZE
+... snip ...
+</code></pre>
+
+<p>The events <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>F</code>, <code>G</code>, <code>H</code>, <code>I</code>, <code>X</code>, <code>Y</code>, <code>Z</code> are normal events and <code>E</code> is the problematic "error" event. So we need to figure out which event pattern causes the problem?</p>
+
+<p>After we prepare the configuration file (explained later) and plug in the data <strong>spexs</strong> gives the result:</p>
+
+<pre><code>pattern      errors     all         ratio   p-value
+... snip ...
+F.*Y.*Z      272/343    522/5000    7.588   1.639e-174
+X.*A.*Z      305/343    811/5000    5.478   1.798e-176
+X.*B.*Z      304/343    785/5000    5.641   1.540e-178
+D.*Y.*Z      281/343    557/5000    7.347   1.066e-180
+C.*Y.*Z      285/343    584/5000    7.107   1.056e-181
+B.*Y.*Z      292/343    610/5000    6.971   2.370e-187
+A.*Y.*Z      300/343    616/5000    7.092   3.163e-198
+X.*Z         343/343    1054/5000   4.740   1.276e-215
+Y.*Z         343/343    805/5000    6.204   1.009e-249
+X.*Y.*Z      343/343    343/5000    14.537  0
+</code></pre>
+
+<p>Which means that we found an interesting pattern <code>X.*Y.*Z</code> (using the regular expression notation).</p>
+
+<p>Remember that <strong>spexs</strong> isn't a magical tool that knows which kinds of patterns you are looking for, so you need to configure the tool appropriately.</p>
+
+<h3>Overview</h3>
+
+<p>The easiest way to get started is to download an example that is most similar with your problem. Then adjust the configuration and finally tweak until it fits.</p>
+
+<p>The simplest approach to running the tool is:</p>
+
+<pre><code>./spexs2 -conf=conf.json inp=data.txt ref=random.txt
+</code></pre>
+
+<p>We need to give it a configuration file to specify how to find patterns. Let's examine the configuration file:</p>
+
+<pre><code>{
+    "Dataset": {
+        "fore" : { "File" : "$inp$" },
+        "back" : { "File" : "$ref$" }
+    },
+    "Reader" : {
+        "Method" : "Delimited",
+        "Separator" : "",
+        "CountSeparator": ""
+    },
+    "Extension": {
+        "Method": "Star",
+        "Groups" : {
+            "." : { "elements" : "ABCDFGHIXYZ"}
+        },
+        "Extendable": {
+            "PatLength()" : {"max" : 7},
+            "PatGroups()" : {"max" : 3},
+            "Matches(fore)" : {"min" : 250},
+            "NoStartingGroup()" : {},
+            "NoTokens()" : {"Tokens":"E"},
+        },
+        "Outputtable" : {
+            "PatLength()" : {"min" : 3},
+            "Hyper(fore, back)" : {"max" : $limit:1e-10$},
+            "NoEndingGroup()" : {}
+        }
+    },
+    "Output": {
+        "SortBy": ["-Hyper(fore,back)", "Matches(fore)"],
+        "Count": 20
+    },
+    "Printer" : {
+        "Method" : "Formatted",
+        "ShowHeader": true,
+        "Reverse": true,
+        "Header": "",
+        "Format": "Pat?()\tMatchesPropRatio(fore,back)\tHyper(fore,back)\n"
+    }
+}
+</code></pre>
+
+<p>First the configuration looks a lot like <em>json</em> format, but it can also deal with small user errors, like missing trailing commas. As we can see the configuration is divided into 5 parts: Dataset, Reader, Extension, Output and Printer. Each specifies a particular part of the tool.</p>
+
+<h4>Dataset</h4>
+
+<p>The datasets define where we get our input sequences. There are several ways to specify which files to load:</p>
+
+<pre><code>"Dataset": {
+    "single" : { "File" : "data" },
+    "multiple" : { "Files" : ["a.txt", "b.txt", "c.txt"]},
+    "filelist" : { "Filelist" : "listing.txt" },
+    "cmdline" : {"File" : "$inp$"}
+},
+</code></pre>
+
+<p>The key values in the definition are names for the datasets. These names will be used in the configuration file later.</p>
+
+<p>The <em>single</em> just loads the sequences in the file "data". The <em>multiple</em> and <em>filelist</em> loads sequences from multiple files.</p>
+
+<p>The <em>cmdline</em> dataset uses special syntax that is used to mix configuration file and command line parameters. If we run the tool with arguments:</p>
+
+<pre><code>./spexs2 -conf=conf.json inp=data.txt
+</code></pre>
+
+<p>Then the <code>$inp$</code> in the configuration file will be replaced with <code>data.txt</code>. You can also provide default values, for cases where the parameter is missing. For example, if we use <code>$inp:data$</code> in the configuration and the <code>inp</code> parameter isn't specified it will be replaced with <code>data</code> in the configuration file.</p>
+
+<h4>Reader</h4>
+
+<p>Reader specifies how to read in the input. "Method" specifies how to read in the sequences and the rest are arguments to the reader. There are currently to ways of reading the input: "Delimited" and "Counted".</p>
+
+<pre><code>"Reader" : {
+    "Method" : "Delimited",
+    "Separator" : "",
+    "Skip": "_,.-'",
+},
+</code></pre>
+
+<p>"Separator" specifies how to split the sequences into separate tokens. For example using separator "" will break "AB C" into "A", "B", " ", "C" and using separator " " will break "AB C" into "AB", "C". This separator gives the ability to use letters or letter sequences as our token in the patterns.</p>
+
+<p>"Skip" allows to ignore tokens that are in the input sequence. The "Skip" will be split into tokens in the same way as the sequences, using the "Separator".</p>
+
+<p>There is an alternative way for reading the input:</p>
+
+<pre><code>"Reader" : {
+    "Method" : "Counted",
+    "Separator" : "",
+    "CountSeparator" : ":"
+},
+</code></pre>
+
+<p>This counted reader expects the input to be in the format:</p>
+
+<pre><code>number CountSeparator sequence
+</code></pre>
+
+<p>For example:</p>
+
+<pre><code>5:ABCDEFGH
+2:CBBDAGHE
+1:ABCDAD
+</code></pre>
+
+<p>If we know how many times a sequence occured we can use this to provide a weight for the patterns.</p>
+
+<h4>Extension</h4>
+
+<p>Extension part specifies which patterns will be searched and are nice enough for output.</p>
+
+<pre><code>"Extension": {
+    "Method": "Star",
+    "Groups" : {
+        "g1" : { "elements" : "ABC"},
+        "g2" : { "elements" : "CDE"},
+    },
+    "Extendable": {
+        "PatLength()" : {"max" : 7},
+        "PatGroups()" : {"max" : 3},
+        "Matches(fore)" : {"min" : 250},
+        "NoStartingGroup()" : {},
+        "NoTokens()" : {"Tokens":"E"},
+    },
+    "Outputtable" : {
+        "PatLength()" : {"min" : 3},
+        "Hyper(fore, back)" : {"max" : $limit:1e-10$},
+        "NoEndingGroup()" : {}
+    }
+},
+</code></pre>
+
+<p>The "Method" specifies which kinds of patterns it will search. Currently there are 4 different ways for finding patterns: Simple, Group, Star, Regex. </p>
+
+<h5>Methods</h5>
+
+<p>The "Simple" method will find only patterns that are a simple sequence of tokens.</p>
+
+<p>The "Group" method will find patterns that can contain groups specified in the "Groups" parameter. The group means an alternate possibility for a token. For example, in regular expression syntax it can find patterns <code>A[BC]D</code>. The "Groups" allows to specify which groups will be searched for.</p>
+
+<p>The "Star" method will find patterns that can contain gaps in the pattern. For example, in regular expression it would look like <code>A.*D</code>.</p>
+
+<p>The "Regex" method will find patterns that can contain either groups or gaps. For example, it could look like <code>A.*[BC]</code>.</p>
+
+<h5>Features</h5>
+
+<p>Features are the properties of the patterns. For example, how many times the pattern occurs in a dataset, or how long it is, or the probablity of finding such pattern.</p>
+
+<p>Features allow to define filters (explained in the next section) and they can be used for printing the result. To specify a feature we use the name of the filter and use data set names as argument. For example, to find the number of matching sequences in the data set "alpha" we can specify <code>Matches(alpha)</code>.</p>
+
+<p>The full list of features can be seen on the command line with <code>./spexs2 --details</code>.</p>
+
+<p>There are important features "Binom" and "Hyper" that allow us to find interesting patterns. To determine whether a pattern happens by chance or is, indeed, characteristic to the data we need to use some statistics. We can calculate how probable some pattern is when we compare the number of matches in the data to the number of matches in some random data. If a pattern is found in the input and random data the same number of times, it probably occured by chance. If a pattern is only found in the input data, then it probably is very interesting.</p>
+
+<h5>Filters</h5>
+
+<p>The filters specify how to limit our search space - or more trivially, how to skip looking at the patterns.</p>
+
+<p>The "Extendable" filter specifies our search space, for example here we can add a limit to the pattern length or skip patterns with low number of occurences.</p>
+
+<p>The "Outputtable" filter specifies the patterns that we allow to be printed. For example we probably do not want very small patterns.</p>
+
+<p>The feature filter defintion looks like:</p>
+
+<pre><code>"Feature(dataset)" : { "min" : 0, "max" : $max:13$ }
+</code></pre>
+
+<p>We can use the special syntax to specify limits from the command-line as well.</p>
+
+<h4>Output</h4>
+
+<p>We can use output to specify how many of the "best" patterns will be remembered and how they will be sorted:</p>
+
+<pre><code>"Output": {
+    "SortBy": ["-Hyper(fore,back)", "Matches(fore)"],
+    "Count": 20
+},
+</code></pre>
+
+<p>"SortBy" defines how to decide which are the top results. It takes an array of features as the sorting, if the first feature value is same for two patterns it will use the second etc.</p>
+
+<p>"Count" simply specifies the how many top results to keep.</p>
+
+<h4>Printer</h4>
+
+<p>Printer specifies how to show the results in the command line:</p>
+
+<pre><code>"Printer" : {
+    "ShowHeader": true,
+    "Reverse": true,
+    "Header": "",
+    "Format": "Pat?()\tMatchesPropRatio(fore,back)\tHyper(fore,back)\n"
+}
+</code></pre>
+
+<p>"ShowHeader" specifies whether to add an header to the output. "Reverse" allows to reverse the ordering of the output patterns, this is especially useful when testing the tool, since the best results will be printed to the console last.</p>
+
+<p>"Header" is an optional argument for giving nice looking column headers. If the value is empty the "Format" string will be used instead.</p>
+
+<p>"Format" is how we want to print the feature values to the output.</p>
+
+<h3>Tips</h3>
+
+<p>To get started find an example configuration file from the examples that is most similar to your problem.</p>
+
+<p>If you want to use it for large datasets, first try running it on a smaller sample to see whether the limits work nicely.</p>
+
+<p>If the process takes too long try putting in more "Extendable" filters or adding more limits. If the tool doesn't find any results try removing some "Extendable" and/or "Outputtable" filters.</p>
+
+<h3>License</h3>
+
+<pre><code>spexs2
+Copyright (C) 2012  University of Tartu
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Spexs maintained by <a href="https://github.com/egonelbre">egonelbre</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
