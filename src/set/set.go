@@ -4,17 +4,14 @@ type Set interface {
 	Add(val int)
 	Len() int
 	Iter() []int // return unpacked data array
-
-	// Pack()        // pack internal data
-	// Unpack()		 // unpack internal data
 }
 
-type SortedSet interface {
+type Sorted interface {
 	Set
 	IsSorted()
 }
 
-type MultiSet interface {
+type Multi interface {
 	Set
 	AddSet(val Set)
 }

@@ -33,7 +33,7 @@ func (multi *Set) Iter() []int {
 	sets := make([][]int, 0, len(multi.sets))
 	sorted := true
 	for _, s := range multi.sets {
-		if _, ok := s.(set.SortedSet); !ok {
+		if _, ok := s.(set.Sorted); !ok {
 			sorted = false
 		}
 		sets = append(sets, s.Iter())
