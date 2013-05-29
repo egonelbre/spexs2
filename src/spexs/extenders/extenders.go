@@ -1,7 +1,9 @@
 package extenders
 
-import . "spexs"
-import set "set/rle"
+import (
+	. "spexs"
+	"set/multi"
+)
 
 type queryMap map[Token]*Query
 
@@ -44,15 +46,16 @@ func combine(base *Query, db *Database, querys queryMap, isStar bool) {
 	for _, group := range db.Groups {
 		q := NewQuery(base, RegToken{group.Token, true, isStar})
 		querys[group.Token] = q
-		sets := make([]*set.Set, 0, len(group.Elems))
+		sets := multi.New()
 		for _, token := range group.Elems {
 			if s, ok := querys[token]; ok {
-				sets = append(sets, s.Loc)
+				sets.AddSet(s.Loc)
 			}
 		}
-		q.Loc.AddSets(sets...)
+		q.Loc = sets
 	}
 }
+
 
 func Group(base *Query) Querys {
 	querys := make(queryMap)

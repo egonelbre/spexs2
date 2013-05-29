@@ -2,7 +2,8 @@ package spexs
 
 import (
 	"bytes"
-	set "set/rle"
+	"set"
+	defset "set/rle"
 	"unsafe"
 )
 
@@ -19,7 +20,7 @@ type feature struct {
 
 type Query struct {
 	Pat   []RegToken
-	Loc   *set.Set
+	Loc   set.Set
 	Db    *Database
 	Prob  float64
 	memo  map[featureHash]feature
@@ -41,7 +42,7 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Db = parent.Db
 	}
 	q.memo = make(map[featureHash]feature)
-	q.Loc = set.New()
+	q.Loc = defset.New()
 	q.cache.reset()
 
 	return q

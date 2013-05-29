@@ -1,7 +1,7 @@
 package hash
 
 type Set struct {
-	data map[uint]struct{}
+	data map[int]struct{}
 }
 
 const initSize = 30
@@ -15,8 +15,8 @@ func (set *Set) Add(val int) {
 }
 
 func (set *Set) Contains(val int) bool {
-	exists, ok := set.data[val]
-	return exists && ok
+	_, ok := set.data[val]
+	return ok
 }
 
 func (set *Set) Len() int {
@@ -33,8 +33,3 @@ func (set *Set) Iter() []int {
 	return iter
 }
 
-func (set *Set) AddSet(other *Set) {
-	for val, _ := range other.data {
-		set.data[val] = true
-	}
-}
