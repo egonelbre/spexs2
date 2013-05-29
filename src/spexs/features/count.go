@@ -35,23 +35,21 @@ func Matches(group []int) Feature {
 func Seqs(group []int) Feature {
 	return func(q *Query) (float64, string) {
 		db := q.Db
-		counted := make(map[uint]bool, 30)
-		count := 0
-		for _, val := range q.Loc.Iter() {
-			i, _ := DecodePos(val)
-			if counted[i] {
+
+		counted := make(map[int]bool, 30)
+		count := make([]int, len(db.Total))
+		for _, p := range q.Loc.Iter() {
+			si := db.PosToSequence[p]
+			if counted[si] {
 				continue
 			}
-			counted[i] = true
-			seq := db.Sequences[i]
-			for _, sec := range group {
-				if _, ok := seq.Count[sec]; ok {
-					count += 1
-					break
-				}
+			counted[si] = true
+			seq := db.Sequences[si]
+			for sec, _ := range seq.Count {
+				count[sec] += 1
 			}
 		}
-		return float64(count), ""
+		return countf(count, group), ""
 	}
 }
 

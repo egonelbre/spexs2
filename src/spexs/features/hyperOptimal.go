@@ -1,5 +1,5 @@
 package features
-
+/*
 // find optimal hypergeometric split
 import (
 	"fmt"
@@ -75,3 +75,4 @@ func uniq(data []uint) []uint {
 	}
 	return data[0:k]
 }
+*/

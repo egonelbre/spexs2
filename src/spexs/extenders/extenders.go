@@ -1,6 +1,9 @@
 package extenders
 
-import . "spexs"
+import (
+	. "spexs"
+	"set/multi"
+)
 
 type queryMap map[Token]*Query
 
@@ -17,21 +20,19 @@ func toQuerys(queryMap queryMap) Querys {
 }
 
 func extend(base *Query, db *Database, querys queryMap) {
-	for _, val := range base.Loc.Iter() {
-		i, pos := DecodePos(val)
-
-		token, ok, next := db.GetToken(i, pos)
+	for _, p := range base.Loc.Iter() {
+		token, ok, next := db.GetToken(p)
 		if !ok {
 			continue
 		}
 
-		q, exists := querys[token]
-		if !exists {
+		q, ok := querys[token]
+		if !ok {
 			q = NewQuery(base, RegToken{token, false, false})
 			querys[token] = q
 		}
 
-		q.Loc.Add(EncodePos(i, next))
+		q.Loc.Add(next)
 	}
 }
 
@@ -45,14 +46,16 @@ func combine(base *Query, db *Database, querys queryMap, isStar bool) {
 	for _, group := range db.Groups {
 		q := NewQuery(base, RegToken{group.Token, true, isStar})
 		querys[group.Token] = q
+		sets := multi.New()
 		for _, token := range group.Elems {
-			single, ok := querys[token]
-			if ok {
-				q.Loc.AddSet(single.Loc)
+			if s, ok := querys[token]; ok {
+				sets.AddSet(s.Loc)
 			}
 		}
+		q.Loc = sets
 	}
 }
+
 
 func Group(base *Query) Querys {
 	querys := make(queryMap)
@@ -62,26 +65,27 @@ func Group(base *Query) Querys {
 }
 
 func starGreedyExtend(base *Query, db *Database, querys queryMap) {
-	lastPos := make(map[uint]uint, base.Loc.Len())
-
-	for _, val := range base.Loc.Iter() {
-		i, pos := DecodePos(val)
-		if lastPos[i] < pos {
-			lastPos[i] = pos
+	lastPos := make(map[int]int, base.Loc.Len())
+	
+	for _, p := range base.Loc.Iter() {
+		si := db.PosToSequence[p]
+		v, ok := lastPos[si]
+		if !ok || v < p {
+			lastPos[si] = p
 		}
 	}
 
-	for i, last := range lastPos {
+	for _, p := range lastPos {
 		var q *Query
-		token, ok, next := db.GetToken(i, last)
+		token, ok, next := db.GetToken(p)
 		for ok {
 			q, ok = querys[token]
 			if !ok {
 				q = NewQuery(base, RegToken{token, false, true})
 				querys[token] = q
 			}
-			q.Loc.Add(EncodePos(i, next))
-			token, ok, next = db.GetToken(i, next)
+			q.Loc.Add(next)
+			token, ok, next = db.GetToken(next)
 		}
 	}
 }
@@ -95,28 +99,27 @@ func StarGreedy(base *Query) Querys {
 }
 
 func starExtend(base *Query, db *Database, querys queryMap) {
-	firstPos := make(map[uint]uint, base.Loc.Len())
+	firstPos := make(map[int]int, base.Loc.Len())
 
-	for _, val := range base.Loc.Iter() {
-		i, pos := DecodePos(val)
-
-		v, ok := firstPos[i]
-		if !ok || v > pos {
-			firstPos[i] = pos
+	for _, p := range base.Loc.Iter() {
+		si := db.PosToSequence[p]
+		v, ok := firstPos[si]
+		if !ok || v > p {
+			firstPos[si] = p
 		}
 	}
 
-	for i, pos := range firstPos {
+	for _, p := range firstPos {
 		var q *Query
-		token, ok, next := db.GetToken(i, pos)
+		token, ok, next := db.GetToken(p)
 		for ok {
 			q, ok = querys[token]
 			if !ok {
 				q = NewQuery(base, RegToken{token, false, true})
 				querys[token] = q
 			}
-			q.Loc.Add(EncodePos(i, next))
-			token, ok, next = db.GetToken(i, next)
+			q.Loc.Add(next)
+			token, ok, next = db.GetToken(next)
 		}
 	}
 }

@@ -33,21 +33,6 @@ type Setup struct {
 }
 
 func prepareSpexs(s *Setup) {
-	maxSeq := 0
-	for _, seq := range s.Db.Sequences {
-		length := len(seq.Tokens)
-		if length > maxSeq {
-			maxSeq = length
-		}
-	}
-
-	for i := uint(0); i < 32; i += 1 {
-		if 1<<i > maxSeq {
-			PosOffset = i
-			break
-		}
-	}
-
 	s.In.Push(NewEmptyQuery(s.Db))
 }
 
