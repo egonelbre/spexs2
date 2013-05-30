@@ -15,7 +15,7 @@ func Hyper(fore []int, back []int) Feature {
 		countFore := count(matches, fore)
 		countBack := count(matches, back)
 
-		return hyper.Split(countFore, countBack, totalFore, totalBack), ""
+		return hyper.ComplementCdf(countFore, countBack, totalFore, totalBack), ""
 	}
 }
 
@@ -29,7 +29,7 @@ func HyperApprox(fore []int, back []int) Feature {
 		countFore := count(matches, fore)
 		countBack := count(matches, back)
 
-		return hyper.SplitApprox(countFore, countBack, totalFore, totalBack), ""
+		return hyper.ComplementCdfApprox(countFore, countBack, totalFore, totalBack), ""
 	}
 }
 
@@ -43,6 +43,6 @@ func HyperDown(fore []int, back []int) Feature {
 		countFore := count(matches, fore)
 		countBack := count(matches, back)
 
-		return hyper.SplitDown(countFore, countBack, totalFore, totalBack), ""
+		return hyper.Cdf(countFore, countBack, totalFore, totalBack), ""
 	}
 }

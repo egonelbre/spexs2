@@ -12,12 +12,11 @@ func Binom(fore, back []int) Feature {
 		totalBack := count(q.Db.Total, back) + 1
 
 		matches := q.Matches()
-		countFore := count(matches, fore)
-		countBack := count(matches, back)
+		countFore := count(matches, fore) + 1
+		countBack := count(matches, back) + 1
 
 		p := float64(countBack) / float64(totalBack)
-
-		return binom.P(countFore, totalFore, p), ""
+		return binom.ComplementCdf(countFore, totalFore, p), ""
 	}
 }
 

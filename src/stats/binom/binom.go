@@ -6,8 +6,8 @@ import (
 
 // the probability
 // returns probability of
-// choosing at least k items from n items
-// p - probability of getting one item
-func P(k, n int, p float64) float64 {
-	return stat.BetaIncReg(float64(k+1), float64(n-k), p)
+// gettting at least "successes" from "total" items
+// p - probability of getting one success
+func ComplementCdf(successes, total int, p float64) float64 {
+	return stat.BetaIncReg(float64(successes+1), float64(total-successes), p)
 }

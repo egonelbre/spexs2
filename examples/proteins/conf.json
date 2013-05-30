@@ -21,12 +21,12 @@
 		},
 		"Outputtable" : {
 			"MatchesRatio(fore, back)" : {"min" : 2},
-			"HyperApprox(fore, back)" : {"max" : 1e-3},
+			"Binom(fore, back)" : {"max" : 1e-3},
 			"NoEndingGroup()" : {}
 		}
 	},
 	"Output": {
-		"SortBy": ["-Hyper(fore, back)"],
+		"SortBy": ["-Binom(fore, back)"],
 		"Count": 100
 	},
 	"Printer" : {
@@ -34,6 +34,6 @@
 		"ShowHeader": true,
 		"Reverse": true,
 		"Header": "",
-		"Format": "Pat?()\tPatLength()\tPatGroups()\tPatChars()\tMatches(fore)\tMatches(back)\tMatchesRatio(fore,back)\tHyper(fore,back)\n"
+		"Format": "Pat?()\tMatches(fore)/Total(fore)\tMatches(back)/Total(back)\tMatchesRatio(fore,back)\tBinom(fore,back)\n"
 	}
 }

@@ -11,7 +11,17 @@ type test struct {
 	result float64
 }
 
-func TestP(t *testing.T) {
+func BenchmarkBinom(b *testing.B) {
+	for i := 0; i < b.N; i += 1{
+		for v := 0; v < 1000; v += 13 {
+			for r := 0; r < 1000; r += 15 {
+				ComplementCdf(v, 13000, float64(r) / float64(13000))
+			}
+		}
+	}
+}
+
+func TestComplementCdf(t *testing.T) {
 	// verification result was calculated with
 	// pbinom(k, N, p, lower.tail=F, log.P = F)
 
@@ -23,7 +33,7 @@ func TestP(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		p := P(test.k, test.n, test.p)
+		p := ComplementCdf(test.k, test.n, test.p)
 		if math.IsNaN(p) {
 			t.Errorf("got NaN from: k=%v N=%v p=%v", test.k, test.n, test.p)
 		}

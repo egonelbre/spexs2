@@ -9,13 +9,9 @@ func lnG(v int) float64 {
 	return r
 }
 
-func gamma(v int) float64 {
-	return Gamma(float64(v))
-}
-
 // this is for reference
 // as the code below is quite unreadable, but 2x as fast
-func SplitSlow(o int, r int, O int, R int) float64 {
+func ComplementCdfSlow(o, r, O, R int) float64 {
 	total := 0.0
 	lSOR := lnG(O+1) + lnG(R+1)
 	lOR := lnG(O + R + 1)
@@ -35,13 +31,13 @@ func SplitSlow(o int, r int, O int, R int) float64 {
 // O - total items in input, R - total items in validation set
 // using logarithmic gamma function
 // TODO: limits test
-func Split(oi int, ri int, Oi int, Ri int) float64 {
+func ComplementCdf(chosenA, chosenB, totalA, totalB int) float64 {
 	total := 0.0
 
-	o := float64(oi)
-	r := float64(ri)
-	O := float64(Oi)
-	R := float64(Ri)
+	o := float64(chosenA)
+	r := float64(chosenB)
+	O := float64(totalA)
+	R := float64(totalB)
 
 	gO, _ := Lgamma(O + 1.0)
 	gR, _ := Lgamma(R + 1.0)
@@ -67,19 +63,19 @@ func Split(oi int, ri int, Oi int, Ri int) float64 {
 }
 
 // returns probability of split of
-// o - observed in input , r - observed in validation set
-// O - total items in input, R - total items in validation set
+// chosenA - observed in input , chosenB - observed in validation set
+// totalA - total items in input, totalB - total items in validation set
 // using logarithmic gamma function
 // TODO: limits test
 const approxEpsilon = 1e-6
 
-func SplitApprox(oi int, ri int, Oi int, Ri int) float64 {
+func ComplementCdfApprox(chosenA, chosenB, totalA, totalB int) float64 {
 	total := 0.0
 
-	o := float64(oi)
-	r := float64(ri)
-	O := float64(Oi)
-	R := float64(Ri)
+	o := float64(chosenA)
+	r := float64(chosenB)
+	O := float64(totalA)
+	R := float64(totalB)
 
 	gO, _ := Lgamma(O + 1.0)
 	gR, _ := Lgamma(R + 1.0)
@@ -114,13 +110,13 @@ func SplitApprox(oi int, ri int, Oi int, Ri int) float64 {
 // o - observed in input , r - observed in validation set
 // O - total items in input, R - total items in validation set
 // using logarithmic gamma function
-func SplitDown(oi int, ri int, Oi int, Ri int) float64 {
+func Cdf(chosenA, chosenB, totalA, totalB int) float64 {
 	total := 0.0
 
-	o := float64(oi)
-	r := float64(ri)
-	O := float64(Oi)
-	R := float64(Ri)
+	o := float64(chosenA)
+	r := float64(chosenB)
+	O := float64(totalA)
+	R := float64(totalB)
 
 	gO, _ := Lgamma(O + 1.0)
 	gR, _ := Lgamma(R + 1.0)
@@ -137,9 +133,7 @@ func SplitDown(oi int, ri int, Oi int, Ri int) float64 {
 		gRr, _ := Lgamma(R - r + 1.0)
 
 		denom := ga + gOo + gr + gRr + gOR
-
-		add := Exp(nom - denom)
-		total += add
+		total += Exp(nom - denom)
 		r += 1.0
 		o -= 1.0
 	}

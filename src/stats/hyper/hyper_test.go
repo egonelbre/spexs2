@@ -17,21 +17,21 @@ func benchHyper(b *testing.B, fn splitFunc) {
 	}
 }
 
-func BenchmarkSplit(b *testing.B) {
-	benchHyper(b, Split)
+func BenchmarkComplementCdf(b *testing.B) {
+	benchHyper(b, ComplementCdf)
 }
 
-func BenchmarkSplitApprox(b *testing.B) {
-	benchHyper(b, SplitApprox)
+func BenchmarkComplementCdfApprox(b *testing.B) {
+	benchHyper(b, ComplementCdfApprox)
 }
 
-func BenchmarkSplitSlow(b *testing.B) {
-	benchHyper(b, SplitSlow)
+func BenchmarkComplementCdfSlow(b *testing.B) {
+	benchHyper(b, ComplementCdfSlow)
 }
 
 type test struct {
-	o, O, r, R int
-	result     float64
+	chosenA, totalA, chosenB, totalB int
+	expected     float64
 }
 
 func testHyper(t *testing.T, fn splitFunc, epsilon float64) {
@@ -48,23 +48,23 @@ func testHyper(t *testing.T, fn splitFunc, epsilon float64) {
 	}
 
 	for i, test := range tests {
-		p := fn(test.o, test.r, test.O, test.R)
+		p := fn(test.chosenA, test.chosenB, test.totalA, test.totalB)
 
-		diff := math.Abs(p / test.result - 1)
+		diff := math.Abs(p / test.expected - 1)
 		if diff > epsilon {
-			t.Errorf("fail %v: got %v, expected %v, \nerr=%v", i, p, test.result, diff)
+			t.Errorf("fail %v: got %v, expected %v, \nerr=%v", i, p, test.expected, diff)
 		}
 	}
 }
 
-func TestSplit(t *testing.T) {
-	testHyper(t, Split, 1e-6)
+func TestComplementCdf(t *testing.T) {
+	testHyper(t, ComplementCdf, 1e-6)
 }
 
-func TestSplitSlow(t *testing.T) {
-	testHyper(t, SplitSlow, 1e-6)
+func TestComplementCdfSlow(t *testing.T) {
+	testHyper(t, ComplementCdfSlow, 1e-6)
 }
 
-func TestSplitApprox(t *testing.T) {
-	testHyper(t, SplitApprox, 1e-5)
+func TestComplementCdfApprox(t *testing.T) {
+	testHyper(t, ComplementCdfApprox, 1e-5)
 }
