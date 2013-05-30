@@ -58,9 +58,8 @@ func Split(oi int, ri int, Oi int, Ri int) float64 {
 		gRr, _ := Lgamma(R - r + 1.0)
 
 		denom := ga + gOo + gr + gRr + gOR
-
-		add := Exp(nom - denom)
-		total += add
+		
+		total += Exp(nom - denom)
 		r -= 1.0
 		o += 1.0
 	}
