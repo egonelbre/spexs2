@@ -6,7 +6,6 @@ import (
 )
 
 type Sequence struct {
-	start, end int
 	Section  int
 	Count    int
 }
@@ -30,7 +29,7 @@ type Database struct {
 
 	PosToSequence []int
 	FullSequence []Token
-	Sequences   []*Sequence
+	Sequences   []Sequence
 	Total       []int // total number sequence for each section
 	TotalTokens []int // total number of tokens for each section
 
@@ -49,7 +48,7 @@ func NewDatabase(estimatedSize int) *Database {
 
 		PosToSequence: make([]int, 0, estimatedSize),
 		FullSequence: make([]Token, 0, estimatedSize),
-		Sequences:   make([]*Sequence, 0, estimatedSize),
+		Sequences:   make([]Sequence, 0, estimatedSize),
 		Total:       make([]int, 0),
 		TotalTokens: make([]int, 0),
 
@@ -82,18 +81,16 @@ func (db *Database) mkNewToken() Token {
 	return newToken
 }
 
-type exists struct{}
-
 func (db *Database) Matches(s set.Set) []int {
-	counted := make(map[int]exists, s.Len())
+	counted := make(map[int]bool, s.Len())
 	count := make([]int, len(db.Total))
 
 	for _, p := range s.Iter() {
 		si := db.PosToSequence[p]
-		if _, ok := counted[si]; ok {
+		if counted[si] {
 			continue
 		}
-		counted[si] = exists{}
+		counted[si] = true
 		seq := db.Sequences[si]
 		count[seq.Section] += seq.Count
 	}
@@ -163,24 +160,26 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 	tokens := db.ToTokens(raw)
 	db.addToTokenCount(sec, tokens, count)
 
-	seq := &Sequence{0, 0, sec, count}
+	seq := Sequence{sec, count}
 	
 	// add sequence tokens to a single array
-	seq.start = len(db.FullSequence)
+	seqstart := len(db.FullSequence)
 	db.FullSequence = append(db.FullSequence, tokens...)
-	seq.end = len(db.FullSequence)
-	// add separator
-	db.FullSequence = append(db.FullSequence, nullToken)
+	seqend := len(db.FullSequence)
 	
 	// add sequence info to sequence list
+	si := len(db.Sequences)
 	db.Sequences = append(db.Sequences, seq)
-	si := len(db.Sequences) - 1
+	
 	// add sequence indexes for positions
-	db.PosToSequence = append(db.PosToSequence, make([]int, len(tokens) + 1)...)
-	for i := seq.start; i < seq.end; i += 1 {
+	db.PosToSequence = append(db.PosToSequence, make([]int, len(tokens))...)
+	for i := seqstart; i < seqend; i += 1 {
 		db.PosToSequence[i] = si
 	}
-	db.PosToSequence[seq.end] = 0
+
+	// add separators
+	db.FullSequence = append(db.FullSequence, nullToken)
+	db.PosToSequence = append(db.PosToSequence, si)
 }
 
 func hashTokens(toks []Token) string {

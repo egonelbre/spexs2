@@ -31,12 +31,14 @@ func Matches(group []int) Feature {
 	}
 }
 
+const minSeqsCountTable = 30
+
 // the count of matching unique sequences
 func Seqs(group []int) Feature {
 	return func(q *Query) (float64, string) {
 		db := q.Db
 
-		counted := make(map[int]bool, 30)
+		counted := make(map[int]bool, minSeqsCountTable)
 		count := make([]int, len(db.Total))
 		for _, p := range q.Loc.Iter() {
 			si := db.PosToSequence[p]
