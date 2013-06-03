@@ -74,3 +74,7 @@ func (set *Set) AddSet(other *Set) {
 		set.data[val] |= bits
 	}
 }
+
+func (set *Set) IsSorted() bool {
+	return false
+}

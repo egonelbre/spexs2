@@ -31,11 +31,8 @@ func (multi *Set) Len() int {
 
 func (multi *Set) Iter() []int {
 	sets := make([][]int, 0, len(multi.sets))
-	sorted := true
+	sorted := multi.IsSorted()
 	for _, s := range multi.sets {
-		if _, ok := s.(set.Sorted); !ok {
-			sorted = false
-		}
 		sets = append(sets, s.Iter())
 	}
 
@@ -49,6 +46,14 @@ func (multi *Set) Iter() []int {
 	}
 
 	return result
+}
+
+func (multi *Set) IsSorted() bool {
+	sorted := true
+	for _, s := range multi.sets {
+		sorted = sorted && s.IsSorted()
+	}
+	return sorted
 }
 
 var _ = sort.Ints

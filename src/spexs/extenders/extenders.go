@@ -64,62 +64,44 @@ func Group(base *Query) Querys {
 	return toQuerys(querys)
 }
 
-func starGreedyExtend(base *Query, db *Database, querys queryMap) {
-	lastPos := make(map[int]int, base.Loc.Len())
-	
-	for _, p := range base.Loc.Iter() {
-		si := db.PosToSequence[p]
-		v, ok := lastPos[si]
-		if !ok || v < p {
-			lastPos[si] = p
-		}
-	}
 
-	for _, p := range lastPos {
-		var q *Query
-		token, ok, next := db.GetToken(p)
-		for ok {
-			q, ok = querys[token]
-			if !ok {
-				q = NewQuery(base, RegToken{token, false, true})
-				querys[token] = q
-			}
-			q.Loc.Add(next)
-			token, ok, next = db.GetToken(next)
+func starExtendPosition(base *Query, db *Database, querys queryMap, p int){
+	var q *Query
+	token, ok, next := db.GetToken(p)
+	for ok {
+		q, ok = querys[token]
+		if !ok {
+			q = NewQuery(base, RegToken{token, false, true})
+			querys[token] = q
 		}
+		q.Loc.Add(next)
+		token, ok, next = db.GetToken(next)
 	}
-}
-
-func StarGreedy(base *Query) Querys {
-	patterns := make(queryMap)
-	extend(base, base.Db, patterns)
-	stars := make(queryMap)
-	starGreedyExtend(base, base.Db, stars)
-	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 
 func starExtend(base *Query, db *Database, querys queryMap) {
-	firstPos := make(map[int]int, base.Loc.Len())
-
-	for _, p := range base.Loc.Iter() {
-		si := db.PosToSequence[p]
-		v, ok := firstPos[si]
-		if !ok || v > p {
-			firstPos[si] = p
-		}
-	}
-
-	for _, p := range firstPos {
-		var q *Query
-		token, ok, next := db.GetToken(p)
-		for ok {
-			q, ok = querys[token]
-			if !ok {
-				q = NewQuery(base, RegToken{token, false, true})
-				querys[token] = q
+	if base.Loc.IsSorted() {
+		last_si := -1
+		for _, p := range base.Loc.Iter() {
+			si := db.PosToSequence[p]
+			if si == last_si {
+				continue
 			}
-			q.Loc.Add(next)
-			token, ok, next = db.GetToken(next)
+			last_si = si
+			starExtendPosition(base, db, querys, p)
+		}
+	} else {
+		firstPos := make(map[int]int, base.Loc.Len())
+		for _, p := range base.Loc.Iter() {
+			si := db.PosToSequence[p]
+			v, ok := firstPos[si]
+			if !ok || v > p {
+				firstPos[si] = p
+			}
+		}
+
+		for _, p := range firstPos {
+			starExtendPosition(base, db, querys, p)
 		}
 	}
 }
@@ -138,16 +120,6 @@ func Regex(base *Query) Querys {
 	combine(base, base.Db, patterns, false)
 	stars := make(queryMap)
 	starExtend(base, base.Db, stars)
-	combine(base, base.Db, stars, true)
-	return append(toQuerys(patterns), toQuerys(stars)...)
-}
-
-func RegexGreedy(base *Query) Querys {
-	patterns := make(queryMap)
-	extend(base, base.Db, patterns)
-	combine(base, base.Db, patterns, false)
-	stars := make(queryMap)
-	starGreedyExtend(base, base.Db, stars)
 	combine(base, base.Db, stars, true)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }

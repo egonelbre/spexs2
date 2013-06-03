@@ -85,3 +85,7 @@ func (set *Set) AddSet(other *Set) {
 		}
 	}
 }
+
+func (set *Set) IsSorted() bool {
+	return false
+}

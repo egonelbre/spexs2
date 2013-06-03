@@ -33,3 +33,6 @@ func (set *Set) Iter() []int {
 	return iter
 }
 
+func (set *Set) IsSorted() bool {
+	return false
+}
