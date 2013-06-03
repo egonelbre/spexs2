@@ -26,7 +26,7 @@
 		}
 	},
 	"Output": {
-		"SortBy": ["-Binom(fore, back)"],
+		"SortBy": ["-Binom(fore, back)", "MatchesRatio(fore,back)"],
 		"Count": 100
 	},
 	"Printer" : {
