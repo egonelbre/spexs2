@@ -45,9 +45,7 @@ func Seqs(group []int) Feature {
 			}
 			counted[si] = true
 			seq := db.Sequences[si]
-			for sec, _ := range seq.Count {
-				count[sec] += 1
-			}
+			count[seq.Section] += 1
 		}
 		return countf(count, group), ""
 	}

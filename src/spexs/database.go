@@ -7,7 +7,8 @@ import (
 
 type Sequence struct {
 	start, end int
-	Count  map[int]int
+	Section  int
+	Count    int
 }
 
 type TokenGroup struct {
@@ -36,7 +37,6 @@ type Database struct {
 	Separator string // separator for joining pattern
 
 	nameToToken map[string]Token
-	strToSeq    map[string]int
 	lastToken   Token
 }
 
@@ -55,7 +55,6 @@ func NewDatabase(estimatedSize int) *Database {
 
 		Separator: "",
 
-		strToSeq:    make(map[string]int),
 		nameToToken: make(map[string]Token),
 		lastToken:   Token(1),
 	}
@@ -83,24 +82,23 @@ func (db *Database) mkNewToken() Token {
 	return newToken
 }
 
+type exists struct{}
+
 func (db *Database) Matches(s set.Set) []int {
-	counted := make(map[int]bool, s.Len())
+	counted := make(map[int]exists, s.Len())
 	count := make([]int, len(db.Total))
 
 	for _, p := range s.Iter() {
 		si := db.PosToSequence[p]
-		if counted[si] {
+		if _, ok := counted[si]; ok {
 			continue
 		}
-		counted[si] = true
-
+		counted[si] = exists{}
 		seq := db.Sequences[si]
-		for sec, c := range seq.Count {
-			count[sec] += c
-		}
+		count[seq.Section] += seq.Count
 	}
 
-	return count
+	return count 
 }
 
 func (db *Database) Occs(s set.Set) []int {
@@ -108,9 +106,7 @@ func (db *Database) Occs(s set.Set) []int {
 	for _, p := range s.Iter() {
 		si := db.PosToSequence[p]
 		seq := db.Sequences[si]
-		for sec, c := range seq.Count {
-			count[sec] += c
-		}
+		count[seq.Section] += seq.Count
 	}
 	return count
 }
@@ -167,15 +163,7 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 	tokens := db.ToTokens(raw)
 	db.addToTokenCount(sec, tokens, count)
 
-	hash := hashTokens(tokens)
-	if si, ok := db.strToSeq[hash]; ok {
-		seq := db.Sequences[si]
-		seq.Count[sec] += count
-		return
-	}
-	
-	seq := &Sequence{0, 0, make(map[int]int)}
-	seq.Count[sec] = count
+	seq := &Sequence{0, 0, sec, count}
 	
 	// add sequence tokens to a single array
 	seq.start = len(db.FullSequence)
@@ -186,10 +174,7 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 	
 	// add sequence info to sequence list
 	db.Sequences = append(db.Sequences, seq)
-	// cache the sequence index
 	si := len(db.Sequences) - 1
-	db.strToSeq[hash] = si
-
 	// add sequence indexes for positions
 	db.PosToSequence = append(db.PosToSequence, make([]int, len(tokens) + 1)...)
 	for i := seq.start; i < seq.end; i += 1 {
