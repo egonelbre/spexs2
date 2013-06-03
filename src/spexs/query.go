@@ -16,7 +16,6 @@ type Query struct {
 	Pat   []RegToken
 	Loc   set.Set
 	Db    *Database
-	Prob  float64
 	cache queryCache
 }
 
@@ -25,7 +24,6 @@ func NewQuery(parent *Query, token RegToken) *Query {
 
 	q.Pat = nil
 	q.Db = nil
-	q.Prob = 1
 	if parent != nil {
 		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)

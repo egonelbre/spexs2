@@ -2,7 +2,7 @@ package spexs
 
 import "sync"
 
-type Token uint
+type Token uint32
 type Querys []*Query
 
 type Pooler interface {
