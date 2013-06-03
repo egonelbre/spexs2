@@ -6,8 +6,8 @@ import (
 )
 
 type Sequence struct {
-	Section  int
-	Count    int
+	Section int
+	Count   int
 }
 
 type TokenGroup struct {
@@ -27,11 +27,11 @@ type Database struct {
 	Alphabet map[Token]*TokenInfo
 	Groups   map[Token]*TokenGroup
 
-	PosToSequence []int
-	FullSequence []Token
-	Sequences   []Sequence
-	Total       []int // total number sequence for each section
-	TotalTokens []int // total number of tokens for each section
+	PosToSequence []int      // mapping from position to sequence index
+	FullSequence  []Token    // concatenated sequences
+	Sequences     []Sequence // info about sequences
+	Total         []int      // total number sequence for each section
+	TotalTokens   []int      // total number of tokens for each section
 
 	Separator string // separator for joining pattern
 
@@ -47,10 +47,10 @@ func NewDatabase(estimatedSize int) *Database {
 		Groups:   make(map[Token]*TokenGroup),
 
 		PosToSequence: make([]int, 0, estimatedSize),
-		FullSequence: make([]Token, 0, estimatedSize),
-		Sequences:   make([]Sequence, 0, estimatedSize),
-		Total:       make([]int, 0),
-		TotalTokens: make([]int, 0),
+		FullSequence:  make([]Token, 0, estimatedSize),
+		Sequences:     make([]Sequence, 0, estimatedSize),
+		Total:         make([]int, 0),
+		TotalTokens:   make([]int, 0),
 
 		Separator: "",
 
@@ -95,7 +95,7 @@ func (db *Database) Matches(s set.Set) []int {
 		count[seq.Section] += seq.Count
 	}
 
-	return count 
+	return count
 }
 
 func (db *Database) Occs(s set.Set) []int {
@@ -161,16 +161,16 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 	db.addToTokenCount(sec, tokens, count)
 
 	seq := Sequence{sec, count}
-	
+
 	// add sequence tokens to a single array
 	seqstart := len(db.FullSequence)
 	db.FullSequence = append(db.FullSequence, tokens...)
 	seqend := len(db.FullSequence)
-	
+
 	// add sequence info to sequence list
 	si := len(db.Sequences)
 	db.Sequences = append(db.Sequences, seq)
-	
+
 	// add sequence indexes for positions
 	db.PosToSequence = append(db.PosToSequence, make([]int, len(tokens))...)
 	for i := seqstart; i < seqend; i += 1 {

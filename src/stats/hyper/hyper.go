@@ -54,7 +54,7 @@ func ComplementCdf(chosenA, chosenB, totalA, totalB int) float64 {
 		gRr, _ := Lgamma(R - r + 1.0)
 
 		denom := ga + gOo + gr + gRr + gOR
-		
+
 		total += Exp(nom - denom)
 		r -= 1.0
 		o += 1.0

@@ -12,10 +12,10 @@ type test struct {
 }
 
 func BenchmarkBinom(b *testing.B) {
-	for i := 0; i < b.N; i += 1{
+	for i := 0; i < b.N; i += 1 {
 		for v := 0; v < 1000; v += 13 {
 			for r := 0; r < 1000; r += 15 {
-				ComplementCdf(v, 13000, float64(r) / float64(13000))
+				ComplementCdf(v, 13000, float64(r)/float64(13000))
 			}
 		}
 	}
@@ -29,7 +29,7 @@ func TestComplementCdf(t *testing.T) {
 		{0, 4, 0.25, 0.6835937},
 		{5, 100, 0.01, 0.0005345345},
 		{10, 100, 0.01, 6.25552e-9},
-		{39, 98, 23.0/1000.0, 3.883636e-39},
+		{39, 98, 23.0 / 1000.0, 3.883636e-39},
 	}
 
 	for _, test := range tests {

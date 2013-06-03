@@ -2,9 +2,9 @@ package main
 
 import (
 	"bytes"
-	"launchpad.net/rjson"
 	"flag"
 	"io/ioutil"
+	"launchpad.net/rjson"
 	"log"
 	"os"
 	"regexp"

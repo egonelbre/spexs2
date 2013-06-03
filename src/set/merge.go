@@ -2,7 +2,7 @@ package set
 
 import "math"
 
-func MergeSortedInts(sets... []int) []int {
+func MergeSortedInts(sets ...[]int) []int {
 	t := 0
 	for _, s := range sets {
 		t += len(s)
@@ -37,19 +37,18 @@ func MergeSortedInts(sets... []int) []int {
 		}
 	}
 
-
 	if len(sets) == 1 {
 		s := sets[0]
 		for i := idx[0]; i < len(s); i += 1 {
 			r[ri] = s[i]
 			ri += 1
 		}
-	}	
+	}
 
 	return r
 }
 
-func MergeSortedUniqueInts(sets... []int) []int {
+func MergeSortedUniqueInts(sets ...[]int) []int {
 	t := 0
 	for _, s := range sets {
 		t += len(s)

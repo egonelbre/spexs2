@@ -1,8 +1,8 @@
 package extenders
 
 import (
-	. "spexs"
 	"set/multi"
+	. "spexs"
 )
 
 type queryMap map[Token]*Query
@@ -56,7 +56,6 @@ func combine(base *Query, db *Database, querys queryMap, isStar bool) {
 	}
 }
 
-
 func Group(base *Query) Querys {
 	querys := make(queryMap)
 	extend(base, base.Db, querys)
@@ -64,8 +63,7 @@ func Group(base *Query) Querys {
 	return toQuerys(querys)
 }
 
-
-func starExtendPosition(base *Query, db *Database, querys queryMap, p int){
+func starExtendPosition(base *Query, db *Database, querys queryMap, p int) {
 	var q *Query
 	token, ok, next := db.GetToken(p)
 	for ok {

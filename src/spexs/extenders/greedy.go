@@ -44,7 +44,7 @@ func starGreedyExtend(base *Query, db *Database, querys queryMap) {
 		for _, p := range lastPos {
 			starExtendPosition(base, db, querys, p)
 		}
-	}	
+	}
 }
 
 func StarGreedy(base *Query) Querys {

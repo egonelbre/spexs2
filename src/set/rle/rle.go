@@ -1,9 +1,9 @@
 package rle
 
 const (
-	bits  = 7
-	mark  = 1 << bits
-	mask  = mark - 1
+	bits = 7
+	mark = 1 << bits
+	mask = mark - 1
 )
 
 type Set struct {
@@ -28,7 +28,7 @@ func (s *Set) Add(v int) {
 	if df < 0 {
 		panic("not in increasing order")
 	}
-	
+
 	for ; df >= mark; df = df >> bits {
 		s.data = append(s.data, byte(mark|(df&mask)))
 	}
@@ -62,7 +62,7 @@ func (s *Set) Len() int {
 
 func (s *Set) AddSet(other *Set) {
 	as, bs := s.Iter(), other.Iter()
-	
+
 	r := New()
 	ai, bi := 0, 0
 	for ai < len(as) && bi < len(bs) {
@@ -77,7 +77,7 @@ func (s *Set) AddSet(other *Set) {
 			r.Add(av)
 			ai += 1
 			bi += 1
-			
+
 		}
 	}
 
@@ -96,7 +96,7 @@ func (s *Set) AddSet(other *Set) {
 	s.cur = r.cur
 }
 
-func (s *Set) AddSets(other... *Set) {
+func (s *Set) AddSets(other ...*Set) {
 	sets := make([][]int, 0)
 	if s.Len() > 0 {
 		sets = append(sets, s.Iter())

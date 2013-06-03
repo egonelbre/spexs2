@@ -53,7 +53,7 @@ func CreateDatabase(conf *Conf) (*Database, *Dataset) {
 	ds.AddFileGroups(db, conf.Dataset, conf.Reader.CountSeparator, skip)
 
 	log.Printf("Alphabet size: %v\n", len(db.Alphabet))
-	
+
 	return db, ds
 }
 

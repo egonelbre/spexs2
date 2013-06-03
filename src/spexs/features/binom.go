@@ -19,4 +19,3 @@ func Binom(fore, back []int) Feature {
 		return binom.ComplementCdf(countFore, totalFore, p), ""
 	}
 }
-

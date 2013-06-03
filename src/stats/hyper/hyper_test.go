@@ -8,7 +8,7 @@ import (
 type splitFunc func(o int, r int, O int, R int) float64
 
 func benchHyper(b *testing.B, fn splitFunc) {
-	for i := 0; i < b.N; i += 1{
+	for i := 0; i < b.N; i += 1 {
 		for v := 0; v < 1000; v += 13 {
 			for r := 0; r < 1000; r += 15 {
 				fn(v, r, 13000, 13000)
@@ -31,7 +31,8 @@ func BenchmarkComplementCdfSlow(b *testing.B) {
 
 type test struct {
 	chosenA, totalA, chosenB, totalB int
-	expected     float64
+
+	expected float64
 }
 
 func testHyper(t *testing.T, fn splitFunc, epsilon float64) {
@@ -50,7 +51,7 @@ func testHyper(t *testing.T, fn splitFunc, epsilon float64) {
 	for i, test := range tests {
 		p := fn(test.chosenA, test.chosenB, test.totalA, test.totalB)
 
-		diff := math.Abs(p / test.expected - 1)
+		diff := math.Abs(p/test.expected - 1)
 		if diff > epsilon {
 			t.Errorf("fail %v: got %v, expected %v, \nerr=%v", i, p, test.expected, diff)
 		}

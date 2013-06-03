@@ -1,8 +1,8 @@
 package main
 
 import (
-	"launchpad.net/rjson"
 	"fmt"
+	"launchpad.net/rjson"
 	"log"
 	"regexp"
 	. "spexs"
