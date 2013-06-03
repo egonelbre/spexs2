@@ -78,7 +78,7 @@ func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 	feature := createdFn
 	if !positive {
 		feature = func(q *Query) (float64, string) {
-			v, info := q.Memoized(createdFn)
+			v, info := createdFn(q)
 			return -v, info
 		}
 	}

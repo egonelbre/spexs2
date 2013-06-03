@@ -23,7 +23,6 @@ type Query struct {
 	Loc   set.Set
 	Db    *Database
 	Prob  float64
-	memo  map[featureHash]feature
 	cache queryCache
 }
 
@@ -41,7 +40,6 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Pat[len(q.Pat)-1] = token
 		q.Db = parent.Db
 	}
-	q.memo = make(map[featureHash]feature)
 	q.Loc = defset.New()
 	q.cache.reset()
 
@@ -57,16 +55,6 @@ func NewEmptyQuery(db *Database) *Query {
 
 func (q *Query) Len() int {
 	return len(q.Pat)
-}
-
-func (q *Query) Memoized(f Feature) (float64, string) {
-	h := featureHash(*(*unsafe.Pointer)(unsafe.Pointer(&f)))
-	if res, ok := q.memo[h]; ok {
-		return res.Value, res.Info
-	}
-	val, info := f(q)
-	q.memo[h] = feature{val, info}
-	return val, info
 }
 
 type queryCache struct {

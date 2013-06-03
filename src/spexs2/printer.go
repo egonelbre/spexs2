@@ -32,12 +32,12 @@ func (s *AppSetup) initPrinter() {
 			var feat strFeature
 			if !info {
 				feat = func(q *Query) string {
-					val, _ := q.Memoized(feature)
+					val, _ := feature(q)
 					return fmt.Sprintf("%v", val)
 				}
 			} else {
 				feat = func(q *Query) string {
-					_, info := q.Memoized(feature)
+					_, info := feature(q)
 					return info
 				}
 			}

@@ -24,17 +24,17 @@ func FeatureFilter(feature Feature, data []byte) Filter {
 
 	if low && high {
 		return func(q *Query) bool {
-			val, _ := q.Memoized(feature)
+			val, _ := feature(q)
 			return (min <= val) && (val <= max)
 		}
 	} else if low {
 		return func(q *Query) bool {
-			val, _ := q.Memoized(feature)
+			val, _ := feature(q)
 			return min <= val
 		}
 	} else if high {
 		return func(q *Query) bool {
-			val, _ := q.Memoized(feature)
+			val, _ := feature(q)
 			return val <= max
 		}
 	}

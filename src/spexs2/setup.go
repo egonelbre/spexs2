@@ -50,7 +50,7 @@ func NewAppSetup(conf *Conf) *AppSetup {
 	s.PreProcess = func(q *Query) error {
 		q.CacheValues()
 		for _, fn := range features {
-			q.Memoized(fn)
+			fn(q)
 		}
 		return nil
 	}
