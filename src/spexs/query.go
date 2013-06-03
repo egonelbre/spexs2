@@ -21,9 +21,6 @@ type Query struct {
 
 func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
-
-	q.Pat = nil
-	q.Db = nil
 	if parent != nil {
 		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)
@@ -31,8 +28,6 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Db = parent.Db
 	}
 	q.Loc = defset.New()
-	q.cache.reset()
-
 	return q
 }
 
@@ -47,14 +42,13 @@ func (q *Query) Len() int {
 	return len(q.Pat)
 }
 
+func (q *Query) Free() {
+	//
+}
+
 type queryCache struct {
 	count []int
 	occs  []int
-}
-
-func (q *queryCache) reset() {
-	q.count = nil
-	q.occs = nil
 }
 
 func (q *Query) CacheValues() {
