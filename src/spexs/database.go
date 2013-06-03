@@ -82,19 +82,34 @@ func (db *Database) mkNewToken() Token {
 }
 
 func (db *Database) MatchesOccs(s set.Set) (matches []int, occs []int) {
-	counted := make(map[int]bool, s.Len())
-	
 	matches = make([]int, len(db.Total))
 	occs = make([]int, len(db.Total))
 
-	for _, p := range s.Iter() {
-		si := db.PosToSequence[p]
-		seq := db.Sequences[si]
-		occs[seq.Section] += seq.Count
+	if s.IsSorted() {
+		last_si := -1
+		for _, p := range s.Iter() {
+			si := db.PosToSequence[p]
+			seq := db.Sequences[si]
+			occs[seq.Section] += seq.Count
 
-		if !counted[si] {
-			counted[si] = true
-			matches[seq.Section] += seq.Count
+			if last_si != si {
+				last_si = si
+				matches[seq.Section] += seq.Count
+			}
+		}
+	} else {
+		counted := make(map[int]bool, s.Len())
+		last_si := -1
+		for _, p := range s.Iter() {
+			si := db.PosToSequence[p]
+			seq := db.Sequences[si]
+			occs[seq.Section] += seq.Count
+
+			if last_si != si && !counted[si] {
+				last_si = si
+				counted[si] = true
+				matches[seq.Section] += seq.Count
+			}
 		}
 	}
 
