@@ -41,12 +41,11 @@ func Seqs(group []int) Feature {
 		counted := make(map[int]bool, minSeqsCountTable)
 		count := make([]int, len(db.Total))
 		for _, p := range q.Loc.Iter() {
-			si := db.PosToSequence[p]
-			if counted[si] {
+			seq := db.PosToSequence[p]
+			if counted[seq.Index] {
 				continue
 			}
-			counted[si] = true
-			seq := db.Sequences[si]
+			counted[seq.Index] = true
 			count[seq.Section] += 1
 		}
 		return countf(count, group), ""

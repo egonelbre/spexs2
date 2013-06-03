@@ -27,7 +27,7 @@ func NewDataset() *Dataset {
 }
 
 func CreateDatabase(conf *Conf) (*Database, *Dataset) {
-	db := NewDatabase(1024)
+	db := NewDatabase()
 	db.Separator = conf.Reader.Separator
 
 	skip := make(map[string]bool)

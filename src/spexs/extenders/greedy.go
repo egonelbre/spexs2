@@ -11,20 +11,20 @@ func starGreedyExtend(base *Query, db *Database, querys queryMap) {
 
 		// initialize the last position and sequence index
 		last_p := positions[0]
-		last_si := db.PosToSequence[last_p]
+		last_si := db.PosToSequence[last_p].Index
 
 		for _, p := range positions {
-			si := db.PosToSequence[p]
+			seq := db.PosToSequence[p]
 
 			// if we encounter a sequence index change the last_p was the last position in sequence
-			if si == last_si {
+			if seq.Index == last_si {
 				last_p = p
 				continue
 			}
 
 			starExtendPosition(base, db, querys, last_p)
 
-			last_si = si
+			last_si = seq.Index
 			last_p = p
 		}
 
@@ -34,10 +34,10 @@ func starGreedyExtend(base *Query, db *Database, querys queryMap) {
 	} else {
 		lastPos := make(map[int]int, base.Loc.Len())
 		for _, p := range base.Loc.Iter() {
-			si := db.PosToSequence[p]
-			v, ok := lastPos[si]
+			seq := db.PosToSequence[p]
+			v, ok := lastPos[seq.Index]
 			if !ok || v < p {
-				lastPos[si] = p
+				lastPos[seq.Index] = p
 			}
 		}
 
