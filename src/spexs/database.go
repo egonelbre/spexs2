@@ -91,11 +91,10 @@ func (db *Database) MatchesOccs(s set.Set) (matches []int, occs []int) {
 			si := db.PosToSequence[p]
 			seq := db.Sequences[si]
 			occs[seq.Section] += seq.Count
-
 			if last_si != si {
-				last_si = si
 				matches[seq.Section] += seq.Count
 			}
+			last_si = si
 		}
 	} else {
 		counted := make(map[int]bool, s.Len())
