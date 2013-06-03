@@ -80,23 +80,18 @@ func (q *queryCache) reset() {
 }
 
 func (q *Query) CacheValues() {
-	q.Matches()
-	q.Occs()
+	if q.cache.count == nil || q.cache.occs == nil {
+		q.cache.count, q.cache.occs = q.Db.MatchesOccs(q.Loc)
+	}
 }
 
 func (q *Query) Matches() []int {
-	if q.cache.count == nil {
-		count := q.Db.Matches(q.Loc)
-		q.cache.count = count
-	}
+	q.CacheValues()
 	return q.cache.count
 }
 
 func (q *Query) Occs() []int {
-	if q.cache.occs == nil {
-		count := q.Db.Occs(q.Loc)
-		q.cache.occs = count
-	}
+	q.CacheValues()
 	return q.cache.occs
 }
 
