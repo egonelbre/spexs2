@@ -4,18 +4,12 @@ import (
 	"bytes"
 	"set"
 	defset "set/rle"
-	"unsafe"
 )
 
 type RegToken struct {
 	Token   Token
 	IsGroup bool
 	IsStar  bool
-}
-
-type feature struct {
-	Value float64
-	Info  string
 }
 
 type Query struct {
@@ -25,8 +19,6 @@ type Query struct {
 	Prob  float64
 	cache queryCache
 }
-
-type featureHash unsafe.Pointer
 
 func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
