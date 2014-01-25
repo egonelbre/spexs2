@@ -42,10 +42,6 @@ func (q *Query) Len() int {
 	return len(q.Pat)
 }
 
-func (q *Query) Free() {
-	//
-}
-
 type queryCache struct {
 	count []int
 	occs  []int
