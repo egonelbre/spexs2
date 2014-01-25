@@ -7,5 +7,5 @@ VERSION=`git describe --tags --long`
 TIME=`date +%D\\ %H:%M:%S`
 echo -e "package main\n\nfunc init(){\n\ttheVersion = \"$VERSION-rev$REVS\"\n\ttheBuildTime=\"$TIME\"\n}\n" > src/spexs2/autoVersion.go
 
-go install spexs
-go install spexs2
+go install -gcflags -B spexs
+go install -gcflags -B spexs2

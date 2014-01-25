@@ -1,11 +1,3 @@
-;; Anything you type in here will be executed
-;; immediately with the results shown on the
-;; right.
-
-;; Anything you type in here will be executed
-;; immediately with the results shown on the
-;; right.
-
 (require '[ clojure.core.reducers :as r ])
 
 ; a parallel grouping function

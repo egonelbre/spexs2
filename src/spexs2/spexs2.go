@@ -21,7 +21,7 @@ var (
 	writeConf        *string = flag.String("writeconf", "", "write conf file")
 
 	stats       *bool = flag.Bool("stats", false, "print memory/extension statistics")
-	procs       *int  = flag.Int("procs", 16, "goroutines for extending")
+	procs       *int  = flag.Int("procs", -1, "goroutines for extending")
 	memoryLimit *int  = flag.Int("mem", -1, "memory limit in MB")
 
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
@@ -87,9 +87,9 @@ func main() {
 	ifthen(*memoryLimit > 0, setMemLimit)
 	ifthen(*memprofile != "", attachMemProfiler)
 
-	info("running spexs")
+	info("running spexs [", *procs, "]")
 
-	if *procs <= 1 {
+	if *procs == 1 {
 		Run(&setup.Setup)
 	} else {
 		RunParallel(&setup.Setup, *procs)

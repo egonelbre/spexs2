@@ -14,6 +14,9 @@ const mb = 1024 * 1024
 
 func setupRuntime() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	if runtime.NumCPU() > *procs || *procs <= 0 {
+		*procs = runtime.NumCPU()
+	}
 }
 
 func startProfiler(outputFile string) bool {

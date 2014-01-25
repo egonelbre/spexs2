@@ -1,6 +1,9 @@
 package spexs
 
-import "sync"
+import (
+	"sync"
+	"runtime"
+)
 
 type Token uint32
 type Querys []*Query
@@ -76,8 +79,8 @@ func RunParallel(s *Setup, routines int) {
 
 	for i := 0; i < routines; i += 1 {
 		wg.Add(1)
-
 		go func() {
+			runtime.LockOSThread()
 			for {
 				<-added
 				m.Lock()
