@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SPEXS=../bin/spexs2
+SPEXS=../spexs2
 
 time $SPEXS -stats \
 	-verbose=true \
