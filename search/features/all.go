@@ -2,9 +2,10 @@ package features
 
 import (
 	"fmt"
+	"reflect"
+
 	. "github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/utils"
-	"reflect"
 )
 
 type CreateFunc interface{}
@@ -17,7 +18,7 @@ var All = [...]CreateFunc{
 	// binomial
 	Binom,
 	// hypergeometrics
-	Hyper, HyperApprox, HyperDown, // HyperOptimal,
+	Hyper, HyperApprox, HyperDown, HyperOptimal,
 	// pattern length related
 	PatLength, PatChars, PatGroups, PatStars,
 	// only strings

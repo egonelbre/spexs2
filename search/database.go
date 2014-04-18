@@ -1,4 +1,4 @@
-package spexs
+package search
 
 import "github.com/egonelbre/spexs2/set"
 

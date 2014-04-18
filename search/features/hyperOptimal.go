@@ -1,33 +1,39 @@
 package features
 
-/*
 // find optimal hypergeometric split
 import (
 	"fmt"
 	"math"
-	"sort"
-	. "spexs"
-	"stats/hyper"
+	
+	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/stats/hyper"
 )
 
-func uniquePositions(q *Query) []uint {
-	positions := make([]uint, q.Loc.Len())
-	k := 0
-	for _, val := range q.Loc.Iter() {
-		p, _ := DecodePos(val)
-		positions[k] = p
-		k += 1
+// the count of matching unique sequences
+func countseqs(q *Query, group []int, iter []int) int {
+	db := q.Db
+
+	counted := make(map[int]struct{}, minSeqsCountTable)
+	seqs := make([]int, len(db.Total))
+
+	for _, p := range iter {
+		seq := db.PosToSequence[p]
+		if _, ok := counted[seq.Index]; ok {
+			continue
+		}
+		counted[seq.Index] = struct{}{}
+		seqs[seq.Section] += 1
 	}
-	sort.Sort(uintSlice(positions))
-	return uniq(positions)
+	return count(seqs, group)
 }
 
 func HyperOptimal(fore []int) Feature {
 	return func(q *Query) (float64, string) {
 		db := q.Db
-		positions := uniquePositions(q)
 
-		allMatches := count(q.Matches(), fore)
+		iter := q.Loc.Iter()
+		
+		allmatches := countseqs(q, fore, iter)
 		totalSeqs := count(db.Total, fore)
 
 		var best struct {
@@ -37,43 +43,37 @@ func HyperOptimal(fore []int) Feature {
 		}
 		best.p = math.Inf(1.0)
 
-		acc := 0
-		for _, i := range positions {
-			seq := db.Sequences[i]
+		include := make([]bool, len(db.Total))
+		for _, sec := range fore {
+			include[sec] = true
+		}
 
-			for _, sec := range fore {
-				acc += seq.Count[sec]
+		counted := make(map[int]struct{})
+
+		count := 0
+		for _, i := range iter {
+			seq := db.PosToSequence[i]
+			if !include[seq.Section] {
+				continue
+			}
+			if _, ok := counted[seq.Index]; ok {
+				continue
 			}
 
-			p := hyper.Split(acc, allMatches, int(i+1), totalSeqs)
+			counted[seq.Index] = struct{}{}
+
+			count += int(seq.Count)
+
+			p := hyper.ComplementCdfSlow(count, allmatches, seq.Index, totalSeqs)
 			if p < best.p {
 				best.p = p
-				best.matches = acc
-				best.seqs = int(i + 1)
+				best.matches = count
+				best.seqs = seq.Index
 			}
 		}
+
+		//fmt.Printf("<%v/%v> <%v/%v>\t%v\t%v\n", best.matches, best.seqs, allMatches, totalSeqs, best.p, q)
 
 		return best.p, fmt.Sprintf("<%v/%v>", best.matches, best.seqs)
 	}
 }
-
-type uintSlice []uint
-
-func (p uintSlice) Len() int           { return len(p) }
-func (p uintSlice) Less(i, j int) bool { return p[i] < p[j] }
-func (p uintSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-
-func uniq(data []uint) []uint {
-	if len(data) <= 0 {
-		return data
-	}
-	k := 1
-	for i := 0; i < len(data); i += 1 {
-		if data[k-1] != data[i] {
-			data[k] = data[i]
-			k += 1
-		}
-	}
-	return data[0:k]
-}
-*/

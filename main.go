@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	"time"
-	
+
 	. "github.com/egonelbre/spexs2/search"
 )
 

@@ -2,8 +2,9 @@ package filters
 
 import (
 	"encoding/json"
-	. "github.com/egonelbre/spexs2/search"
 	"strings"
+	
+	. "github.com/egonelbre/spexs2/search"
 )
 
 // don't allow start to be grouping token

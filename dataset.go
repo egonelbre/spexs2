@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	. "github.com/egonelbre/spexs2/search"	
+	. "github.com/egonelbre/spexs2/search"
 )
 
 type File struct {

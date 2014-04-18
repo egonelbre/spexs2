@@ -45,23 +45,23 @@ type Stack struct {
 	capacity int
 	offset   int
 
-	blocks [][]*spexs.Query
-	active []*spexs.Query
+	blocks [][]*search.Query
+	active []*search.Query
 }
 
 // Creates a new, empty stack.
 func NewStack() *Stack {
 	result := new(Stack)
-	result.active = make([]*spexs.Query, blockSize)
-	result.blocks = [][]*spexs.Query{result.active}
+	result.active = make([]*search.Query, blockSize)
+	result.blocks = [][]*search.Query{result.active}
 	result.capacity = blockSize
 	return result
 }
 
 // Pushes a value onto the stack, expanding it if necessary.
-func (s *Stack) Push(data *spexs.Query) {
+func (s *Stack) Push(data *search.Query) {
 	if s.size == s.capacity {
-		s.active = make([]*spexs.Query, blockSize)
+		s.active = make([]*search.Query, blockSize)
 		s.blocks = append(s.blocks, s.active)
 		s.capacity += blockSize
 		s.offset = 0
@@ -75,7 +75,7 @@ func (s *Stack) Push(data *spexs.Query) {
 }
 
 // Pops a value off the stack and returns it. Currently no shrinking is done.
-func (s *Stack) Pop() (res *spexs.Query, ok bool) {
+func (s *Stack) Pop() (res *search.Query, ok bool) {
 	if s.size == 0 {
 		return nil, false
 	}
@@ -96,8 +96,8 @@ func (s *Stack) Empty() bool {
 }
 
 // Returns all values in an array
-func (s *Stack) Values() []*spexs.Query {
-	r := make([]*spexs.Query, 0, s.Len())
+func (s *Stack) Values() []*search.Query {
+	r := make([]*search.Query, 0, s.Len())
 	for !s.Empty() {
 		v, _ := s.Pop()
 		r = append(r, v)

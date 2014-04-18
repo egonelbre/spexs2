@@ -46,22 +46,22 @@ type Queue struct {
 	tailOff int
 	headOff int
 
-	blocks [][]*spexs.Query
-	head   []*spexs.Query
-	tail   []*spexs.Query
+	blocks [][]*search.Query
+	head   []*search.Query
+	tail   []*search.Query
 }
 
 // Creates a new, empty queue.
 func NewQueue() *Queue {
 	result := new(Queue)
-	result.blocks = [][]*spexs.Query{make([]*spexs.Query, blockSize)}
+	result.blocks = [][]*search.Query{make([]*search.Query, blockSize)}
 	result.head = result.blocks[0]
 	result.tail = result.blocks[0]
 	return result
 }
 
 // Pushes a new element into the queue, expanding it if necessary.
-func (q *Queue) Push(data *spexs.Query) {
+func (q *Queue) Push(data *search.Query) {
 	q.tail[q.tailOff] = data
 	q.tailOff++
 	if q.tailOff == blockSize {
@@ -70,9 +70,9 @@ func (q *Queue) Push(data *spexs.Query) {
 
 		// If we wrapped over to the end, insert a new block and update indices
 		if q.tailIdx == q.headIdx {
-			buffer := make([][]*spexs.Query, len(q.blocks)+1)
+			buffer := make([][]*search.Query, len(q.blocks)+1)
 			copy(buffer[:q.tailIdx], q.blocks[:q.tailIdx])
-			buffer[q.tailIdx] = make([]*spexs.Query, blockSize)
+			buffer[q.tailIdx] = make([]*search.Query, blockSize)
 			copy(buffer[q.tailIdx+1:], q.blocks[q.tailIdx:])
 			q.blocks = buffer
 			q.headIdx++
@@ -83,7 +83,7 @@ func (q *Queue) Push(data *spexs.Query) {
 }
 
 // Pops out an element from the queue. Note, no bounds checking are done.
-func (q *Queue) Pop() (res *spexs.Query, ok bool) {
+func (q *Queue) Pop() (res *search.Query, ok bool) {
 	if q.headIdx == q.tailIdx && q.headOff == q.tailOff {
 		return nil, false
 	}
@@ -116,8 +116,8 @@ func (q *Queue) Len() (size int) {
 }
 
 // Returns all values in an array
-func (q *Queue) Values() []*spexs.Query {
-	r := make([]*spexs.Query, 0, q.Len())
+func (q *Queue) Values() []*search.Query {
+	r := make([]*search.Query, 0, q.Len())
 	for !q.Empty() {
 		v, _ := q.Pop()
 		r = append(r, v)

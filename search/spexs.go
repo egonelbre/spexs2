@@ -1,4 +1,4 @@
-package spexs
+package search
 
 import (
 	"runtime"

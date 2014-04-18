@@ -2,9 +2,10 @@ package filters
 
 import (
 	"encoding/json"
-	. "github.com/egonelbre/spexs2/search"
 	"log"
 	"math"
+	
+	. "github.com/egonelbre/spexs2/search"
 )
 
 type minmax struct{ Min, Max float64 }
