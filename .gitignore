@@ -11,9 +11,7 @@ pkg/**
 bin/**
 pages/**
 
-autoVersion.go
-
-!doc/**
+!_doc/**
 
 *.prof
 *.sublime-project
