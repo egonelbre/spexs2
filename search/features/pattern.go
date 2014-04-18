@@ -22,7 +22,7 @@ func PatLength() Feature {
 		t := 0
 		for _, e := range q.Pat {
 			t += 1
-			if e.IsStar {
+			if e.Flags&IsStar != 0 {
 				t += 1
 			}
 		}
@@ -35,7 +35,7 @@ func PatChars() Feature {
 	return func(q *Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
-			if !e.IsGroup {
+			if e.Flags&IsGroup == 0 {
 				t += 1
 			}
 		}
@@ -48,7 +48,7 @@ func PatGroups() Feature {
 	return func(q *Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
-			if e.IsGroup {
+			if e.Flags&IsGroup != 0 {
 				t += 1
 			}
 		}
@@ -61,7 +61,7 @@ func PatStars() Feature {
 	return func(q *Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
-			if e.IsStar {
+			if e.Flags&IsStar != 0 {
 				t += 1
 			}
 		}

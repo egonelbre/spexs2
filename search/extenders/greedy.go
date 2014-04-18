@@ -42,9 +42,9 @@ func StarGreedy(base *Query) Querys {
 func RegexGreedy(base *Query) Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
-	combine(base, base.Db, patterns, false)
+	combine(base, base.Db, patterns, IsSingle)
 	stars := make(queryMap)
 	starGreedyExtend(base, base.Db, stars)
-	combine(base, base.Db, stars, true)
+	combine(base, base.Db, stars, IsStar)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }

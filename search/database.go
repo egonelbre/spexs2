@@ -38,7 +38,7 @@ type Database struct {
 }
 
 const initialSize = 1e4
-const nullToken = Token(0)
+const ZeroToken = Token(0)
 
 func NewDatabase() *Database {
 	return &Database{
@@ -60,18 +60,10 @@ func NewDatabase() *Database {
 
 func (db *Database) AddAllPositions(s set.Set) {
 	for i, v := range db.FullSequence {
-		if v != nullToken {
+		if v != ZeroToken {
 			s.Add(i)
 		}
 	}
-}
-
-func (db *Database) GetToken(pos int) (token Token, ok bool, nextPos int) {
-	t := db.FullSequence[pos]
-	if t == nullToken {
-		return 0, false, 0
-	}
-	return t, true, pos + 1
 }
 
 func (db *Database) mkNewToken() Token {
@@ -142,8 +134,8 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 	tokens := db.ToTokens(raw)
 	db.addToTokenCount(sec, tokens, count)
 
-	db.genSeqId += 1
 	seq := Sequence{db.genSeqId, uint32(sec), uint32(count)}
+	db.genSeqId += 1
 
 	// add sequence tokens to a single array
 	seqstart := len(db.FullSequence)
@@ -157,6 +149,6 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 	}
 
 	// add separators
-	db.FullSequence = append(db.FullSequence, nullToken)
+	db.FullSequence = append(db.FullSequence, ZeroToken)
 	db.PosToSequence = append(db.PosToSequence, seq)
 }

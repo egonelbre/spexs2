@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"math"
-	
+
 	. "github.com/egonelbre/spexs2/search"
 )
 

@@ -39,7 +39,7 @@ func Seqs(group []int) Feature {
 		db := q.Db
 
 		prevseq := -1
-		
+
 		count := make([]int, len(db.Total))
 		for _, p := range q.Loc.Iter() {
 			seq := db.PosToSequence[p]

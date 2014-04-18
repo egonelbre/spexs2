@@ -6,10 +6,17 @@ import (
 	defset "github.com/egonelbre/spexs2/set/rle"
 )
 
+type RegFlags uint8
+
+const (
+	IsGroup RegFlags = 1 << iota
+	IsStar
+	IsSingle RegFlags = 0
+)
+
 type RegToken struct {
-	Token   Token
-	IsGroup bool
-	IsStar  bool
+	Token Token
+	Flags RegFlags
 }
 
 type Query struct {
@@ -83,7 +90,7 @@ func (q *Query) string(short bool) string {
 	buf := bytes.NewBufferString("")
 	db := q.Db
 	for i, regToken := range q.Pat {
-		if regToken.IsStar {
+		if regToken.Flags&IsStar != 0 {
 			buf.WriteString("*")
 			buf.WriteString(db.Separator)
 		}

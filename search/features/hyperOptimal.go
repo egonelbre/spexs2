@@ -4,7 +4,7 @@ package features
 import (
 	"fmt"
 	"math"
-	
+
 	. "github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/stats/hyper"
 )
@@ -33,7 +33,7 @@ func HyperOptimal(fore []int) Feature {
 		db := q.Db
 
 		iter := q.Loc.Iter()
-		
+
 		allmatches := countseqs(q, fore, iter)
 		totalSeqs := count(db.Total, fore)
 
@@ -50,7 +50,7 @@ func HyperOptimal(fore []int) Feature {
 		}
 
 		prevseq := -1
-		
+
 		count := 0
 		for _, i := range iter {
 			seq := db.PosToSequence[i]
@@ -64,11 +64,11 @@ func HyperOptimal(fore []int) Feature {
 			}
 			count += int(seq.Count)
 
-			p := hyper.ComplementCdfSlow(count, allmatches, seq.Index, totalSeqs)
+			p := hyper.ComplementCdfSlow(count, allmatches, seq.Index+1, totalSeqs)
 			if p < best.p {
 				best.p = p
 				best.matches = count
-				best.seqs = seq.Index
+				best.seqs = seq.Index + 1
 			}
 		}
 

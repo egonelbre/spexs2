@@ -21,18 +21,18 @@ func toQuerys(queryMap queryMap) Querys {
 
 func extend(base *Query, db *Database, querys queryMap) {
 	for _, p := range base.Loc.Iter() {
-		token, ok, next := db.GetToken(p)
-		if !ok {
+		token := db.FullSequence[p]
+		if token == ZeroToken {
 			continue
 		}
 
 		q, ok := querys[token]
 		if !ok {
-			q = NewQuery(base, RegToken{token, false, false})
+			q = NewQuery(base, RegToken{token, IsSingle})
 			querys[token] = q
 		}
 
-		q.Loc.Add(next)
+		q.Loc.Add(p + 1)
 	}
 }
 
@@ -42,9 +42,9 @@ func Simple(base *Query) Querys {
 	return toQuerys(querys)
 }
 
-func combine(base *Query, db *Database, querys queryMap, isStar bool) {
+func combine(base *Query, db *Database, querys queryMap, flags RegFlags) {
 	for _, group := range db.Groups {
-		q := NewQuery(base, RegToken{group.Token, true, isStar})
+		q := NewQuery(base, RegToken{group.Token, IsGroup | flags})
 		querys[group.Token] = q
 		sets := multi.New()
 		for _, token := range group.Elems {
@@ -59,21 +59,20 @@ func combine(base *Query, db *Database, querys queryMap, isStar bool) {
 func Group(base *Query) Querys {
 	querys := make(queryMap)
 	extend(base, base.Db, querys)
-	combine(base, base.Db, querys, false)
+	combine(base, base.Db, querys, IsSingle)
 	return toQuerys(querys)
 }
 
 func starExtendPosition(base *Query, db *Database, querys queryMap, p int) {
-	var q *Query
-	token, ok, next := db.GetToken(p)
-	for ok {
-		q, ok = querys[token]
+	token := db.FullSequence[p]
+	for token != ZeroToken {
+		q, ok := querys[token]
 		if !ok {
-			q = NewQuery(base, RegToken{token, false, true})
+			q = NewQuery(base, RegToken{token, IsStar})
 			querys[token] = q
 		}
-		q.Loc.Add(next)
-		token, ok, next = db.GetToken(next)
+		q.Loc.Add(p + 1)
+		token = db.FullSequence[p+1]
 	}
 }
 
@@ -100,9 +99,9 @@ func Star(base *Query) Querys {
 func Regex(base *Query) Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
-	combine(base, base.Db, patterns, false)
+	combine(base, base.Db, patterns, IsSingle)
 	stars := make(queryMap)
 	starExtend(base, base.Db, stars)
-	combine(base, base.Db, stars, true)
+	combine(base, base.Db, stars, IsStar)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }

@@ -3,7 +3,7 @@ package filters
 import (
 	"encoding/json"
 	"strings"
-	
+
 	. "github.com/egonelbre/spexs2/search"
 )
 
@@ -11,7 +11,7 @@ import (
 func NoStartingGroup(s Setup, data []byte) Filter {
 	return func(q *Query) bool {
 		start := q.Pat[0]
-		return !start.IsGroup && !start.IsStar
+		return start.Flags == IsSingle
 	}
 }
 
@@ -19,7 +19,7 @@ func NoStartingGroup(s Setup, data []byte) Filter {
 func NoEndingGroup(s Setup, data []byte) Filter {
 	return func(q *Query) bool {
 		end := q.Pat[len(q.Pat)-1]
-		return !end.IsGroup
+		return end.Flags&IsGroup == 0
 	}
 }
 
