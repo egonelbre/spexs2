@@ -10,7 +10,13 @@ import (
 
 type minmax struct{ Min, Max float64 }
 
-func FeatureFilter(feature Feature, data []byte) Filter {
+type featureFilter struct {
+	Feature Feature
+	Min     float64
+	Max     float64
+}
+
+func NewFeatureFilter(f Feature, data []byte) Filter {
 	var conf struct{ Min, Max float64 }
 	conf.Min = math.NaN()
 	conf.Max = math.NaN()
@@ -21,24 +27,17 @@ func FeatureFilter(feature Feature, data []byte) Filter {
 	}
 
 	min, max := conf.Min, conf.Max
-	low, high := !math.IsNaN(conf.Min), !math.IsNaN(conf.Max)
-
-	if low && high {
-		return func(q *Query) bool {
-			val, _ := feature(q)
-			return (min <= val) && (val <= max)
-		}
-	} else if low {
-		return func(q *Query) bool {
-			val, _ := feature(q)
-			return min <= val
-		}
-	} else if high {
-		return func(q *Query) bool {
-			val, _ := feature(q)
-			return val <= max
-		}
+	if math.IsNaN(conf.Min) {
+		min = math.Inf(-1)
+	}
+	if math.IsNaN(conf.Max) {
+		max = math.Inf(1)
 	}
 
-	return func(q *Query) bool { return true }
+	return &featureFilter{f, min, max}
+}
+
+func (f *featureFilter) Accepts(q *Query) bool {
+	val, _ := f.Feature.Evaluate(q)
+	return (f.Min <= val) && (val <= f.Max)
 }

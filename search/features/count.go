@@ -16,89 +16,113 @@ func countf(arr []int, group []int) float64 {
 }
 
 // the total count of sequences
-func Total(group []int) Feature {
-	return func(q *Query) (float64, string) {
-		total := countf(q.Db.Total, group)
-		return total, ""
-	}
+type Total struct {
+	feature
+	Group []int
+}
+
+func (f *Total) Evaluate(q *Query) (float64, string) {
+	return countf(f.Db.Total, f.Group), ""
 }
 
 // the count of matching sequences
-func Matches(group []int) Feature {
-	return func(q *Query) (float64, string) {
-		matches := q.Matches()
-		return countf(matches, group), ""
-	}
+type Matches struct {
+	feature
+	Group []int
+}
+
+func (f *Matches) Evaluate(q *Query) (float64, string) {
+	return countf(q.Matches(f.Db), f.Group), ""
 }
 
 const minSeqsCountTable = 30
 
 // the count of matching unique sequences
-func Seqs(group []int) Feature {
-	return func(q *Query) (float64, string) {
-		db := q.Db
+type Seqs struct {
+	feature
+	Group []int
+}
 
-		prevseq := -1
+func (f *Seqs) Evaluate(q *Query) (float64, string) {
+	prevseq := -1
 
-		count := make([]int, len(db.Total))
-		for _, p := range q.Loc.Iter() {
-			seq := db.PosToSequence[p]
-			if seq.Index == prevseq {
-				continue
-			}
-			prevseq = seq.Index
-			count[seq.Section] += 1
+	count := make([]int, len(f.Db.Total))
+	for _, p := range q.Loc.Iter() {
+		seq := f.Db.PosToSequence[p]
+		if seq.Index == prevseq {
+			continue
 		}
-		return countf(count, group), ""
+		prevseq = seq.Index
+		count[seq.Section] += 1
 	}
+	return countf(count, f.Group), ""
 }
 
 // the count of occurences
-func Occs(group []int) Feature {
-	return func(q *Query) (float64, string) {
-		occs := q.Occs()
-		return countf(occs, group), ""
-	}
+type Occs struct {
+	feature
+	Group []int
+}
+
+func (f *Occs) Evaluate(q *Query) (float64, string) {
+	occs := q.Occs(f.Db)
+	return countf(occs, f.Group), ""
 }
 
 // the ratio of matching sequences to total count
-func MatchesProp(group []int) Feature {
-	return func(q *Query) (float64, string) {
-		total := countf(q.Db.Total, group)
-		matches := q.Matches()
-		return countf(matches, group) / total, ""
-	}
+type MatchesProp struct {
+	feature
+	Group []int
+}
+
+func (f *MatchesProp) Evaluate(q *Query) (float64, string) {
+	matches := q.Matches(f.Db)
+	total := countf(f.Db.Total, f.Group)
+	return countf(matches, f.Group) / total, ""
 }
 
 // the ratio between matching sequences (adjusted)
-func MatchesRatio(nom []int, denom []int) Feature {
-	return func(q *Query) (float64, string) {
-		matches := q.Matches()
-		countNom := countf(matches, nom) + 1.0
-		countDenom := countf(matches, denom) + 1.0
-		return countNom / countDenom, ""
-	}
+type MatchesRatio struct {
+	feature
+	Nom   []int
+	Denom []int
+}
+
+func (f *MatchesRatio) Evaluate(q *Query) (float64, string) {
+	matches := q.Matches(f.Db)
+	countNom := countf(matches, f.Nom) + 1.0
+	countDenom := countf(matches, f.Denom) + 1.0
+	return countNom / countDenom, ""
 }
 
 // the ratio between occurences (adjusted)
-func OccsRatio(nom []int, denom []int) Feature {
-	return func(q *Query) (float64, string) {
-		occs := q.Occs()
-		countNom := countf(occs, nom) + 1.0
-		countDenom := countf(occs, denom) + 1.0
-		return countNom / countDenom, ""
-	}
+type OccsRatio struct {
+	feature
+	Nom   []int
+	Denom []int
+}
+
+func (f *OccsRatio) Evaluate(q *Query) (float64, string) {
+	occs := q.Occs(f.Db)
+	countNom := countf(occs, f.Nom) + 1.0
+	countDenom := countf(occs, f.Denom) + 1.0
+	return countNom / countDenom, ""
 }
 
 // the ratio of proptions between matches (adjusted)
-func MatchesPropRatio(nom []int, denom []int) Feature {
-	return func(q *Query) (float64, string) {
-		totalNom := countf(q.Db.Total, nom) + 1.0
-		totalDenom := countf(q.Db.Total, denom) + 1.0
+type MatchesPropRatio struct {
+	feature
+	Nom   []int
+	Denom []int
+}
 
-		matches := q.Matches()
-		countNom := countf(matches, nom) + 1.0
-		countDenom := countf(matches, denom) + 1.0
-		return (countNom / totalNom) / (countDenom / totalDenom), ""
-	}
+func (f *MatchesPropRatio) Evaluate(q *Query) (float64, string) {
+	totalNom := countf(f.Db.Total, f.Nom) + 1.0
+	totalDenom := countf(f.Db.Total, f.Denom) + 1.0
+
+	matches := q.Matches(f.Db)
+	countNom := countf(matches, f.Nom) + 1.0
+	countDenom := countf(matches, f.Denom) + 1.0
+	return (countNom / totalNom) / (countDenom / totalDenom), ""
+
 }

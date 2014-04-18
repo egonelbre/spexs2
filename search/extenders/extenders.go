@@ -36,9 +36,13 @@ func extend(base *Query, db *Database, querys queryMap) {
 	}
 }
 
-func Simple(base *Query) Querys {
+type Simple struct {
+	extender
+}
+
+func (e *Simple) Extend(base *Query) Querys {
 	querys := make(queryMap)
-	extend(base, base.Db, querys)
+	extend(base, e.Db, querys)
 	return toQuerys(querys)
 }
 
@@ -56,10 +60,14 @@ func combine(base *Query, db *Database, querys queryMap, flags RegFlags) {
 	}
 }
 
-func Group(base *Query) Querys {
+type Group struct {
+	extender
+}
+
+func (e *Group) Extend(base *Query) Querys {
 	querys := make(queryMap)
-	extend(base, base.Db, querys)
-	combine(base, base.Db, querys, IsSingle)
+	extend(base, e.Db, querys)
+	combine(base, e.Db, querys, IsSingle)
 	return toQuerys(querys)
 }
 
@@ -79,29 +87,36 @@ func starExtendPosition(base *Query, db *Database, querys queryMap, p int) {
 func starExtend(base *Query, db *Database, querys queryMap) {
 	prevseq := -1
 	for _, p := range base.Loc.Iter() {
-		seq := db.PosToSequence[p]
-		if seq.Index == prevseq {
-			continue
+		seq := &db.PosToSequence[p]
+		if seq.Index != prevseq {
+			starExtendPosition(base, db, querys, p)
 		}
-		starExtendPosition(base, db, querys, p)
 		prevseq = seq.Index
 	}
 }
 
-func Star(base *Query) Querys {
+type Star struct {
+	extender
+}
+
+func (e *Star) Extend(base *Query) Querys {
 	patterns := make(queryMap)
-	extend(base, base.Db, patterns)
+	extend(base, e.Db, patterns)
 	stars := make(queryMap)
-	starExtend(base, base.Db, stars)
+	starExtend(base, e.Db, stars)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 
-func Regex(base *Query) Querys {
+type Regex struct {
+	extender
+}
+
+func (e *Regex) Extend(base *Query) Querys {
 	patterns := make(queryMap)
-	extend(base, base.Db, patterns)
+	extend(base, e.Db, patterns)
 	combine(base, base.Db, patterns, IsSingle)
 	stars := make(queryMap)
-	starExtend(base, base.Db, stars)
+	starExtend(base, e.Db, stars)
 	combine(base, base.Db, stars, IsStar)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }

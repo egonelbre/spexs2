@@ -1,25 +1,55 @@
 package filters
 
 import (
+	"reflect"
+
 	. "github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/utils"
 )
 
-type CreateFunc func(Setup, []byte) Filter
-
-var All = [...]CreateFunc{
-	NoStartingGroup,
-	NoEndingGroup,
-	NoTokens,
+type filter struct {
+	Db *Database
 }
 
-func Get(name string) (CreateFunc, bool) {
-	for _, fn := range All {
-		if utils.FuncName(fn) == name {
-			return fn, true
+var All = [...]Filter{
+	&NoStartingGroup{},
+	&NoEndingGroup{},
+	&NoTokens{},
+}
+
+func Get(name string) (Filter, bool) {
+	for _, f := range All {
+		if utils.UnqualifiedNameOf(f) == name {
+			return f, true
 		}
 	}
 	return nil, false
+}
+
+func mk(template Filter) Filter {
+	ps := reflect.ValueOf(template)
+	t := ps.Elem().Type()
+	return reflect.New(t).Interface().(Filter)
+}
+
+func trySetField(obj interface{}, field string, value interface{}) {
+	defer recover()
+	// pointer to struct
+	ps := reflect.ValueOf(obj)
+	// struct itself
+	s := ps.Elem()
+	if s.Kind() == reflect.Struct {
+		field := s.FieldByName(field)
+		if field.IsValid() && field.CanSet() {
+			field.Set(reflect.ValueOf(value))
+		}
+	}
+}
+
+func Make(template Filter, setup *Setup, data []byte) Filter {
+	v := mk(template)
+	trySetField(v, "Db", setup.Db)
+	return v
 }
 
 var Help = `

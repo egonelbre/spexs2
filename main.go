@@ -75,8 +75,6 @@ func main() {
 	setup := NewAppSetup(conf)
 
 	// defined in runtime.go
-	setupRuntime()
-
 	if startProfiler(*cpuprofile) {
 		defer stopProfiler()
 	}
@@ -95,7 +93,7 @@ func main() {
 
 	info("running spexs [", *procs, "]")
 
-	if *procs == 1 {
+	if *procs <= 1 {
 		Run(&setup.Setup)
 	} else {
 		RunParallel(&setup.Setup, *procs)

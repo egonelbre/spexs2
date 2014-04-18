@@ -31,20 +31,28 @@ func starGreedyExtend(base *Query, db *Database, querys queryMap) {
 	starExtendPosition(base, db, querys, prevpos)
 }
 
-func StarGreedy(base *Query) Querys {
+type StarGreedy struct {
+	extender
+}
+
+func (e *StarGreedy) Extend(base *Query) Querys {
 	patterns := make(queryMap)
-	extend(base, base.Db, patterns)
+	extend(base, e.Db, patterns)
 	stars := make(queryMap)
-	starGreedyExtend(base, base.Db, stars)
+	starGreedyExtend(base, e.Db, stars)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 
-func RegexGreedy(base *Query) Querys {
+type RegexGreedy struct {
+	extender
+}
+
+func (e *RegexGreedy) Extend(base *Query) Querys {
 	patterns := make(queryMap)
-	extend(base, base.Db, patterns)
+	extend(base, e.Db, patterns)
 	combine(base, base.Db, patterns, IsSingle)
 	stars := make(queryMap)
-	starGreedyExtend(base, base.Db, stars)
+	starGreedyExtend(base, e.Db, stars)
 	combine(base, base.Db, stars, IsStar)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }

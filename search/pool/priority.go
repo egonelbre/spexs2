@@ -84,9 +84,9 @@ func (p *Priority) Heapify() {
 }
 
 func (p *Priority) less(a *Query, b *Query) bool {
-	for _, fn := range p.Order {
-		aval, _ := fn(a)
-		bval, _ := fn(b)
+	for _, feature := range p.Order {
+		aval, _ := feature.Evaluate(a)
+		bval, _ := feature.Evaluate(b)
 
 		if aval != bval {
 			return aval < bval

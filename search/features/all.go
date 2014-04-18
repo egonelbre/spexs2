@@ -1,56 +1,68 @@
 package features
 
 import (
-	"fmt"
 	"reflect"
 
 	. "github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/utils"
 )
 
-type CreateFunc interface{}
-
-var All = [...]CreateFunc{
-	// simple counting
-	Total, Matches, Seqs, Occs,
-	// ratios and proportions
-	MatchesProp, MatchesRatio, OccsRatio, MatchesPropRatio,
-	// binomial
-	Binom,
-	// hypergeometrics
-	Hyper, HyperApprox, HyperDown, HyperOptimal,
-	// pattern length related
-	PatLength, PatChars, PatGroups, PatStars,
-	// only strings
-	Pat, PatRegex,
+type feature struct {
+	Db *Database
 }
 
-func Get(name string) (CreateFunc, bool) {
-	for _, fn := range All {
-		if utils.FuncName(fn) == name {
-			return fn, true
+var All = [...]Feature{
+	// simple counting
+	&Total{}, &Matches{}, &Seqs{}, &Occs{},
+	// ratios and proportions
+	&MatchesProp{}, &MatchesRatio{}, &OccsRatio{}, &MatchesPropRatio{},
+	// binomial
+	&Binom{},
+	// hypergeometrics
+	&Hyper{}, &HyperApprox{}, &HyperOptimal{},
+	// pattern length related
+	&PatLength{}, &PatChars{}, &PatGroups{}, &PatStars{},
+	// only strings
+	&Pat{}, &PatRegex{},
+}
+
+func Get(name string) (Feature, bool) {
+	for _, f := range All {
+		if utils.UnqualifiedNameOf(f) == name {
+			return f, true
 		}
 	}
 	return nil, false
 }
 
-func CallCreateWithArgs(function CreateFunc, args []interface{}) (Feature, error) {
-	fn, fnType, ok := functionAndType(function)
-	if !ok {
-		return nil, fmt.Errorf("Argument is not a function!")
-	}
+func mk(template Feature) Feature {
+	ps := reflect.ValueOf(template)
+	t := ps.Elem().Type()
+	return reflect.New(t).Interface().(Feature)
+}
 
-	if fnType.NumIn() != len(args) {
-		return nil, fmt.Errorf("Invalid number of arguments, requires %v", fnType.NumIn())
-	}
+func Make(template Feature, setup *Setup, args []interface{}) (Feature, error) {
+	v := mk(template)
+	ps := reflect.ValueOf(v)
+	s := ps.Elem()
+	if s.Kind() == reflect.Struct {
+		// assume "Db" is the first field
+		field := s.FieldByName("Db")
+		index := 0
+		if field.IsValid() && field.CanSet() {
+			field.Set(reflect.ValueOf(setup.Db))
+			index += 1
+		}
 
-	arguments := make([]reflect.Value, fnType.NumIn())
-	for i := range args {
-		arguments[i] = reflect.ValueOf(args[i])
+		for _, v := range args {
+			field := s.Field(index)
+			index += 1
+			if field.IsValid() && field.CanSet() {
+				field.Set(reflect.ValueOf(v))
+			}
+		}
 	}
-	result := fn.Call(arguments)
-	inter := result[0].Interface()
-	return inter.(Feature), nil
+	return v, nil
 }
 
 var Help = `

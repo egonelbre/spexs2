@@ -50,6 +50,15 @@ func (s *AppSetup) makeFeature(call string) Feature {
 	return feature
 }
 
+type negativeFeature struct {
+	feature Feature
+}
+
+func (f *negativeFeature) Evaluate(q *Query) (float64, string) {
+	v, info := f.feature.Evaluate(q)
+	return -v, info
+}
+
 func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 	info("  feature: parse " + call)
 	name, args, isInfo, positive := s.parseFeature(call)
@@ -65,22 +74,19 @@ func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 	}
 
 	info("    make new: " + normalized)
-	create, ok := features.Get(name)
+	template, ok := features.Get(name)
 	if !ok {
 		log.Fatal("No feature named ", name)
 	}
 
-	createdFn, err := features.CallCreateWithArgs(create, args)
+	createFeature, err := features.Make(template, &s.Setup, args)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	feature := createdFn
+	feature := createFeature
 	if !positive {
-		feature = func(q *Query) (float64, string) {
-			v, info := createdFn(q)
-			return -v, info
-		}
+		feature = &negativeFeature{createFeature}
 	}
 
 	s.Features[normalized] = feature

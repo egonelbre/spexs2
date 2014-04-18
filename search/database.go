@@ -46,9 +46,10 @@ func NewDatabase() *Database {
 		Groups:   make(map[Token]*TokenGroup),
 
 		PosToSequence: make([]Sequence, 0, initialSize),
-		FullSequence:  make([]Token, 0, initialSize),
-		Total:         make([]int, 0),
-		TotalTokens:   make([]int, 0),
+
+		FullSequence: make([]Token, 0, initialSize),
+		Total:        make([]int, 0),
+		TotalTokens:  make([]int, 0),
 
 		Separator: "",
 

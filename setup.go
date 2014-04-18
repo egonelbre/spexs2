@@ -48,13 +48,14 @@ func NewAppSetup(conf *Conf) *AppSetup {
 
 	features := s.Features
 	s.PreProcess = func(q *Query) error {
-		q.CacheValues()
-		for _, fn := range features {
-			fn(q)
+		q.CacheValues(s.Db)
+		for _, feature := range features {
+			feature.Evaluate(q)
 		}
 		return nil
 	}
 	s.PostProcess = func(q *Query) error {
+		// q.Loc = nil
 		return nil
 	}
 
@@ -80,10 +81,12 @@ func (s *AppSetup) initExtender() {
 	}
 
 	method := s.conf.Extension.Method
-	extender, ok := extenders.Get(method)
+	template, ok := extenders.Get(method)
 	if !ok {
 		log.Fatal("No extender named: ", method)
 	}
+
+	extender, _ := extenders.Make(template, &s.Setup)
 
 	/*args := conf.Extension.Args[conf.Extension.Method]
 
@@ -105,14 +108,14 @@ func (s *AppSetup) makeFilter(name string, data rjson.RawMessage) (Filter, error
 
 	regRemoveParens, _ := regexp.Compile(`\(.*\)`)
 	filterName := regRemoveParens.ReplaceAllString(name, "")
-	createFilter, ok := filters.Get(filterName)
+	template, ok := filters.Get(filterName)
 	if ok {
-		return createFilter(s.Setup, bytes), nil
+		return filters.Make(template, &s.Setup, bytes), nil
 	}
 
 	// didn't find filter, let's create it from feature
 	feature := s.makeFeature(name)
-	filter := filters.FeatureFilter(feature, bytes)
+	filter := filters.NewFeatureFilter(feature, bytes)
 	return filter, nil
 }
 

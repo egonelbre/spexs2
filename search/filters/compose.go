@@ -4,21 +4,29 @@ import (
 	. "github.com/egonelbre/spexs2/search"
 )
 
-func trueFilter(q *Query) bool { return true }
+type trueFilter struct{}
+
+func (f *trueFilter) Accepts(q *Query) bool {
+	return true
+}
+
+type compositeFilter []Filter
+
+func (fs compositeFilter) Accepts(q *Query) bool {
+	for _, filter := range fs {
+		if !filter.Accepts(q) {
+			return false
+		}
+	}
+	return true
+}
 
 func Compose(filters []Filter) Filter {
 	if len(filters) == 0 {
-		return trueFilter
+		return &trueFilter{}
 	} else if len(filters) == 1 {
 		return filters[0]
 	}
 
-	return func(q *Query) bool {
-		for _, filter := range filters {
-			if !filter(q) {
-				return false
-			}
-		}
-		return true
-	}
+	return (compositeFilter)(filters)
 }

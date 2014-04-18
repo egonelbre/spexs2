@@ -3,68 +3,80 @@ package features
 import . "github.com/egonelbre/spexs2/search"
 
 // pattern as a string
-func Pat() Feature {
-	return func(q *Query) (float64, string) {
-		return 0.0, q.String()
-	}
+type Pat struct {
+	feature
+}
+
+func (f *Pat) Evaluate(q *Query) (float64, string) {
+	return 0.0, q.String(f.Db)
 }
 
 // pattern as regular expression
-func PatRegex() Feature {
-	return func(q *Query) (float64, string) {
-		return 0.0, q.StringLong()
-	}
+type PatRegex struct {
+	feature
+}
+
+func (f *PatRegex) Evaluate(q *Query) (float64, string) {
+	return 0.0, q.StringLong(f.Db)
 }
 
 // length of the pattern
-func PatLength() Feature {
-	return func(q *Query) (float64, string) {
-		t := 0
-		for _, e := range q.Pat {
+type PatLength struct {
+	feature
+}
+
+func (f *PatLength) Evaluate(q *Query) (float64, string) {
+	t := 0
+	for _, e := range q.Pat {
+		t += 1
+		if e.Flags&IsStar != 0 {
 			t += 1
-			if e.Flags&IsStar != 0 {
-				t += 1
-			}
 		}
-		return float64(t), ""
 	}
+	return float64(t), ""
 }
 
 // count of characters
-func PatChars() Feature {
-	return func(q *Query) (float64, string) {
-		t := 0
-		for _, e := range q.Pat {
-			if e.Flags&IsGroup == 0 {
-				t += 1
-			}
+type PatChars struct {
+	feature
+}
+
+func (f *PatChars) Evaluate(q *Query) (float64, string) {
+	t := 0
+	for _, e := range q.Pat {
+		if e.Flags&IsGroup == 0 {
+			t += 1
 		}
-		return float64(t), ""
 	}
+	return float64(t), ""
 }
 
 // count of groups
-func PatGroups() Feature {
-	return func(q *Query) (float64, string) {
-		t := 0
-		for _, e := range q.Pat {
-			if e.Flags&IsGroup != 0 {
-				t += 1
-			}
+type PatGroups struct {
+	feature
+}
+
+func (f *PatGroups) Evaluate(q *Query) (float64, string) {
+	t := 0
+	for _, e := range q.Pat {
+		if e.Flags&IsGroup != 0 {
+			t += 1
 		}
-		return float64(t), ""
 	}
+	return float64(t), ""
 }
 
 // count of stars
-func PatStars() Feature {
-	return func(q *Query) (float64, string) {
-		t := 0
-		for _, e := range q.Pat {
-			if e.Flags&IsStar != 0 {
-				t += 1
-			}
+type PatStars struct {
+	feature
+}
+
+func (f *PatStars) Evaluate(q *Query) (float64, string) {
+	t := 0
+	for _, e := range q.Pat {
+		if e.Flags&IsStar != 0 {
+			t += 1
 		}
-		return float64(t), ""
 	}
+	return float64(t), ""
 }

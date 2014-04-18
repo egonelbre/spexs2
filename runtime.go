@@ -13,13 +13,6 @@ import (
 
 const mb = 1024 * 1024
 
-func setupRuntime() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	if runtime.NumCPU() < *procs || *procs <= 0 {
-		*procs = runtime.NumCPU()
-	}
-}
-
 func startProfiler(outputFile string) bool {
 	if outputFile == "" {
 		return false
@@ -36,41 +29,48 @@ func stopProfiler() {
 	pprof.StopCPUProfile()
 }
 
-func setMemLimit(setup *AppSetup) {
-	memLimit := uint64(*memoryLimit)
-	ext := setup.Extender
-	m := new(runtime.MemStats)
+type memLimiter struct {
+	extender Extender
+	memLimit uint64
+	stats    *runtime.MemStats
+}
 
-	setup.Extender = func(q *Query) Querys {
-		runtime.ReadMemStats(m)
-		if m.Alloc/mb > memLimit {
-			panic(errors.New("MEMORY LIMIT EXCEEDED!"))
-		}
-		return ext(q)
+func (e *memLimiter) Extend(q *Query) Querys {
+	result := e.extender.Extend(q)
+	runtime.ReadMemStats(e.stats)
+	if e.stats.Alloc/mb > e.memLimit {
+		panic(errors.New("MEMORY LIMIT EXCEEDED!"))
 	}
+	return result
+}
+
+func setMemLimit(setup *AppSetup) {
+	setup.Extender = &memLimiter{setup.Extender, uint64(*memoryLimit), new(runtime.MemStats)}
+}
+
+type memProfiler struct {
+	filename string
+	limit    int
+	count    int
+	extender Extender
+}
+
+func (e *memProfiler) Extend(q *Query) Querys {
+	if e.count >= e.limit {
+		f, err := os.Create(e.filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.WriteHeapProfile(f)
+		f.Close()
+		log.Fatal("Wrote memory profile!")
+	}
+	e.count += 1
+	return e.extender.Extend(q)
 }
 
 func attachMemProfiler(setup *AppSetup) {
-	filename := *memprofile
-	limit := *memsteps
-
-	count := 0
-
-	ext := setup.Extender
-
-	setup.Extender = func(q *Query) Querys {
-		if count >= limit {
-			f, err := os.Create(filename)
-			if err != nil {
-				log.Fatal(err)
-			}
-			pprof.WriteHeapProfile(f)
-			f.Close()
-			log.Fatal("Wrote memory profile!")
-		}
-		count += 1
-		return ext(q)
-	}
+	setup.Extender = &memProfiler{*memprofile, *memsteps, 0, setup.Extender}
 }
 
 var (
@@ -78,9 +78,21 @@ var (
 	statsStarted = false
 )
 
+type statsCounter struct {
+	db          *Database
+	extender    Extender
+	count       uint64
+	lastPattern string
+}
+
+func (e *statsCounter) Extend(q *Query) Querys {
+	e.count += 1
+	e.lastPattern = q.String(e.db)
+	return e.extender.Extend(q)
+}
+
 func runStats(setup *AppSetup) {
-	var counter uint64 = 0
-	var seq string = ""
+	counter := &statsCounter{setup.Db, setup.Extender, 0, ""}
 	statsStarted = true
 
 	go func() {
@@ -93,16 +105,11 @@ func runStats(setup *AppSetup) {
 			}
 
 			runtime.ReadMemStats(m)
-			lg.Printf("%v\t%v\t%v\t%v\t%v\t\n", m.Alloc/mb, m.TotalAlloc/mb, counter, setup.Out.Len(), seq)
+			lg.Printf("%v\t%v\t%v\t%v\t%v\t\n", m.Alloc/mb, m.TotalAlloc/mb, counter.count, setup.Out.Len(), counter.lastPattern)
 		}
 	}()
 
-	ext := setup.Extender
-	setup.Extender = func(q *Query) Querys {
-		seq = q.String()
-		counter += 1
-		return ext(q)
-	}
+	setup.Extender = counter
 }
 
 func endStats() {
@@ -111,13 +118,20 @@ func endStats() {
 	}
 }
 
-func setupLiveView(setup *AppSetup) {
-	out := setup.Outputtable
-	setup.Outputtable = func(q *Query) bool {
-		result := out(q)
-		if result {
-			setup.printQuery(os.Stderr, q)
-		}
-		return result
+type liveViewer struct {
+	setup  *AppSetup
+	filter Filter
+}
+
+func (f *liveViewer) Accepts(q *Query) bool {
+	ok := f.filter.Accepts(q)
+	if ok {
+		f.setup.printQuery(os.Stderr, q)
 	}
+	return ok
+}
+
+func setupLiveView(setup *AppSetup) {
+	setup.Outputtable = &liveViewer{setup, setup.Outputtable}
+
 }

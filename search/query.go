@@ -28,19 +28,21 @@ type Query struct {
 
 func NewQuery(parent *Query, token RegToken) *Query {
 	q := &Query{}
+
+	q.Pat = nil
 	if parent != nil {
 		q.Pat = make([]RegToken, len(parent.Pat)+1)
 		copy(q.Pat, parent.Pat)
 		q.Pat[len(q.Pat)-1] = token
-		q.Db = parent.Db
 	}
 	q.Loc = defset.New()
+	q.cache.reset()
+
 	return q
 }
 
 func NewEmptyQuery(db *Database) *Query {
 	q := NewQuery(nil, RegToken{})
-	q.Db = db
 	db.AddAllPositions(q.Loc)
 	return q
 }
@@ -54,28 +56,33 @@ type queryCache struct {
 	occs  []int
 }
 
-func (q *Query) CacheValues() {
+func (q *queryCache) reset() {
+	q.count = nil
+	q.occs = nil
+}
+
+func (q *Query) CacheValues(db *Database) {
 	if q.cache.count == nil || q.cache.occs == nil {
-		q.cache.count, q.cache.occs = q.Db.MatchesOccs(q.Loc)
+		q.cache.count, q.cache.occs = db.MatchesOccs(q.Loc)
 	}
 }
 
-func (q *Query) Matches() []int {
-	q.CacheValues()
+func (q *Query) Matches(db *Database) []int {
+	q.CacheValues(db)
 	return q.cache.count
 }
 
-func (q *Query) Occs() []int {
-	q.CacheValues()
+func (q *Query) Occs(db *Database) []int {
+	q.CacheValues(db)
 	return q.cache.occs
 }
 
-func (q *Query) String() string {
-	return q.string(true)
+func (q *Query) String(db *Database) string {
+	return q.string(db, true)
 }
 
-func (q *Query) StringLong() string {
-	return q.string(false)
+func (q *Query) StringLong(db *Database) string {
+	return q.string(db, false)
 }
 
 func (q *Query) StringRaw() string {
@@ -86,9 +93,8 @@ func (q *Query) StringRaw() string {
 	return string(buf.Bytes())
 }
 
-func (q *Query) string(short bool) string {
+func (q *Query) string(db *Database, short bool) string {
 	buf := bytes.NewBufferString("")
-	db := q.Db
 	for i, regToken := range q.Pat {
 		if regToken.Flags&IsStar != 0 {
 			buf.WriteString("*")

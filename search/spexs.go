@@ -16,10 +16,17 @@ type Pooler interface {
 	Empty() bool
 }
 
-type Extender func(p *Query) Querys
-type Filter func(p *Query) bool
+type Extender interface {
+	Extend(p *Query) Querys
+}
+type Filter interface {
+	Accepts(p *Query) bool
+}
 type ProcessQuery func(p *Query) error
-type Feature func(p *Query) (float64, string)
+
+type Feature interface {
+	Evaluate(p *Query) (float64, string)
+}
 
 type Setup struct {
 	Db  *Database
@@ -47,11 +54,11 @@ func Run(s *Setup) {
 			return
 		}
 
-		extensions := s.Extender(p)
+		extensions := s.Extender.Extend(p)
 		for _, extended := range extensions {
-			if s.Extendable(extended) {
+			if s.Extendable.Accepts(extended) {
 				s.In.Push(extended)
-				if s.Outputtable(extended) {
+				if s.Outputtable.Accepts(extended) {
 					s.Out.Push(extended)
 				}
 			}
@@ -79,6 +86,7 @@ func RunParallel(s *Setup, routines int) {
 
 	for i := 0; i < routines; i += 1 {
 		wg.Add(1)
+
 		go func() {
 			runtime.LockOSThread()
 			for {
@@ -97,10 +105,9 @@ func RunParallel(s *Setup, routines int) {
 				}
 				workers += 1
 				m.Unlock()
-
-				extensions := s.Extender(p)
+				extensions := s.Extender.Extend(p)
 				for _, extended := range extensions {
-					if s.Extendable(extended) {
+					if s.Extendable.Accepts(extended) {
 						s.PreProcess(extended)
 
 						m.Lock()
@@ -109,14 +116,13 @@ func RunParallel(s *Setup, routines int) {
 
 						added <- signal{}
 
-						if s.Outputtable(extended) {
+						if s.Outputtable.Accepts(extended) {
 							out.Lock()
 							s.Out.Push(extended)
 							out.Unlock()
 						}
 					}
 				}
-
 				m.Lock()
 				workers -= 1
 				allDone = workers == 0 && s.In.Empty()

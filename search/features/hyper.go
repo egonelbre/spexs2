@@ -6,43 +6,37 @@ import (
 )
 
 // hypergeometric split p-value
-func Hyper(fore []int, back []int) Feature {
-	return func(q *Query) (float64, string) {
-		totalFore := count(q.Db.Total, fore)
-		totalBack := count(q.Db.Total, back)
+type Hyper struct {
+	feature
+	Fore []int
+	Back []int
+}
 
-		matches := q.Matches()
-		countFore := count(matches, fore)
-		countBack := count(matches, back)
+func (f *Hyper) Evaluate(q *Query) (float64, string) {
+	totalFore := count(f.Db.Total, f.Fore)
+	totalBack := count(f.Db.Total, f.Back)
 
-		return hyper.ComplementCdf(countFore, countBack, totalFore, totalBack), ""
-	}
+	matches := q.Matches(f.Db)
+	countFore := count(matches, f.Fore)
+	countBack := count(matches, f.Back)
+
+	return hyper.ComplementCdf(countFore, countBack, totalFore, totalBack), ""
 }
 
 // approximate hypergeometric split p-value (~5 significant digits)
-func HyperApprox(fore []int, back []int) Feature {
-	return func(q *Query) (float64, string) {
-		totalFore := count(q.Db.Total, fore)
-		totalBack := count(q.Db.Total, back)
-
-		matches := q.Matches()
-		countFore := count(matches, fore)
-		countBack := count(matches, back)
-
-		return hyper.ComplementCdfApprox(countFore, countBack, totalFore, totalBack), ""
-	}
+type HyperApprox struct {
+	feature
+	Fore []int
+	Back []int
 }
 
-// hypergeometric split down p-value
-func HyperDown(fore []int, back []int) Feature {
-	return func(q *Query) (float64, string) {
-		totalFore := count(q.Db.Total, fore)
-		totalBack := count(q.Db.Total, back)
+func (f *HyperApprox) Evaluate(q *Query) (float64, string) {
+	totalFore := count(f.Db.Total, f.Fore)
+	totalBack := count(f.Db.Total, f.Back)
 
-		matches := q.Matches()
-		countFore := count(matches, fore)
-		countBack := count(matches, back)
+	matches := q.Matches(f.Db)
+	countFore := count(matches, f.Fore)
+	countBack := count(matches, f.Back)
 
-		return hyper.Cdf(countFore, countBack, totalFore, totalBack), ""
-	}
+	return hyper.ComplementCdfApprox(countFore, countBack, totalFore, totalBack), ""
 }
