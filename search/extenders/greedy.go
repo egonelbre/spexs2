@@ -3,48 +3,32 @@ package extenders
 import . "github.com/egonelbre/spexs2/search"
 
 func starGreedyExtend(base *Query, db *Database, querys queryMap) {
-	if base.Loc.IsSorted() {
-		positions := base.Loc.Iter()
-		if len(positions) == 0 {
-			return
-		}
-
-		// initialize the last position and sequence index
-		last_p := positions[0]
-		last_si := db.PosToSequence[last_p].Index
-
-		for _, p := range positions {
-			seq := db.PosToSequence[p]
-
-			// if we encounter a sequence index change the last_p was the last position in sequence
-			if seq.Index == last_si {
-				last_p = p
-				continue
-			}
-
-			starExtendPosition(base, db, querys, last_p)
-
-			last_si = seq.Index
-			last_p = p
-		}
-
-		// also change the last position
-		starExtendPosition(base, db, querys, last_p)
-
-	} else {
-		lastPos := make(map[int]int, base.Loc.Len())
-		for _, p := range base.Loc.Iter() {
-			seq := db.PosToSequence[p]
-			v, ok := lastPos[seq.Index]
-			if !ok || v < p {
-				lastPos[seq.Index] = p
-			}
-		}
-
-		for _, p := range lastPos {
-			starExtendPosition(base, db, querys, p)
-		}
+	positions := base.Loc.Iter()
+	if len(positions) == 0 {
+		return
 	}
+
+	// initialize the last position and sequence index
+	prevpos := positions[0]
+	prevseq := db.PosToSequence[prevpos].Index
+
+	for _, p := range positions {
+		seq := db.PosToSequence[p]
+
+		// if we encounter a sequence index change the prevpos was the last position in sequence
+		if seq.Index == prevseq {
+			prevpos = p
+			continue
+		}
+
+		starExtendPosition(base, db, querys, prevpos)
+
+		prevseq = seq.Index
+		prevpos = p
+	}
+
+	// also change the last position
+	starExtendPosition(base, db, querys, prevpos)
 }
 
 func StarGreedy(base *Query) Querys {

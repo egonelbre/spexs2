@@ -78,28 +78,14 @@ func starExtendPosition(base *Query, db *Database, querys queryMap, p int) {
 }
 
 func starExtend(base *Query, db *Database, querys queryMap) {
-	if base.Loc.IsSorted() {
-		last_si := -1
-		for _, p := range base.Loc.Iter() {
-			seq := db.PosToSequence[p]
-			if seq.Index != last_si {
-				starExtendPosition(base, db, querys, p)
-			}
-			last_si = seq.Index
+	prevseq := -1
+	for _, p := range base.Loc.Iter() {
+		seq := db.PosToSequence[p]
+		if seq.Index == prevseq {
+			continue
 		}
-	} else {
-		firstPos := make(map[int]int, base.Loc.Len())
-		for _, p := range base.Loc.Iter() {
-			seq := db.PosToSequence[p]
-			v, ok := firstPos[seq.Index]
-			if !ok || v > p {
-				firstPos[seq.Index] = p
-			}
-		}
-
-		for _, p := range firstPos {
-			starExtendPosition(base, db, querys, p)
-		}
+		starExtendPosition(base, db, querys, p)
+		prevseq = seq.Index
 	}
 }
 

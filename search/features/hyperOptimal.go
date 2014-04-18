@@ -13,15 +13,16 @@ import (
 func countseqs(q *Query, group []int, iter []int) int {
 	db := q.Db
 
-	counted := make(map[int]struct{}, minSeqsCountTable)
+	prevseq := -1
 	seqs := make([]int, len(db.Total))
 
 	for _, p := range iter {
 		seq := db.PosToSequence[p]
-		if _, ok := counted[seq.Index]; ok {
+
+		if seq.Index == prevseq {
 			continue
 		}
-		counted[seq.Index] = struct{}{}
+		prevseq = seq.Index
 		seqs[seq.Section] += 1
 	}
 	return count(seqs, group)
@@ -48,20 +49,19 @@ func HyperOptimal(fore []int) Feature {
 			include[sec] = true
 		}
 
-		counted := make(map[int]struct{})
-
+		prevseq := -1
+		
 		count := 0
 		for _, i := range iter {
 			seq := db.PosToSequence[i]
+			if seq.Index == prevseq {
+				continue
+			}
+			prevseq = seq.Index
+
 			if !include[seq.Section] {
 				continue
 			}
-			if _, ok := counted[seq.Index]; ok {
-				continue
-			}
-
-			counted[seq.Index] = struct{}{}
-
 			count += int(seq.Count)
 
 			p := hyper.ComplementCdfSlow(count, allmatches, seq.Index, totalSeqs)

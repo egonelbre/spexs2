@@ -17,10 +17,6 @@ func New() *Set {
 	return s
 }
 
-func (s *Set) IsSorted() bool {
-	return true
-}
-
 func (s *Set) Add(v int) {
 	df := v - s.cur
 	s.cur = v

@@ -84,29 +84,15 @@ func (db *Database) MatchesOccs(s set.Set) (matches []int, occs []int) {
 	matches = make([]int, len(db.Total))
 	occs = make([]int, len(db.Total))
 
-	if s.IsSorted() {
-		last_si := -1
-		for _, p := range s.Iter() {
-			seq := db.PosToSequence[p]
-			occs[seq.Section] += int(seq.Count)
-			if last_si != seq.Index {
-				matches[seq.Section] += int(seq.Count)
-			}
-			last_si = seq.Index
+	prevseq := -1
+	for _, p := range s.Iter() {
+		seq := db.PosToSequence[p]
+		occs[seq.Section] += int(seq.Count)
+		if seq.Index == prevseq {
+			continue
 		}
-	} else {
-		counted := make(map[int]bool, s.Len())
-		last_si := -1
-		for _, p := range s.Iter() {
-			seq := db.PosToSequence[p]
-			occs[seq.Section] += int(seq.Count)
-
-			if last_si != seq.Index && !counted[seq.Index] {
-				counted[seq.Index] = true
-				matches[seq.Section] += int(seq.Count)
-			}
-			last_si = seq.Index
-		}
+		matches[seq.Section] += int(seq.Count)
+		prevseq = seq.Index
 	}
 
 	return

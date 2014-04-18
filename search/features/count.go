@@ -38,15 +38,15 @@ func Seqs(group []int) Feature {
 	return func(q *Query) (float64, string) {
 		db := q.Db
 
-		counted := make(map[int]struct{}, minSeqsCountTable)
+		prevseq := -1
+		
 		count := make([]int, len(db.Total))
-
 		for _, p := range q.Loc.Iter() {
 			seq := db.PosToSequence[p]
-			if _, ok := counted[seq.Index]; ok {
+			if seq.Index == prevseq {
 				continue
 			}
-			counted[seq.Index] = struct{}{}
+			prevseq = seq.Index
 			count[seq.Section] += 1
 		}
 		return countf(count, group), ""
