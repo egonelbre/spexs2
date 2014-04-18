@@ -1,90 +1,50 @@
 package set
 
-import "math"
-
-func MergeSortedInts(sets ...[]int) []int {
-	t := 0
-	for _, s := range sets {
-		t += len(s)
+func merge(left, right, into []int) {
+	if len(left) == 0 {
+		copy(into, right)
+		return
 	}
-	r := make([]int, t)
-	ri := 0
+	if len(right) == 0 {
+		copy(into, left)
+		return
+	}
 
-	idx := make([]int, len(sets))
-	for len(sets) > 1 {
-		min := math.MaxInt64
-		for si, i := range idx {
-			v := sets[si][i]
-			if v < min {
-				min = v
+	i, rlast := 0, 0
+	for _, lv := range left {
+		for _, rv := range right[rlast:] {
+			if lv < rv {
+				break
 			}
+			into[i] = rv
+			i += 1
+			rlast += 1
 		}
-
-		r[ri] = min
-		ri += 1
-
-		for si := len(idx) - 1; si >= 0; si -= 1 {
-			i := idx[si]
-			if sets[si][i] == min {
-				i += 1
-				if i >= len(sets[si]) {
-					idx = append(idx[:si], idx[si+1:]...)
-					sets = append(sets[:si], sets[si+1:]...)
-				} else {
-					idx[si] = i
-				}
-			}
-		}
+		into[i] = lv
+		i += 1
 	}
-
-	if len(sets) == 1 {
-		s := sets[0]
-		for i := idx[0]; i < len(s); i += 1 {
-			r[ri] = s[i]
-			ri += 1
-		}
-	}
-
-	return r
+	copy(into[i:], right[rlast:])
 }
 
-func MergeSortedUniqueInts(sets ...[]int) []int {
+func MergeSortedInts(sets ...[]int) []int {
+	if len(sets) == 0 {
+		return nil
+	}
+	if len(sets) == 1 {
+		return sets[0]
+	}
+
 	t := 0
 	for _, s := range sets {
 		t += len(s)
 	}
+
 	r := make([]int, t)
-	ri := 0
-
-	idx := make([]int, len(sets))
-	for len(sets) > 1 {
-		min := math.MaxInt64
-		min_si := -1
-		for si, i := range idx {
-			v := sets[si][i]
-			if v < min {
-				min = v
-				min_si = si
-			}
-		}
-
-		r[ri] = min
-		ri += 1
-
-		si := min_si
-		idx[si] += 1
-		if idx[si] >= len(sets[si]) {
-			idx = append(idx[:si], idx[si+1:]...)
-			sets = append(sets[:si], sets[si+1:]...)
-		}
-	}
-
-	if len(sets) == 1 {
-		s := sets[0]
-		for i := idx[0]; i < len(s); i += 1 {
-			r[ri] = s[i]
-			ri += 1
-		}
+	prev := sets[0]
+	for i := 1; i < len(sets); i += 1 {
+		target := r[t-len(sets[i])-len(prev):]
+		merge(prev, sets[i], target)
+		prev = target
 	}
 
 	return r

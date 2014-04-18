@@ -28,10 +28,10 @@ func (multi *Set) Len() int {
 
 func (multi *Set) Iter() []int {
 	sets := make([][]int, 0, len(multi.sets))
-	
+
 	for _, s := range multi.sets {
 		sets = append(sets, s.Iter())
 	}
 
-	return set.MergeSortedUniqueInts(sets...)
+	return set.MergeSortedInts(sets...)
 }
