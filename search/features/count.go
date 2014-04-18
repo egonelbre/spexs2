@@ -37,9 +37,10 @@ const minSeqsCountTable = 30
 func Seqs(group []int) Feature {
 	return func(q *Query) (float64, string) {
 		db := q.Db
-
+		
 		counted := make(map[int]bool, minSeqsCountTable)
 		count := make([]int, len(db.Total))
+
 		for _, p := range q.Loc.Iter() {
 			seq := db.PosToSequence[p]
 			if counted[seq.Index] {

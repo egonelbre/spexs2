@@ -55,7 +55,6 @@ func NewAppSetup(conf *Conf) *AppSetup {
 		return nil
 	}
 	s.PostProcess = func(q *Query) error {
-		q.Loc = nil
 		return nil
 	}
 
