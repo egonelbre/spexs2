@@ -3,7 +3,8 @@ package search
 import (
 	"bytes"
 	"github.com/egonelbre/spexs2/set"
-	defset "github.com/egonelbre/spexs2/set/rle"
+	rleset "github.com/egonelbre/spexs2/set/rle"
+	arrayset "github.com/egonelbre/spexs2/set/array"
 )
 
 type RegFlags uint8
@@ -34,7 +35,11 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Pat[len(q.Pat)-1] = token
 		q.Db = parent.Db
 	}
-	q.Loc = defset.New()
+	if parent == nil || parent.Len() > 64 {
+		q.Loc = rleset.New()
+	} else {
+		q.Loc = arrayset.New()
+	}
 	return q
 }
 

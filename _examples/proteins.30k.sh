@@ -1,8 +1,9 @@
 #!/bin/bash
 
-SPEXS=../spexs2
+go build ../
 
-time $SPEXS -stats \
+time spexs2 -stats \
+	-procs=1 \
 	-verbose=true \
 	-conf=proteins/conf.json \
 	inp=proteins/g21_30k.inp \
