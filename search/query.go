@@ -2,9 +2,10 @@ package search
 
 import (
 	"bytes"
+	
 	"github.com/egonelbre/spexs2/set"
-	rleset "github.com/egonelbre/spexs2/set/rle"
-	arrayset "github.com/egonelbre/spexs2/set/array"
+	"github.com/egonelbre/spexs2/set/packed"
+	"github.com/egonelbre/spexs2/set/array"
 )
 
 type RegFlags uint8
@@ -35,11 +36,24 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		q.Pat[len(q.Pat)-1] = token
 		q.Db = parent.Db
 	}
-	if parent == nil || parent.Len() > 64 {
-		q.Loc = rleset.New()
+
+	if parent == nil {
+		// the initial location is only stored once,
+		// so we can just use the trivial implementaton
+		q.Loc = array.New()
 	} else {
-		q.Loc = arrayset.New()
+		// we try to guess what would be the most efficient way to represent the set
+		// when the positions are sparse, packing doesn't give anything
+		// when they are dense, simple method uses more memory than it needs to
+		expected := parent.Loc.Len() / len(parent.Db.Alphabet)
+		spacing := len(parent.Db.PosToSequence) / (1 + expected)
+		if (spacing > 1 << 15) || (expected < 4) {
+			q.Loc = array.New()
+		} else {
+			q.Loc = packed.New()
+		}
 	}
+
 	return q
 }
 

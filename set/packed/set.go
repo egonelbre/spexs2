@@ -1,9 +1,9 @@
-package rle
+package packed
 
-type bucket uint32
+type bucket uint16
 
 const (
-	bits = 30        // bits per bucket
+	bits = 15        // bits per bucket
 	cbit = 1 << bits // continuation bit
 	mask = cbit - 1  // bits mask
 )
@@ -23,9 +23,6 @@ func (s *Set) Add(v int) {
 	df := v - s.cur
 	s.cur = v
 	s.count += 1
-	if df < 0 {
-		panic("not in increasing order")
-	}
 
 	// fast detection of numbits
 	switch {
@@ -33,7 +30,6 @@ func (s *Set) Add(v int) {
 		s.data = append(s.data, bucket(df))
 
 	case df>>(bits*1) < cbit:
-		print("2")
 		s.data = append(s.data,
 			bucket(cbit|(df&mask)),
 			bucket(df>>bits),

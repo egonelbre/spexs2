@@ -13,6 +13,8 @@ pages/**
 
 !_doc/**
 
+*.large.*
+
 *.prof
 *.sublime-project
 *.sublime-workspace

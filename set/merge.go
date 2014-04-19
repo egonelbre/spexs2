@@ -1,5 +1,7 @@
 package set
 
+import "sort"
+
 func merge(left, right, into []int) {
 	if len(left) == 0 {
 		copy(into, right)
@@ -26,6 +28,12 @@ func merge(left, right, into []int) {
 	copy(into[i:], right[rlast:])
 }
 
+type bylen [][]int
+
+func (s bylen) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s bylen) Len() int           { return len(s) }
+func (s bylen) Less(i, j int) bool { return len(s[i]) < len(s[j]) }
+
 func MergeSortedInts(sets ...[]int) []int {
 	if len(sets) == 0 {
 		return nil
@@ -39,11 +47,13 @@ func MergeSortedInts(sets ...[]int) []int {
 		t += len(s)
 	}
 
+	sort.Sort(bylen(sets))
+
 	r := make([]int, t)
 	prev := sets[0]
-	for i := 1; i < len(sets); i += 1 {
-		target := r[t-len(sets[i])-len(prev):]
-		merge(prev, sets[i], target)
+	for _, cur := range sets[1:] {
+		target := r[t-len(cur)-len(prev):]
+		merge(prev, cur, target)
 		prev = target
 	}
 

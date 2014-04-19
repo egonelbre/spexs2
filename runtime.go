@@ -76,6 +76,7 @@ func attachMemProfiler(setup *AppSetup) {
 var (
 	quitStats    = make(chan int)
 	statsStarted = false
+	maxMemoryUsed uint64 = 0
 )
 
 func runStats(setup *AppSetup) {
@@ -94,6 +95,17 @@ func runStats(setup *AppSetup) {
 
 			runtime.ReadMemStats(m)
 			lg.Printf("%v\t%v\t%v\t%v\t%v\t\n", m.Alloc/mb, m.TotalAlloc/mb, counter, setup.Out.Len(), seq)
+		}
+	}()
+
+	go func() {
+		m := new (runtime.MemStats)
+		t := time.Tick(50 * time.Millisecond)
+		for _ = range t {
+			runtime.ReadMemStats(m)
+			if m.Alloc > maxMemoryUsed {
+				maxMemoryUsed = m.Alloc
+			}
 		}
 	}()
 

@@ -105,4 +105,8 @@ func main() {
 
 	info("printing results")
 	setup.Printer(os.Stdout, setup.Out)
+
+	if *stats {
+		info("max memory used ", maxMemoryUsed / (1024 * 1024), "MB")
+	}
 }

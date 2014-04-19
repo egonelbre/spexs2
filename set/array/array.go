@@ -3,7 +3,7 @@ package array
 type Set []int
 
 func New() *Set {
-	arr := Set(make([]int, 0, 64))
+	arr := Set(make([]int, 0, 8))
 	return &arr
 }
 
