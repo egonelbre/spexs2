@@ -15,8 +15,7 @@ type Set struct {
 }
 
 func New() *Set {
-	s := &Set{0, 0, make([]bucket, 0, 64)}
-	return s
+	return &Set{}
 }
 
 func (s *Set) Add(v int) {
