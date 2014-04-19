@@ -13,7 +13,9 @@ pages/**
 
 !_doc/**
 
-*.large.*
+*large*
+spexs2
+spexs2.exe
 
 *.prof
 *.sublime-project
