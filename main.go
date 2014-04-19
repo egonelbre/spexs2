@@ -95,18 +95,23 @@ func main() {
 
 	info("running spexs [", *procs, "]")
 
+	starttime := time.Now()
+
 	if *procs == 1 {
 		Run(&setup.Setup)
 	} else {
 		RunParallel(&setup.Setup, *procs)
 	}
 
+	finishtime := time.Now()
+
 	endStats()
 
 	info("printing results")
 	setup.Printer(os.Stdout, setup.Out)
 
+	info("searching ", finishtime.Sub(starttime))
 	if *stats {
-		info("max memory used ", maxMemoryUsed/(1024*1024), "MB")
+		info("max ", maxMemoryUsed/(1024*1024), "MB")
 	}
 }

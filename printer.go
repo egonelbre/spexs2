@@ -73,7 +73,6 @@ func (s *AppSetup) initPrinter() {
 
 	s.Printer = func(out io.Writer, pool Pooler) {
 		values := pool.Values()
-		info("printing results")
 
 		if showHeader {
 			fmt.Fprint(out, header)
@@ -89,7 +88,5 @@ func (s *AppSetup) initPrinter() {
 				printQuery(out, q)
 			}
 		}
-
-		info("done")
 	}
 }
