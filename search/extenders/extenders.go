@@ -63,16 +63,20 @@ func Group(base *Query) Querys {
 	return toQuerys(querys)
 }
 
-func starExtendPosition(base *Query, db *Database, querys queryMap, p int) {
-	token := db.FullSequence[p]
-	for token != ZeroToken {
+func starExtendPosition(base *Query, db *Database, querys queryMap, start int) {
+	for i, token := range db.FullSequence[start:] {
+		p := start + i
+		if token == ZeroToken {
+			break
+		}
+
 		q, ok := querys[token]
 		if !ok {
 			q = NewQuery(base, RegToken{token, IsStar})
 			querys[token] = q
 		}
+
 		q.Loc.Add(p + 1)
-		token = db.FullSequence[p+1]
 	}
 }
 

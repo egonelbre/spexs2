@@ -74,8 +74,8 @@ func attachMemProfiler(setup *AppSetup) {
 }
 
 var (
-	quitStats    = make(chan int)
-	statsStarted = false
+	quitStats            = make(chan int)
+	statsStarted         = false
 	maxMemoryUsed uint64 = 0
 )
 
@@ -99,7 +99,7 @@ func runStats(setup *AppSetup) {
 	}()
 
 	go func() {
-		m := new (runtime.MemStats)
+		m := new(runtime.MemStats)
 		t := time.Tick(50 * time.Millisecond)
 		for _ = range t {
 			runtime.ReadMemStats(m)

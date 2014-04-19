@@ -2,8 +2,10 @@
 FLAGS=-stats -procs=2 -verbose=true
 SPX=../spexs2 $(FLAGS)
 
+GOFLAGS=-gcflags -B
+
 rebuild:
-	cd .. && go build -gcflags -B .
+	cd .. && go build $(GOFLAGS) .
 
 dna: rebuild
 	$(SPX) -conf=dna/small.json inp=dna/dna.small
@@ -12,13 +14,13 @@ events: rebuild
 	$(SPX) -conf=events/conf.json inp=events/errors.txt ref=events/events.txt
 
 proteins.10k: rebuild
-	$(SPX) -conf=proteins/conf.json inp=proteins/g21_10k.txt ref=proteins/g27_10k.txt	
+	$(SPX) -conf=proteins/conf.json inp=proteins/g21_10k.inp ref=proteins/g27_10k.ref	
 
 proteins.30k: rebuild
-	$(SPX) -conf=proteins/conf.json inp=proteins/g21_30k.txt ref=proteins/g27_30k.txt	
+	$(SPX) -conf=proteins/conf.json inp=proteins/g21_30k.inp ref=proteins/g27_30k.ref	
 
 proteins.large: rebuild
-	$(SPX) -conf=proteins/conf.json inp=proteins/g21_large.txt ref=proteins/g27_large.txt	
+	$(SPX) -conf=proteins/conf.json inp=proteins/g21_large.inp ref=proteins/g27_large.ref	
 
 text: rebuild
 	$(SPX) -conf=text/conf.json inp=text/text.inp ref=text/text.ref

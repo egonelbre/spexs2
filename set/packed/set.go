@@ -21,6 +21,11 @@ func New() *Set {
 
 func (s *Set) Add(v int) {
 	df := v - s.cur
+
+	if df <= 0 {
+		panic("Not in increasing order!")
+	}
+
 	s.cur = v
 	s.count += 1
 

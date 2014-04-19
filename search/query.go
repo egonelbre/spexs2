@@ -2,10 +2,10 @@ package search
 
 import (
 	"bytes"
-	
+
 	"github.com/egonelbre/spexs2/set"
-	"github.com/egonelbre/spexs2/set/packed"
 	"github.com/egonelbre/spexs2/set/array"
+	"github.com/egonelbre/spexs2/set/packed"
 )
 
 type RegFlags uint8
@@ -47,7 +47,7 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		// when they are dense, simple method uses more memory than it needs to
 		expected := parent.Loc.Len() / len(parent.Db.Alphabet)
 		spacing := len(parent.Db.PosToSequence) / (1 + expected)
-		if (spacing > 1 << 15) || (expected < 4) {
+		if (spacing > 1<<15) || (expected < 4) {
 			q.Loc = array.New()
 		} else {
 			q.Loc = packed.New()
