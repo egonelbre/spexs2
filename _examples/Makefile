@@ -7,6 +7,8 @@ GOFLAGS=-gcflags -B
 rebuild:
 	cd .. && go build $(GOFLAGS) .
 
+all: rebuild dna events proteins.10k proteins.30k text transcripts yeast
+
 dna: rebuild
 	$(SPX) -conf=dna/small.json inp=dna/dna.small
 
