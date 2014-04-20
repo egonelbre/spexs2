@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"io"
-	"launchpad.net/rjson"
 	"log"
 	"regexp"
+
+	"github.com/egonelbre/spexs2/vendor/rjson"
 
 	. "github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/search/extenders"

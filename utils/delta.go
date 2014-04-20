@@ -2,7 +2,7 @@ package utils
 
 import (
 	"bytes"
-	"launchpad.net/rjson"
+	"github.com/egonelbre/spexs2/vendor/rjson"
 	"log"
 )
 

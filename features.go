@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"launchpad.net/rjson"
 	"log"
 	"regexp"
+
+	"github.com/egonelbre/spexs2/vendor/rjson"
 
 	. "github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/search/features"

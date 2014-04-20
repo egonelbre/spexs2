@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"flag"
 	"io/ioutil"
-	"launchpad.net/rjson"
 	"log"
 	"os"
 	"regexp"
+
+	"github.com/egonelbre/spexs2/vendor/rjson"
 )
 
 const baseConfiguration = `{
