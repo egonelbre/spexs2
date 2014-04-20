@@ -45,8 +45,8 @@ func NewQuery(parent *Query, token RegToken) *Query {
 		// we try to guess what would be the most efficient way to represent the set
 		// when the positions are sparse, packing doesn't give anything
 		// when they are dense, simple method uses more memory than it needs to
-		expected := parent.Loc.Len() / len(parent.Db.Alphabet)
-		spacing := len(parent.Db.PosToSequence) / (1 + expected)
+		expected := parent.Loc.Len() / (len(parent.Db.Alphabet) + 1)
+		spacing := len(parent.Db.PosToSequence) / (expected + 1)
 		if (spacing > 1<<15) || (expected < 4) {
 			q.Loc = array.New()
 		} else {
@@ -100,6 +100,9 @@ func (q *Query) StringLong() string {
 func (q *Query) StringRaw() string {
 	buf := bytes.NewBufferString("")
 	for _, tok := range q.Pat {
+		if tok.Flags&IsStar != 0 {
+			buf.WriteString("*")
+		}
 		buf.WriteRune(rune(tok.Token))
 	}
 	return string(buf.Bytes())
@@ -108,18 +111,18 @@ func (q *Query) StringRaw() string {
 func (q *Query) string(short bool) string {
 	buf := bytes.NewBufferString("")
 	db := q.Db
-	for i, regToken := range q.Pat {
-		if regToken.Flags&IsStar != 0 {
+	for i, tok := range q.Pat {
+		if tok.Flags&IsStar != 0 {
 			buf.WriteString("*")
 			buf.WriteString(db.Separator)
 		}
 
-		tokInfo, ok := db.Alphabet[regToken.Token]
+		tokInfo, ok := db.Alphabet[tok.Token]
 		if ok {
 			buf.WriteString(tokInfo.Name)
 		}
 
-		group, ok := db.Groups[regToken.Token]
+		group, ok := db.Groups[tok.Token]
 		if ok {
 			if short {
 				buf.WriteString(group.Name)

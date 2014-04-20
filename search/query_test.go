@@ -6,7 +6,8 @@ import (
 )
 
 func pat(s string) *Query {
-	r := NewPattern(0, nil)
+	r := NewQuery(nil, RegToken{})
+	r.Db = NewDatabase()
 	return add(r, s)
 }
 
@@ -15,10 +16,12 @@ func add(base *Query, s string) *Query {
 		return base
 	}
 	rune, size := utf8.DecodeRuneInString(s)
-	n := NewPattern(Token(rune), base)
+
+	tok := RegToken{Token(rune), IsSingle}
 	if rune == 'X' {
-		n.IsStar = true
+		tok.Flags = IsStar
 	}
+	n := NewQuery(base, tok)
 	return add(n, s[size:])
 }
 
@@ -32,7 +35,7 @@ func TestTrieNodeString(t *testing.T) {
 	e := add(d, " heist")
 
 	test := func(n *Query, s string) {
-		if n.String() != s {
+		if n.StringRaw() != s {
 			t.Errorf("wrong result got='%s' expected='%s'", n.String(), s)
 		}
 	}

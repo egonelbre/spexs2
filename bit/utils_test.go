@@ -21,14 +21,6 @@ var countTests = []struct {
 	{0xfff, 12},
 }
 
-func TestCount(t *testing.T) {
-	for i, test := range countTests {
-		if n := Count(test.in); n != test.out {
-			t.Errorf("#%d got %d want %d", i, n, test.out)
-		}
-	}
-}
-
 func TestCount64(t *testing.T) {
 	for i, test := range countTests {
 		if n := Count64(uint64(test.in)); n != test.out {

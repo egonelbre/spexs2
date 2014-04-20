@@ -1,13 +1,14 @@
 package pool
 
 import (
-	. "spexs"
+	. "github.com/egonelbre/spexs2/search"
 	"testing"
 	"unicode/utf8"
 )
 
 func pat(s string) *Query {
 	r := NewQuery(nil, RegToken{})
+	r.Db = NewDatabase()
 	return add(r, s)
 }
 
@@ -16,7 +17,11 @@ func add(base *Query, s string) *Query {
 		return base
 	}
 	rune, size := utf8.DecodeRuneInString(s)
-	token := RegToken{Token(rune), false, rune == 'X'}
+
+	token := RegToken{Token(rune), IsSingle}
+	if rune == 'X' {
+		token.Flags = IsStar
+	}
 	n := NewQuery(base, token)
 	return add(n, s[size:])
 }
@@ -54,7 +59,7 @@ func TestPriority(t *testing.T) {
 		return float64(q.Len()), ""
 	}
 
-	p := NewPriority(lenFeature, 0, true)
+	p := NewPriority([]Feature{lenFeature}, 0)
 
 	p.Push(pat("bc"))
 	p.Push(pat("defg"))
