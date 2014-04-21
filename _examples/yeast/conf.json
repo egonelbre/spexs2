@@ -1,0 +1,40 @@
+{
+	"Dataset": {
+		"fore" : { "File" : "$inp$" },
+		"back" : { "File" : "$ref$" }
+	},
+	"Reader" : {
+		"Method" : "Delimited",
+		"Separator" : "",
+		"Skip": "_"
+	},
+	"Extension": {
+		"Method": "Group",
+		"Groups" : {
+			"." : { "elements" : "ACGT"}
+		},
+		"Extendable": {
+			"PatGroups()" : {"max" : 2},
+			"PatLength()" : {"max" : 15},
+			"Matches(fore)" : {"min" : 20},
+			"NoStartingGroup()" : {},
+		},
+		"Outputtable" : {
+			"MatchesPropRatio(fore,back)" : {"min": 2},
+			"PatLength()" : {"min" : 3},
+			"Binom(fore, back)" : {"max" : 1e-8},
+			"NoEndingGroup()" : {}
+		}
+	},
+	"Output": {
+		"SortBy": ["-Binom(fore, back)"],
+		"Count": 15
+	},
+	"Printer" : {
+		"Method" : "Formatted",
+		"ShowHeader": true,
+		"Reverse": false,
+		"Header": "Pattern\tCluster\tBackground\tRatio\tBinomial Prob.\n",
+		"Format": "Pat?()\tMatches(fore)/Occs(fore)\tMatches(back)/Occs(back)\tMatchesPropRatio(fore,back)\tBinom(fore, back)\n"
+	}
+}

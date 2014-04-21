@@ -1,0 +1,40 @@
+{
+	"Dataset": {
+		"fore" : { "File" : "$inp$" },
+		"back" : { "File" : "$ref$" }
+	},
+	"Reader" : {
+		"Method" : "Delimited",
+		"Separator" : "",
+		"CountSeparator": ""
+	},
+	"Extension": {
+		"Method": "Star",
+		"Groups" : {
+			"." : { "elements" : "ABCDFGHIXYZ"}
+		},
+		"Extendable": {
+			"PatLength()" : {"max" : 7},
+			"PatGroups()" : {"max" : 3},
+			"Matches(fore)" : {"min" : 250},
+			"NoStartingGroup()" : {},
+			"NoTokens()" : {"Tokens":"E"},
+		},
+		"Outputtable" : {
+			"PatLength()" : {"min" : 3},
+			"Hyper(fore, back)" : {"max" : 1e-10},
+			"NoEndingGroup()" : {}
+		}
+	},
+	"Output": {
+		"SortBy": ["-Hyper(fore,back)", "Matches(fore)"],
+		"Count": 20
+	},
+	"Printer" : {
+		"Method" : "Formatted",
+		"ShowHeader": true,
+		"Reverse": true,
+		"Header": "",
+		"Format": "Pat?()\t\tMatches(fore)/Total(fore)\tMatches(back)/Total(back)\tMatchesPropRatio(fore,back)\tHyper(fore,back)\n"
+	}
+}

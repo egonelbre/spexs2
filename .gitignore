@@ -1,3 +1,7 @@
+.git
+.bzr
+.hg
+
 *.exe
 *.log
 *.pdf
@@ -5,8 +9,13 @@
 temp/**
 pkg/**
 bin/**
+pages/**
 
-!doc/**
+!_doc/**
+
+*large*
+spexs2
+spexs2.exe
 
 *.prof
 *.sublime-project
