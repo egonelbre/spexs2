@@ -30,6 +30,8 @@ var (
 	procs       *int  = flag.Int("procs", -1, "goroutines for extending")
 	memoryLimit *int  = flag.Int("mem", -1, "memory limit in MB")
 
+	chanmode *bool = flag.Bool("chanmode", false, "use channels in processing")
+
 	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
 	memprofile *string = flag.String("memprofile", "", "write mem profile to file")
 	memsteps   *int    = flag.Int("memsteps", 10000, "after how many extensions to write the mem profile")
@@ -99,6 +101,8 @@ func main() {
 
 	if *procs == 1 {
 		Run(&setup.Setup)
+	} else if *chanmode {
+		RunParallelChan(&setup.Setup, *procs)
 	} else {
 		RunParallel(&setup.Setup, *procs)
 	}

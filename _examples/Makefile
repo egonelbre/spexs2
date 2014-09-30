@@ -1,5 +1,5 @@
 
-FLAGS=-stats -procs=2 -verbose=true
+FLAGS=-stats -procs=4 -verbose=true
 SPX=../spexs2 $(FLAGS)
 
 GOFLAGS=-gcflags -B
