@@ -15,6 +15,12 @@ func (s *Set) Len() int {
 	return len(*s)
 }
 
-func (s *Set) Iter() []int {
+func (s *Set) Unpack() []int {
 	return []int(*s)
+}
+
+func (s *Set) Iter(fn func(val int)) {
+	for _, v := range *s {
+		fn(v)
+	}
 }

@@ -32,7 +32,7 @@ func HyperOptimal(fore []int) Feature {
 	return func(q *Query) (float64, string) {
 		db := q.Db
 
-		iter := q.Loc.Iter()
+		iter := q.Loc.Unpack()
 
 		allmatches := countseqs(q, fore, iter)
 		totalSeqs := count(db.Total, fore)

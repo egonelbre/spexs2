@@ -41,14 +41,14 @@ func Seqs(group []int) Feature {
 		prevseq := -1
 
 		count := make([]int, len(db.Total))
-		for _, p := range q.Loc.Iter() {
+		q.Loc.Iter(func(p int) {
 			seq := db.PosToSequence[p]
 			if seq.Index == prevseq {
-				continue
+				return
 			}
 			prevseq = seq.Index
 			count[seq.Section] += 1
-		}
+		})
 		return countf(count, group), ""
 	}
 }

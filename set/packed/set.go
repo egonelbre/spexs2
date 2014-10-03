@@ -68,7 +68,7 @@ func (s *Set) Add(v int) {
 
 }
 
-func (s *Set) Iter() []int {
+func (s *Set) Unpack() []int {
 	vals := make([]int, s.count)
 	j := 0
 	base := 0
@@ -86,6 +86,24 @@ func (s *Set) Iter() []int {
 		}
 	}
 	return vals
+}
+
+func (s *Set) Iter(fn func(v int)) {
+	j := 0
+	base := 0
+	df := 0
+	k := uint(0)
+	for _, b := range s.data {
+		df = df | (int(b&mask) << k)
+		k += bits
+		if b < cbit {
+			base += df
+			fn(base)
+			df = 0
+			k = 0
+			j += 1
+		}
+	}
 }
 
 func (s *Set) Len() int {

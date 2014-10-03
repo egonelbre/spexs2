@@ -20,10 +20,10 @@ func toQuerys(queryMap queryMap) Querys {
 }
 
 func extend(base *Query, db *Database, querys queryMap) {
-	for _, p := range base.Loc.Iter() {
+	base.Loc.Iter(func(p int) {
 		token := db.FullSequence[p]
 		if token == ZeroToken {
-			continue
+			return
 		}
 
 		q, ok := querys[token]
@@ -33,7 +33,7 @@ func extend(base *Query, db *Database, querys queryMap) {
 		}
 
 		q.Loc.Add(p + 1)
-	}
+	})
 }
 
 func Simple(base *Query) Querys {
@@ -82,14 +82,14 @@ func starExtendPosition(base *Query, db *Database, querys queryMap, start int) {
 
 func starExtend(base *Query, db *Database, querys queryMap) {
 	prevseq := -1
-	for _, p := range base.Loc.Iter() {
+	base.Loc.Iter(func(p int) {
 		seq := db.PosToSequence[p]
 		if seq.Index == prevseq {
-			continue
+			return
 		}
 		starExtendPosition(base, db, querys, p)
 		prevseq = seq.Index
-	}
+	})
 }
 
 func Star(base *Query) Querys {

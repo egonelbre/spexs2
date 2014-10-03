@@ -4,10 +4,11 @@ import "github.com/egonelbre/spexs2/set"
 
 type Set struct {
 	sets []set.Set
+	data []int
 }
 
 func New() *Set {
-	return &Set{make([]set.Set, 0)}
+	return &Set{make([]set.Set, 0), nil}
 }
 
 func (multi *Set) Add(val int) {
@@ -26,12 +27,25 @@ func (multi *Set) Len() int {
 	return c
 }
 
-func (multi *Set) Iter() []int {
-	sets := make([][]int, 0, len(multi.sets))
-
-	for _, s := range multi.sets {
-		sets = append(sets, s.Iter())
+func (multi *Set) unpack() {
+	if multi.data != nil {
+		return
 	}
+	sets := make([][]int, 0, len(multi.sets))
+	for _, s := range multi.sets {
+		sets = append(sets, s.Unpack())
+	}
+	multi.data = set.MergeSortedInts(sets...)
+}
 
-	return set.MergeSortedInts(sets...)
+func (multi *Set) Unpack() []int {
+	multi.unpack()
+	return multi.data
+}
+
+func (multi *Set) Iter(fn func(val int)) {
+	multi.unpack()
+	for _, v := range multi.data {
+		fn(v)
+	}
 }

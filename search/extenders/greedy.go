@@ -3,7 +3,7 @@ package extenders
 import . "github.com/egonelbre/spexs2/search"
 
 func starGreedyExtend(base *Query, db *Database, querys queryMap) {
-	positions := base.Loc.Iter()
+	positions := base.Loc.Unpack()
 	if len(positions) == 0 {
 		return
 	}
