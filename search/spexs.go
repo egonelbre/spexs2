@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 type Token uint32
@@ -36,12 +37,8 @@ type Setup struct {
 	PostProcess ProcessQuery
 }
 
-func prepareSpexs(s *Setup) {
-	s.In.Push(NewEmptyQuery(s.Db))
-}
-
 func Run(s *Setup) {
-	prepareSpexs(s)
+	s.In.Push(NewEmptyQuery(s.Db))
 	for {
 		p, ok := s.In.Pop()
 		if !ok {
@@ -67,7 +64,7 @@ func Run(s *Setup) {
 type signal struct{}
 
 func RunParallel(s *Setup, routines int) {
-	prepareSpexs(s)
+	s.In.Push(NewEmptyQuery(s.Db))
 
 	wg := sync.WaitGroup{}
 
@@ -138,103 +135,91 @@ func RunParallel(s *Setup, routines int) {
 	wg.Wait()
 }
 
-func RunParallelChan(s *Setup, routines int) {
-	// keep at least N items ready for workers
-	work := make(chan *Query, routines)
+func pipe(from chan *Query, storage Pooler, to chan *Query) {
+	var next *Query
+	for {
+		switch {
+		case next != nil:
+			select {
+			case q, ok := <-from:
+				if !ok { return }
+				storage.Push(q)
+			case to <- next:
+				next = nil
+			}
+		case storage.Len() > 0:
+			next, _ = storage.Pop()
+		default:
+			q, ok := <-from
+			if !ok { return }
+			next = q
+		}
+	}
+}
+
+func RunParallelChan(s *Setup, procs int) {
+	const Buffer = 128
+
+	// work queue for workers
+	work := make(chan *Query, procs)
 	// this pumps elements into the input pool
-	queue := make(chan *Query, 1000)
+	newwork := make(chan *Query, Buffer)
+	// this pumps results into output pool
+	found := make(chan *Query, Buffer)
+	
+	// sort the work items
+	go pipe(newwork, s.In, work)
+
+	// monitor found queries
+	var output sync.WaitGroup
+	output.Add(1)
+	go func(){
+		for q := range found {
+			s.Out.Push(q)
+		}
+		output.Done()
+	}()
 
 	// number of unfinished items
-	prepareSpexs(s)
 	var pending int32 = 1
+	work <- NewEmptyQuery(s.Db)	
 
-	go func() {
-		next, nextok := s.In.Pop()
-		for {
-			if nextok {
-				select {
-				case work <- next:
-					next, nextok = s.In.Pop()
-				case q := <-queue:
-					s.In.Push(q)
-				}
-			} else {
-				select {
-				case q := <-queue:
-					// try immediate send
-					select {
-					case work <- q:
-						// yay
-					default:
-						// keep it as the next element
-						nextok = true
-						next = q
+	Spawn(procs, func(){
+		for p := range work {
+			extensions := s.Extender(p)
+			for _, extended := range extensions {
+				if s.Extendable(extended) {
+					s.PreProcess(extended)
+
+					atomic.AddInt32(&pending, 1)
+					newwork <- extended
+
+					if s.Outputtable(extended) {
+						found <- extended
 					}
 				}
 			}
+			s.PostProcess(p)
+			atomic.AddInt32(&pending, -1)
 		}
-	}()
+	})
 
-	// this pumps results from workers to output pool
-	output := make(chan *Query, 1000)
-	outputFinished := make(chan signal)
-	go func() {
-		for v := range output {
-			s.Out.Push(v)
-		}
-		outputFinished <- signal{}
-	}()
-
-	// signals completion of work
-	done := make(chan signal, 1000)
-	// early termination
-	var terminated int32
-	terminate := make(chan signal)
-
-	for i := 0; i < routines; i += 1 {
-		go func() {
-			for {
-				p := <-work
-				extensions := s.Extender(p)
-				for _, extended := range extensions {
-					if s.Extendable(extended) {
-						s.PreProcess(extended)
-
-						atomic.AddInt32(&pending, 1)
-						queue <- extended
-
-						if s.Outputtable(extended) {
-							output <- extended
-						}
-					}
-				}
-
-				if s.PostProcess(p) != nil {
-					atomic.StoreInt32(&terminated, 1)
-					terminate <- signal{}
-				}
-				if atomic.LoadInt32(&terminated) != 0 {
-					break
-				}
-
-				atomic.AddInt32(&pending, -1)
-				done <- signal{}
-			}
-		}()
-	}
-
-FINISHED:
-	for {
-		select {
-		case <-done:
-			if atomic.LoadInt32(&pending) == 0 {
-				break FINISHED
-			}
-		case <-terminate:
-			break FINISHED
+	// monitor whether there is no work pending
+	for range time.Tick(10*time.Millisecond) {
+		if atomic.LoadInt32(&pending) == 0 {
+			break
 		}
 	}
 
-	close(output)
-	<-outputFinished
+	close(work)
+	close(newwork)
+	close(found)
+
+	output.Wait()
+}
+
+func Spawn(N int, fn func()){
+	for i := 0; i < N; i +=  1{
+		go fn()
+	}
 }

@@ -107,6 +107,5 @@ func (s *Stack) Values() []*search.Query {
 
 // Returns the number of elements in the stack.
 func (s *Stack) Len() int {
-	r := s.size
-	return r
+	return s.size
 }

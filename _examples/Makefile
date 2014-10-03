@@ -1,5 +1,4 @@
-
-FLAGS=-stats -procs=4 -chanmode -verbose=true
+FLAGS=-stats -procs=8 -chanmode -verbose=true
 SPX=../spexs2 $(FLAGS)
 
 GOFLAGS=-gcflags -B
