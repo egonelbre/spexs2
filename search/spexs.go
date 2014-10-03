@@ -20,7 +20,7 @@ type Pooler interface {
 
 type Extender func(p *Query) Querys
 type Filter func(p *Query) bool
-type ProcessQuery func(p *Query) error
+type ProcessQuery func(p *Query)
 type Feature func(p *Query) (float64, string)
 
 type Setup struct {
@@ -55,9 +55,7 @@ func Run(s *Setup) {
 			}
 		}
 
-		if s.PostProcess(p) != nil {
-			break
-		}
+		s.PostProcess(p)
 	}
 }
 
@@ -118,9 +116,9 @@ func RunParallel(s *Setup, routines int) {
 				m.Lock()
 				workers -= 1
 				allDone = workers == 0 && s.In.Empty()
-				needToTerminate := s.PostProcess(p) != nil
+				s.PostProcess(p)
 
-				if allDone || needToTerminate {
+				if allDone {
 					added <- signal{}
 					m.Unlock()
 					break
