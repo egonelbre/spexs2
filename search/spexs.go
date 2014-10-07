@@ -3,8 +3,6 @@ package search
 import (
 	"runtime"
 	"sync"
-	"sync/atomic"
-	"time"
 )
 
 type Token uint32
@@ -183,7 +181,7 @@ func RunParallelChan(s *Setup, procs int) {
 	}()
 
 	// number of unfinished items
-	var pending int32 = 1
+	workcounter := make(chan int, Buffer)
 	work <- NewEmptyQuery(s.Db)
 
 	for i := 0; i < procs; i += 1 {
@@ -194,7 +192,7 @@ func RunParallelChan(s *Setup, procs int) {
 					if s.Extendable(extended) {
 						s.PreProcess(extended)
 
-						atomic.AddInt32(&pending, 1)
+						workcounter <- 1
 						newwork <- extended
 
 						if s.Outputtable(extended) {
@@ -203,14 +201,15 @@ func RunParallelChan(s *Setup, procs int) {
 					}
 				}
 				s.PostProcess(p)
-				atomic.AddInt32(&pending, -1)
+				workcounter <- -1
 			}
 		}()
 	}
 
-	// monitor whether there is no work pending
-	for _ = range time.Tick(10 * time.Millisecond) {
-		if atomic.LoadInt32(&pending) == 0 {
+	pending := 1
+	for s := range workcounter {
+		pending += s
+		if pending == 0 {
 			break
 		}
 	}
