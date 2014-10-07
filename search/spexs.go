@@ -140,7 +140,9 @@ func pipe(from chan *Query, storage Pooler, to chan *Query) {
 		case next != nil:
 			select {
 			case q, ok := <-from:
-				if !ok { return }
+				if !ok {
+					return
+				}
 				storage.Push(q)
 			case to <- next:
 				next = nil
@@ -149,7 +151,9 @@ func pipe(from chan *Query, storage Pooler, to chan *Query) {
 			next, _ = storage.Pop()
 		default:
 			q, ok := <-from
-			if !ok { return }
+			if !ok {
+				return
+			}
 			next = q
 		}
 	}
@@ -164,14 +168,14 @@ func RunParallelChan(s *Setup, procs int) {
 	newwork := make(chan *Query, Buffer)
 	// this pumps results into output pool
 	found := make(chan *Query, Buffer)
-	
+
 	// sort the work items
 	go pipe(newwork, s.In, work)
 
 	// monitor found queries
 	var output sync.WaitGroup
 	output.Add(1)
-	go func(){
+	go func() {
 		for q := range found {
 			s.Out.Push(q)
 		}
@@ -180,30 +184,32 @@ func RunParallelChan(s *Setup, procs int) {
 
 	// number of unfinished items
 	var pending int32 = 1
-	work <- NewEmptyQuery(s.Db)	
+	work <- NewEmptyQuery(s.Db)
 
-	Spawn(procs, func(){
-		for p := range work {
-			extensions := s.Extender(p)
-			for _, extended := range extensions {
-				if s.Extendable(extended) {
-					s.PreProcess(extended)
+	for i := 0; i < procs; i += 1 {
+		go func() {
+			for p := range work {
+				extensions := s.Extender(p)
+				for _, extended := range extensions {
+					if s.Extendable(extended) {
+						s.PreProcess(extended)
 
-					atomic.AddInt32(&pending, 1)
-					newwork <- extended
+						atomic.AddInt32(&pending, 1)
+						newwork <- extended
 
-					if s.Outputtable(extended) {
-						found <- extended
+						if s.Outputtable(extended) {
+							found <- extended
+						}
 					}
 				}
+				s.PostProcess(p)
+				atomic.AddInt32(&pending, -1)
 			}
-			s.PostProcess(p)
-			atomic.AddInt32(&pending, -1)
-		}
-	})
+		}()
+	}
 
 	// monitor whether there is no work pending
-	for range time.Tick(10*time.Millisecond) {
+	for _ = range time.Tick(10 * time.Millisecond) {
 		if atomic.LoadInt32(&pending) == 0 {
 			break
 		}
@@ -214,10 +220,4 @@ func RunParallelChan(s *Setup, procs int) {
 	close(found)
 
 	output.Wait()
-}
-
-func Spawn(N int, fn func()){
-	for i := 0; i < N; i +=  1{
-		go fn()
-	}
 }
