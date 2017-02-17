@@ -8,7 +8,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/egonelbre/spexs2/vendor/rjson"
+	"launchpad.net/rjson"
 )
 
 const baseConfiguration = `{

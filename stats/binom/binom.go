@@ -1,7 +1,7 @@
 package binom
 
 import (
-	"github.com/egonelbre/spexs2/vendor/go-fn/fn"
+	"github.com/ematvey/go-fn/fn"
 )
 
 // the probability

@@ -2,8 +2,9 @@ package utils
 
 import (
 	"bytes"
-	"github.com/egonelbre/spexs2/vendor/rjson"
 	"log"
+
+	"launchpad.net/rjson"
 )
 
 func ApplyObject(src interface{}, dest interface{}) {

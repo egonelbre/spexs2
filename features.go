@@ -5,7 +5,7 @@ import (
 	"log"
 	"regexp"
 
-	"github.com/egonelbre/spexs2/vendor/rjson"
+	"launchpad.net/rjson"
 
 	. "github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/search/features"
