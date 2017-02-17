@@ -7,10 +7,11 @@ package rjson_test
 import (
 	"fmt"
 	"io"
-	"github.com/egonelbre/spexs2/vendor/rjson"
 	"log"
 	"os"
 	"strings"
+
+	"launchpad.net/rjson"
 )
 
 func ExampleMarshal() {

@@ -12,8 +12,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"github.com/egonelbre/spexs2/vendor/rjson"
 	"os"
+
+	"launchpad.net/rjson"
 )
 
 var jsonOut = flag.Bool("j", false, "produce JSON output")
