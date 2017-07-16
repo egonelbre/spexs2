@@ -108,12 +108,12 @@ func (s *AppSetup) makeFilter(name string, data rjson.RawMessage) (Filter, error
 	filterName := regRemoveParens.ReplaceAllString(name, "")
 	createFilter, ok := filters.Get(filterName)
 	if ok {
-		return createFilter(s.Setup, bytes), nil
+		return createFilter(&s.Setup, bytes), nil
 	}
 
 	// didn't find filter, let's create it from feature
 	feature := s.makeFeature(name)
-	filter := filters.FeatureFilter(feature, bytes)
+	filter := filters.FromFeature(feature, bytes)
 	return filter, nil
 }
 
@@ -126,7 +126,7 @@ func (s *AppSetup) makeFilters(conf map[string]rjson.RawMessage) Filter {
 			fns = append(fns, fn)
 		}
 	}
-	return filters.Compose(fns)
+	return filters.Compose(fns...)
 }
 
 func (s *AppSetup) initFilters() {

@@ -8,7 +8,7 @@ import (
 )
 
 // don't allow start to be grouping token
-func NoStartingGroup(s Setup, data []byte) Filter {
+func NoStartingGroup(s *Setup, data []byte) Filter {
 	return func(q *Query) bool {
 		start := q.Pat[0]
 		return start.Flags == IsSingle
@@ -16,14 +16,14 @@ func NoStartingGroup(s Setup, data []byte) Filter {
 }
 
 // don't allow ending to be grouping token
-func NoEndingGroup(s Setup, data []byte) Filter {
+func NoEndingGroup(s *Setup, data []byte) Filter {
 	return func(q *Query) bool {
 		end := q.Pat[len(q.Pat)-1]
 		return end.Flags&IsGroup == 0
 	}
 }
 
-func NoTokens(s Setup, data []byte) Filter {
+func NoTokens(s *Setup, data []byte) Filter {
 	var filter struct{ Tokens string }
 	err := json.Unmarshal(data, &filter)
 	if err != nil {

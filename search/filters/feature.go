@@ -10,7 +10,7 @@ import (
 
 type minmax struct{ Min, Max float64 }
 
-func FeatureFilter(feature Feature, data []byte) Filter {
+func FromFeature(feature Feature, data []byte) Filter {
 	var conf struct{ Min, Max float64 }
 	conf.Min = math.NaN()
 	conf.Max = math.NaN()

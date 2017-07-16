@@ -5,7 +5,7 @@ import (
 	"github.com/egonelbre/spexs2/utils"
 )
 
-type CreateFunc func(Setup, []byte) Filter
+type CreateFunc func(*Setup, []byte) Filter
 
 var All = [...]CreateFunc{
 	NoStartingGroup,
