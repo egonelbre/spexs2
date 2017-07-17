@@ -2,10 +2,12 @@ package benchmark
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"os"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/egonelbre/spexs2/search"
@@ -16,6 +18,7 @@ import (
 )
 
 var (
+	limit = flag.Int("limit", -1, "limit the number of regexps to expand")
 	large = flag.Bool("large", false, "run large tests (4GB)")
 	huge  = flag.Bool("huge", false, "make tests larger than (4GB)")
 )
@@ -123,7 +126,16 @@ func NewTestSetup(db *search.Database) *search.Setup {
 	}
 
 	s.PreProcess = func(q *search.Query) error { return nil }
-	s.PostProcess = func(q *search.Query) error { return nil }
+
+	var limiter int64
+	s.PostProcess = func(q *search.Query) error {
+		if *limit > 0 {
+			if atomic.AddInt64(&limiter, 1) > int64(*limit) {
+				return errors.New("early exit")
+			}
+		}
+		return nil
+	}
 
 	return s
 }
