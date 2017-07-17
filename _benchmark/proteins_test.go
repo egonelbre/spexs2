@@ -142,6 +142,9 @@ var cases = []*Case{
 }
 
 func BenchmarkRun(b *testing.B) {
+	if *huge {
+		*large = true
+	}
 	for _, c := range cases {
 		if c.Large && !*large {
 			continue
