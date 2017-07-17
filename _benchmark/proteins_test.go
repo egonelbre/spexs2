@@ -15,7 +15,10 @@ import (
 	"github.com/egonelbre/spexs2/search/pool"
 )
 
-var runhugetests = flag.Bool("huge", false, "")
+var (
+	large = flag.Bool("large", false, "run large tests (4GB)")
+	huge  = flag.Bool("huge", false, "make tests larger than (4GB)")
+)
 
 func ScanLines(filename string, line func(string)) {
 	file, err := os.Open(filename)
@@ -89,18 +92,35 @@ func NewTestSetup(db *search.Database) *search.Setup {
 	s.In = pool.NewStack()
 	s.Out = pool.NewPriority(order, 100)
 
-	s.Extender = extenders.Regex
-	s.Extendable = filters.Compose(
-		filters.FromFeature(groups, []byte(`{"max": 3}`)),
-		filters.FromFeature(length, []byte(`{"max": 6}`)),
-		filters.FromFeature(matches, []byte(`{"min": 20}`)),
-		filters.NoStartingGroup(s, nil),
-	)
-	s.Outputtable = filters.Compose(
-		filters.FromFeature(ratio, []byte(`{"min": 2}`)),
-		filters.FromFeature(binom, []byte(`{"max": 1e-3}`)),
-		filters.NoEndingGroup(s, nil),
-	)
+	if !*huge {
+		s.Extender = extenders.Regex
+
+		s.Extendable = filters.Compose(
+			filters.FromFeature(groups, []byte(`{"max": 3}`)),
+			filters.FromFeature(length, []byte(`{"max": 6}`)),
+			filters.FromFeature(matches, []byte(`{"min": 20}`)),
+			filters.NoStartingGroup(s, nil),
+		)
+		s.Outputtable = filters.Compose(
+			filters.FromFeature(ratio, []byte(`{"min": 2}`)),
+			filters.FromFeature(binom, []byte(`{"max": 1e-3}`)),
+			filters.NoEndingGroup(s, nil),
+		)
+	} else {
+		s.Extender = extenders.Regex
+
+		s.Extendable = filters.Compose(
+			filters.FromFeature(groups, []byte(`{"max": 6}`)),
+			filters.FromFeature(length, []byte(`{"max": 6}`)),
+			filters.FromFeature(matches, []byte(`{"min": 1}`)),
+			filters.NoStartingGroup(s, nil),
+		)
+		s.Outputtable = filters.Compose(
+			filters.FromFeature(ratio, []byte(`{"min": 2}`)),
+			filters.FromFeature(binom, []byte(`{"max": 1e-3}`)),
+			filters.NoEndingGroup(s, nil),
+		)
+	}
 
 	s.PreProcess = func(q *search.Query) error { return nil }
 	s.PostProcess = func(q *search.Query) error { return nil }
@@ -112,7 +132,7 @@ type Case struct {
 	Name       string
 	Foreground string
 	Background string
-	Huge       bool
+	Large      bool
 }
 
 var cases = []*Case{
@@ -123,9 +143,10 @@ var cases = []*Case{
 
 func BenchmarkRun(b *testing.B) {
 	for _, c := range cases {
-		if c.Huge && !*runhugetests {
+		if c.Large && !*large {
 			continue
 		}
+
 		b.Run(c.Name, func(b *testing.B) {
 			db := LoadDatabase(c.Foreground, c.Background)
 			for _, nprocs := range []int{0, 1, 2, 4, 8, 16, 32} {
