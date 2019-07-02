@@ -19,11 +19,11 @@ func merge(left, right, into []int) {
 				break
 			}
 			into[i] = rv
-			i += 1
-			rlast += 1
+			i ++
+			rlast ++
 		}
 		into[i] = lv
-		i += 1
+		i ++
 	}
 	copy(into[i:], right[rlast:])
 }

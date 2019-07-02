@@ -44,7 +44,7 @@ func (s *AppSetup) initPrinter() {
 			}
 
 			name := fmt.Sprintf("f%v", featureIdx)
-			featureIdx += 1
+			featureIdx ++
 			features[name] = feat
 
 			return "{{." + name + "}}"

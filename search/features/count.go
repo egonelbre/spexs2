@@ -47,7 +47,7 @@ func Seqs(group []int) Feature {
 				continue
 			}
 			prevseq = seq.Index
-			count[seq.Section] += 1
+			count[seq.Section] ++
 		}
 		return countf(count, group), ""
 	}

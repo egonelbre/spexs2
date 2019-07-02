@@ -70,7 +70,7 @@ func (p *Priority) Bottom(n int) []*Query {
 	items := p.items[first:p.length]
 	n = len(items)
 	result := make([]*Query, n)
-	for i := 0; i < n; i += 1 {
+	for i := 0; i < n; i ++ {
 		result[i] = items[n-i-1]
 	}
 	return result
@@ -122,7 +122,7 @@ func (p *priorityIntf) Push(x interface{}) {
 	}
 
 	p.items[p.length] = x.(*Query)
-	p.length += 1
+	p.length ++
 }
 
 func (p *priorityIntf) Pop() interface{} {

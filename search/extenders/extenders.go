@@ -14,7 +14,7 @@ func toQuerys(queryMap queryMap) Querys {
 	i := 0
 	for _, q := range queryMap {
 		querys[i] = q
-		i += 1
+		i ++
 	}
 	return querys
 }

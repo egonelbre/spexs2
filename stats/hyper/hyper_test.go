@@ -8,9 +8,9 @@ import (
 type splitFunc func(o int, r int, O int, R int) float64
 
 func benchHyper(b *testing.B, fn splitFunc) {
-	for i := 0; i < b.N; i += 1 {
-		for v := 0; v < 1000; v += 13 {
-			for r := 0; r < 1000; r += 15 {
+	for i := 0; i < b.N; i ++ {
+		for v := 0; v < 1000; v ++3 {
+			for r := 0; r < 1000; r ++5 {
 				fn(v, r, 13000, 13000)
 			}
 		}

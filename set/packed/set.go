@@ -26,7 +26,7 @@ func (s *Set) Add(v int) {
 	}
 
 	s.cur = v
-	s.count += 1
+	s.count ++
 
 	// fast detection of numbits
 	switch {
@@ -82,7 +82,7 @@ func (s *Set) Iter() []int {
 			vals[j] = base
 			df = 0
 			k = 0
-			j += 1
+			j ++
 		}
 	}
 	return vals

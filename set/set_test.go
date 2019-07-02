@@ -59,8 +59,8 @@ func testMemoryUse(set Set, n int, t *testing.T) {
 
 	rand.Seed(5)
 	last := 0
-	for i := 0; i < n; i += 1 {
-		last += 10 + rand.Intn(20)
+	for i := 0; i < n; i ++ {
+		last ++0 + rand.Intn(20)
 		set.Add(last)
 	}
 

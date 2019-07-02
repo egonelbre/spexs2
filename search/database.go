@@ -68,7 +68,7 @@ func (db *Database) AddAllPositions(s set.Set) {
 
 func (db *Database) mkNewToken() Token {
 	newToken := db.genToken
-	db.genToken += 1
+	db.genToken ++
 	return newToken
 }
 
@@ -135,7 +135,7 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 	db.addToTokenCount(sec, tokens, count)
 
 	seq := Sequence{db.genSeqId, uint32(sec), uint32(count)}
-	db.genSeqId += 1
+	db.genSeqId ++
 
 	// add sequence tokens to a single array
 	seqstart := len(db.FullSequence)
@@ -144,7 +144,7 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 
 	// add sequence info for each positions
 	db.PosToSequence = append(db.PosToSequence, make([]Sequence, len(tokens))...)
-	for i := seqstart; i < seqend; i += 1 {
+	for i := seqstart; i < seqend; i ++ {
 		db.PosToSequence[i] = seq
 	}
 

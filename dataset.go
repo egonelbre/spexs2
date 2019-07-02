@@ -122,7 +122,7 @@ func removeInvalid(names []string, skip map[string]bool) []string {
 		}
 
 		result[i] = trimmed
-		i += 1
+		i++
 	}
 	return result[0:i]
 }

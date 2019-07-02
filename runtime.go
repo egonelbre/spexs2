@@ -68,7 +68,7 @@ func attachMemProfiler(setup *AppSetup) {
 			f.Close()
 			log.Fatal("Wrote memory profile!")
 		}
-		count += 1
+		count ++
 		return ext(q)
 	}
 }
@@ -112,7 +112,7 @@ func runStats(setup *AppSetup) {
 	ext := setup.Extender
 	setup.Extender = func(q *Query) Querys {
 		seq = q.String()
-		counter += 1
+		counter ++
 		return ext(q)
 	}
 }
