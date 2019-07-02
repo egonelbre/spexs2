@@ -16,23 +16,23 @@ var (
 )
 
 var (
-	version *bool = flag.Bool("version", false, "print version")
+	version = flag.Bool("version", false, "print version")
 
-	details *bool = flag.Bool("details", false, "detailed help")
-	verbose *bool = flag.Bool("verbose", false, "print extended info")
+	details = flag.Bool("details", false, "detailed help")
+	verbose = flag.Bool("verbose", false, "print extended info")
 
-	interactiveDebug *bool   = flag.Bool("debug", false, "attach step-by-step debugger")
-	live             *bool   = flag.Bool("live", false, "print live output")
-	configs          *string = flag.String("conf", "", "configuration file(s), comma-delimited")
-	writeConf        *string = flag.String("writeconf", "", "write conf file")
+	interactiveDebug = flag.Bool("debug", false, "attach step-by-step debugger")
+	live             = flag.Bool("live", false, "print live output")
+	configs          = flag.String("conf", "", "configuration file(s), comma-delimited")
+	writeConf        = flag.String("writeconf", "", "write conf file")
 
-	stats       *bool = flag.Bool("stats", false, "print memory/extension statistics")
-	procs       *int  = flag.Int("procs", -1, "goroutines for extending")
-	memoryLimit *int  = flag.Int("mem", -1, "memory limit in MB")
+	stats       = flag.Bool("stats", false, "print memory/extension statistics")
+	procs       = flag.Int("procs", -1, "goroutines for extending")
+	memoryLimit = flag.Int("mem", -1, "memory limit in MB")
 
-	cpuprofile *string = flag.String("cpuprofile", "", "write cpu profile to file")
-	memprofile *string = flag.String("memprofile", "", "write mem profile to file")
-	memsteps   *int    = flag.Int("memsteps", 10000, "after how many extensions to write the mem profile")
+	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+	memprofile = flag.String("memprofile", "", "write mem profile to file")
+	memsteps   = flag.Int("memsteps", 10000, "after how many extensions to write the mem profile")
 
 	// logging to stderr
 	lg = log.New(os.Stderr, "", log.Ltime)

@@ -12,16 +12,16 @@ type test struct {
 }
 
 func BenchmarkBinom(b *testing.B) {
-	for i := 0; i < b.N; i ++ {
-		for v := 0; v < 1000; v ++3 {
-			for r := 0; r < 1000; r ++5 {
+	for i := 0; i < b.N; i++ {
+		for v := 0; v < 1000; v += 13 {
+			for r := 0; r < 1000; r += 15 {
 				ComplementCdf(v, 13000, float64(r)/float64(13000))
 			}
 		}
 	}
 }
 
-func TestComplementCdf(t *testing.T) {
+func TestComplementCDF(t *testing.T) {
 	// verification result was calculated with
 	// pbinom(k, N, p, lower.tail=F, log.P = F)
 

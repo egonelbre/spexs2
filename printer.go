@@ -44,7 +44,7 @@ func (s *AppSetup) initPrinter() {
 			}
 
 			name := fmt.Sprintf("f%v", featureIdx)
-			featureIdx ++
+			featureIdx++
 			features[name] = feat
 
 			return "{{." + name + "}}"
@@ -83,7 +83,7 @@ func (s *AppSetup) initPrinter() {
 				printQuery(out, q)
 			}
 		} else {
-			for i := len(values) - 1; i >= 0; i -= 1 {
+			for i := len(values) - 1; i >= 0; i-- {
 				q := values[i]
 				printQuery(out, q)
 			}

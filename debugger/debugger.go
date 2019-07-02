@@ -97,12 +97,10 @@ func DefaultHandler(d *Debugger, cmd string, params []string) Action {
 			timeout, err := strconv.Atoi(params[0])
 			if err == nil {
 				return Skip{timeout}
-			} else {
-				return Err{string(err.Error())}
 			}
-		} else {
-			return Err{"Requires skip count parameter."}
+			return Err{string(err.Error())}
 		}
+		return Err{"Requires skip count parameter."}
 	case "watch", "w":
 		return Watch{}
 	case "continue", "c", "":

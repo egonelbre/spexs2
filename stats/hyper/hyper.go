@@ -20,8 +20,8 @@ func ComplementCdfSlow(o, r, O, R int) float64 {
 		denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lOR
 		add := Exp(nom - denom)
 		total += add
-		r -= 1
-		o += 1
+		r--
+		o++
 	}
 	return total
 }
@@ -56,8 +56,8 @@ func ComplementCdf(chosenA, chosenB, totalA, totalB int) float64 {
 		denom := ga + gOo + gr + gRr + gOR
 
 		total += Exp(nom - denom)
-		r -= 1.0
-		o += 1.0
+		r--
+		o++
 	}
 	return total
 }
@@ -100,8 +100,8 @@ func ComplementCdfApprox(chosenA, chosenB, totalA, totalB int) float64 {
 			break
 		}
 
-		r -= 1.0
-		o += 1.0
+		r--
+		o++
 	}
 	return total
 }
@@ -134,8 +134,8 @@ func Cdf(chosenA, chosenB, totalA, totalB int) float64 {
 
 		denom := ga + gOo + gr + gRr + gOR
 		total += Exp(nom - denom)
-		r += 1.0
-		o -= 1.0
+		r++
+		o--
 	}
 	return total
 }

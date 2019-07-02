@@ -20,15 +20,15 @@ func parseCall(call string) (name string, groups []string, info bool, positive b
 	}
 	positive = tokens[1] != "-"
 	name = tokens[2]
-	info = (tokens[3] == "?")
+	info = tokens[3] == "?"
 	groups = regArgs.FindAllString(tokens[4], -1)
 	return
 }
 
-func (s *AppSetup) groupToIds(group string) []int {
+func (s *AppSetup) groupToIDs(group string) []int {
 	if group == "@" {
 		ids := make([]int, len(s.Dataset.Files))
-		for i, _ := range ids {
+		for i := range ids {
 			ids[i] = i
 		}
 		return ids
@@ -41,7 +41,7 @@ func (s *AppSetup) parseFeature(call string) (name string, args []interface{}, i
 	name, groups, info, positive := parseCall(call)
 	args = make([]interface{}, len(groups))
 	for i, group := range groups {
-		args[i] = s.groupToIds(group)
+		args[i] = s.groupToIDs(group)
 	}
 	return
 }

@@ -68,20 +68,20 @@ func attachMemProfiler(setup *AppSetup) {
 			f.Close()
 			log.Fatal("Wrote memory profile!")
 		}
-		count ++
+		count++
 		return ext(q)
 	}
 }
 
 var (
-	quitStats            = make(chan int)
-	statsStarted         = false
-	maxMemoryUsed uint64 = 0
+	quitStats     = make(chan int)
+	statsStarted  = false
+	maxMemoryUsed uint64
 )
 
 func runStats(setup *AppSetup) {
-	var counter uint64 = 0
-	var seq string = ""
+	var counter uint64
+	var seq string
 	statsStarted = true
 
 	go func() {
@@ -101,7 +101,7 @@ func runStats(setup *AppSetup) {
 	go func() {
 		m := new(runtime.MemStats)
 		t := time.Tick(50 * time.Millisecond)
-		for _ = range t {
+		for range t {
 			runtime.ReadMemStats(m)
 			if m.Alloc > maxMemoryUsed {
 				maxMemoryUsed = m.Alloc
@@ -112,7 +112,7 @@ func runStats(setup *AppSetup) {
 	ext := setup.Extender
 	setup.Extender = func(q *Query) Querys {
 		seq = q.String()
-		counter ++
+		counter++
 		return ext(q)
 	}
 }

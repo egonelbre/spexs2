@@ -77,7 +77,7 @@ func RunParallel(s *Setup, routines int) {
 	added <- signal{}
 	workers := 0
 
-	for i := 0; i < routines; i ++ {
+	for i := 0; i < routines; i++ {
 		wg.Add(1)
 		go func() {
 			runtime.LockOSThread()
@@ -95,7 +95,7 @@ func RunParallel(s *Setup, routines int) {
 					m.Unlock()
 					continue
 				}
-				workers ++
+				workers++
 				m.Unlock()
 
 				extensions := s.Extender(p)
@@ -118,7 +118,7 @@ func RunParallel(s *Setup, routines int) {
 				}
 
 				m.Lock()
-				workers -= 1
+				workers--
 				allDone = workers == 0 && s.In.Empty()
 				needToTerminate := s.PostProcess(p) != nil
 

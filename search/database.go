@@ -33,7 +33,7 @@ type Database struct {
 	Separator string // separator for joining pattern
 
 	nameToToken map[string]Token
-	genSeqId    int
+	genSeqID    int
 	genToken    Token
 }
 
@@ -53,7 +53,7 @@ func NewDatabase() *Database {
 		Separator: "",
 
 		nameToToken: make(map[string]Token),
-		genSeqId:    0,
+		genSeqID:    0,
 		genToken:    Token(1),
 	}
 }
@@ -68,7 +68,7 @@ func (db *Database) AddAllPositions(s set.Set) {
 
 func (db *Database) mkNewToken() Token {
 	newToken := db.genToken
-	db.genToken ++
+	db.genToken++
 	return newToken
 }
 
@@ -134,8 +134,8 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 	tokens := db.ToTokens(raw)
 	db.addToTokenCount(sec, tokens, count)
 
-	seq := Sequence{db.genSeqId, uint32(sec), uint32(count)}
-	db.genSeqId ++
+	seq := Sequence{db.genSeqID, uint32(sec), uint32(count)}
+	db.genSeqID++
 
 	// add sequence tokens to a single array
 	seqstart := len(db.FullSequence)
@@ -144,7 +144,7 @@ func (db *Database) AddSequence(sec int, raw []string, count int) {
 
 	// add sequence info for each positions
 	db.PosToSequence = append(db.PosToSequence, make([]Sequence, len(tokens))...)
-	for i := seqstart; i < seqend; i ++ {
+	for i := seqstart; i < seqend; i++ {
 		db.PosToSequence[i] = seq
 	}
 

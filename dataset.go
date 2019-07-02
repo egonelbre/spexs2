@@ -13,7 +13,7 @@ import (
 )
 
 type File struct {
-	Id   int
+	ID   int
 	Base string
 	Full string
 }
