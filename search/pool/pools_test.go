@@ -1,9 +1,10 @@
 package pool
 
 import (
-	. "github.com/egonelbre/spexs2/search"
 	"testing"
 	"unicode/utf8"
+
+	. "github.com/egonelbre/spexs2/search"
 )
 
 func pat(s string) *Query {

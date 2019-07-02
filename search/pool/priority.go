@@ -2,8 +2,9 @@ package pool
 
 import (
 	"container/heap"
-	. "github.com/egonelbre/spexs2/search"
 	"sort"
+
+	. "github.com/egonelbre/spexs2/search"
 )
 
 type Priority struct {
