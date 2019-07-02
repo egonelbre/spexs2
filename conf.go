@@ -8,7 +8,7 @@ import (
 	"os"
 	"regexp"
 
-	"launchpad.net/rjson"
+	"github.com/rogpeppe/rjson"
 )
 
 const baseConfiguration = `{

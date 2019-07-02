@@ -1,0 +1,4 @@
+github.com/ematvey/go-fn v0.0.0-20130403065544-37331e464987 h1:VeRAdzxdbuFp1A01LDHimsk3W626tcTx/M9M8iKWCzI=
+github.com/ematvey/go-fn v0.0.0-20130403065544-37331e464987/go.mod h1:K8eC8TpllkITOXVB78P3/tkordw6FI7OgqbYbxG/S8s=
+github.com/rogpeppe/rjson v0.0.0-20151026200957-77220b71d327 h1:JuElq05p5jPgkYetPEGMZIcos4SiCM6Jin+/3U7YkxQ=
+github.com/rogpeppe/rjson v0.0.0-20151026200957-77220b71d327/go.mod h1:3QPdyjsZx/TVNJoW0b6d+FuZywNeMmLSXyGOuUhrvJQ=

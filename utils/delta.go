@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"log"
 
-	"launchpad.net/rjson"
+	"github.com/rogpeppe/rjson"
 )
 
 func ApplyObject(src interface{}, dest interface{}) {

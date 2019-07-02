@@ -6,7 +6,7 @@ import (
 	"log"
 	"regexp"
 
-	"launchpad.net/rjson"
+	"github.com/rogpeppe/rjson"
 
 	. "github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/search/extenders"
