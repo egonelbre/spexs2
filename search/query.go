@@ -1,7 +1,7 @@
 package search
 
 import (
-	"bytes"
+	"strings"
 
 	"github.com/egonelbre/spexs2/set"
 	"github.com/egonelbre/spexs2/set/array"
@@ -98,18 +98,18 @@ func (q *Query) StringLong() string {
 }
 
 func (q *Query) StringRaw() string {
-	buf := bytes.NewBufferString("")
+	var buf strings.Builder
 	for _, tok := range q.Pat {
 		if tok.Flags&IsStar != 0 {
 			buf.WriteString("*")
 		}
 		buf.WriteRune(rune(tok.Token))
 	}
-	return string(buf.Bytes())
+	return buf.String()
 }
 
 func (q *Query) string(short bool) string {
-	buf := bytes.NewBufferString("")
+	var buf strings.Builder
 	db := q.Db
 	for i, tok := range q.Pat {
 		if tok.Flags&IsStar != 0 {
@@ -137,5 +137,5 @@ func (q *Query) string(short bool) string {
 		}
 	}
 
-	return string(buf.Bytes())
+	return buf.String()
 }

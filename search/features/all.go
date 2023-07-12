@@ -37,11 +37,11 @@ func Get(name string) (CreateFunc, bool) {
 func CallCreateWithArgs(function CreateFunc, args []interface{}) (Feature, error) {
 	fn, fnType, ok := functionAndType(function)
 	if !ok {
-		return nil, fmt.Errorf("Argument is not a function!")
+		return nil, fmt.Errorf("argument is not a function")
 	}
 
 	if fnType.NumIn() != len(args) {
-		return nil, fmt.Errorf("Invalid number of arguments, requires %v", fnType.NumIn())
+		return nil, fmt.Errorf("invalid number of arguments, requires %v", fnType.NumIn())
 	}
 
 	arguments := make([]reflect.Value, fnType.NumIn())

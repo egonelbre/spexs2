@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"log"
 	"os"
 	"runtime"
@@ -44,7 +43,7 @@ func setMemLimit(setup *AppSetup) {
 	setup.Extender = func(q *Query) Querys {
 		runtime.ReadMemStats(m)
 		if m.Alloc/mb > memLimit {
-			panic(errors.New("MEMORY LIMIT EXCEEDED!"))
+			panic("memory limit exceeded!")
 		}
 		return ext(q)
 	}

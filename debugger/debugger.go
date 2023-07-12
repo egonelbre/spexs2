@@ -68,7 +68,7 @@ handling:
 			}
 		case cmd := <-d.Commands:
 			tokens := strings.Split(cmd, " ")
-			action := d.Handler(d, tokens[0], tokens[1:len(tokens)])
+			action := d.Handler(d, tokens[0], tokens[1:])
 			action.Exec(d)
 		case <-d.Watch:
 			d.Watch <- 1

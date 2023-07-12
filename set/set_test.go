@@ -57,10 +57,11 @@ func testMemoryUse(set Set, n int, t *testing.T) {
 	before := new(runtime.MemStats)
 	runtime.ReadMemStats(before)
 
-	rand.Seed(5)
+	rng := rand.New(rand.NewSource(5))
+
 	last := 0
 	for i := 0; i < n; i++ {
-		last += 10 + rand.Intn(20)
+		last += 10 + rng.Intn(20)
 		set.Add(last)
 	}
 

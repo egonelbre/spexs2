@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"flag"
-	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -98,7 +97,7 @@ func NewConf(configFile string) *Conf {
 		return conf
 	}
 
-	data, err := ioutil.ReadFile(configFile)
+	data, err := os.ReadFile(configFile)
 	if err != nil {
 		log.Println("Unable to read configuration file: ", configFile)
 		log.Fatal(err)
