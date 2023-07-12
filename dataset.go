@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 )
 
 type File struct {
@@ -27,8 +27,8 @@ func NewDataset() *Dataset {
 	return &Dataset{make(map[string][]int), make(map[string]File)}
 }
 
-func CreateDatabase(conf *Conf) (*Database, *Dataset) {
-	db := NewDatabase()
+func CreateDatabase(conf *Conf) (*search.Database, *Dataset) {
+	db := search.NewDatabase()
 	db.Separator = conf.Reader.Separator
 
 	skip := make(map[string]bool)
@@ -39,7 +39,7 @@ func CreateDatabase(conf *Conf) (*Database, *Dataset) {
 
 	ds := NewDataset()
 	for id, grp := range conf.Extension.Groups {
-		group := &TokenGroup{}
+		group := &search.TokenGroup{}
 
 		group.Name = id
 		group.FullName = "[" + grp.Elements + "]"
@@ -87,7 +87,7 @@ func loadFileList(filename string) []string {
 	return lines
 }
 
-func (ds *Dataset) AddFileGroups(db *Database, groups map[string]FileGroup, countSeparator string, skip map[string]bool) {
+func (ds *Dataset) AddFileGroups(db *search.Database, groups map[string]FileGroup, countSeparator string, skip map[string]bool) {
 	for group, filegroup := range groups {
 
 		files := make([]string, 0)
@@ -127,7 +127,7 @@ func removeInvalid(names []string, skip map[string]bool) []string {
 	return result[0:i]
 }
 
-func (ds *Dataset) AddFile(db *Database, filename string, countSeparator string, skip map[string]bool) int {
+func (ds *Dataset) AddFile(db *search.Database, filename string, countSeparator string, skip map[string]bool) int {
 	var (
 		file   *os.File
 		reader *bufio.Reader

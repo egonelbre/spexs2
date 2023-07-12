@@ -1,11 +1,11 @@
 package hyper
 
 import (
-	. "math"
+	"math"
 )
 
 func lnG(v int) float64 {
-	r, _ := Lgamma(float64(v))
+	r, _ := math.Lgamma(float64(v))
 	return r
 }
 
@@ -18,7 +18,7 @@ func ComplementCdfSlow(o, r, O, R int) float64 {
 	for r >= 0 {
 		nom := lSOR + lnG(o+r+1) + lnG(O+R-o-r+1)
 		denom := lnG(o+1) + lnG(O-o+1) + lnG(r+1) + lnG(R-r+1) + lOR
-		add := Exp(nom - denom)
+		add := math.Exp(nom - denom)
 		total += add
 		r--
 		o++
@@ -39,23 +39,23 @@ func ComplementCdf(chosenA, chosenB, totalA, totalB int) float64 {
 	O := float64(totalA)
 	R := float64(totalB)
 
-	gO, _ := Lgamma(O + 1.0)
-	gR, _ := Lgamma(R + 1.0)
+	gO, _ := math.Lgamma(O + 1.0)
+	gR, _ := math.Lgamma(R + 1.0)
 	gaOR := gO + gR
-	gOR, _ := Lgamma(O + R + 1.0)
+	gOR, _ := math.Lgamma(O + R + 1.0)
 	for r >= 0.0 {
-		gor, _ := Lgamma(o + r + 1.0)
-		gORor, _ := Lgamma(O + R - o - r + 1)
+		gor, _ := math.Lgamma(o + r + 1.0)
+		gORor, _ := math.Lgamma(O + R - o - r + 1)
 		nom := gaOR + gor + gORor
 
-		ga, _ := Lgamma(o + 1.0)
-		gOo, _ := Lgamma(O - o + 1.0)
-		gr, _ := Lgamma(r + 1.0)
-		gRr, _ := Lgamma(R - r + 1.0)
+		ga, _ := math.Lgamma(o + 1.0)
+		gOo, _ := math.Lgamma(O - o + 1.0)
+		gr, _ := math.Lgamma(r + 1.0)
+		gRr, _ := math.Lgamma(R - r + 1.0)
 
 		denom := ga + gOo + gr + gRr + gOR
 
-		total += Exp(nom - denom)
+		total += math.Exp(nom - denom)
 		r--
 		o++
 	}
@@ -77,23 +77,23 @@ func ComplementCdfApprox(chosenA, chosenB, totalA, totalB int) float64 {
 	O := float64(totalA)
 	R := float64(totalB)
 
-	gO, _ := Lgamma(O + 1.0)
-	gR, _ := Lgamma(R + 1.0)
+	gO, _ := math.Lgamma(O + 1.0)
+	gR, _ := math.Lgamma(R + 1.0)
 	gaOR := gO + gR
-	gOR, _ := Lgamma(O + R + 1.0)
+	gOR, _ := math.Lgamma(O + R + 1.0)
 	for r >= 0.0 {
-		gor, _ := Lgamma(o + r + 1.0)
-		gORor, _ := Lgamma(O + R - o - r + 1)
+		gor, _ := math.Lgamma(o + r + 1.0)
+		gORor, _ := math.Lgamma(O + R - o - r + 1)
 		nom := gaOR + gor + gORor
 
-		ga, _ := Lgamma(o + 1.0)
-		gOo, _ := Lgamma(O - o + 1.0)
-		gr, _ := Lgamma(r + 1.0)
-		gRr, _ := Lgamma(R - r + 1.0)
+		ga, _ := math.Lgamma(o + 1.0)
+		gOo, _ := math.Lgamma(O - o + 1.0)
+		gr, _ := math.Lgamma(r + 1.0)
+		gRr, _ := math.Lgamma(R - r + 1.0)
 
 		denom := ga + gOo + gr + gRr + gOR
 
-		add := Exp(nom - denom)
+		add := math.Exp(nom - denom)
 		total += add
 
 		if add < total*approxEpsilon {
@@ -118,22 +118,22 @@ func Cdf(chosenA, chosenB, totalA, totalB int) float64 {
 	O := float64(totalA)
 	R := float64(totalB)
 
-	gO, _ := Lgamma(O + 1.0)
-	gR, _ := Lgamma(R + 1.0)
+	gO, _ := math.Lgamma(O + 1.0)
+	gR, _ := math.Lgamma(R + 1.0)
 	gaOR := gO + gR
-	gOR, _ := Lgamma(O + R + 1.0)
+	gOR, _ := math.Lgamma(O + R + 1.0)
 	for o >= 0.0 {
-		gor, _ := Lgamma(o + r + 1.0)
-		gORor, _ := Lgamma(O + R - o - r + 1)
+		gor, _ := math.Lgamma(o + r + 1.0)
+		gORor, _ := math.Lgamma(O + R - o - r + 1)
 		nom := gaOR + gor + gORor
 
-		ga, _ := Lgamma(o + 1.0)
-		gOo, _ := Lgamma(O - o + 1.0)
-		gr, _ := Lgamma(r + 1.0)
-		gRr, _ := Lgamma(R - r + 1.0)
+		ga, _ := math.Lgamma(o + 1.0)
+		gOo, _ := math.Lgamma(O - o + 1.0)
+		gr, _ := math.Lgamma(r + 1.0)
+		gRr, _ := math.Lgamma(R - r + 1.0)
 
 		denom := ga + gOo + gr + gRr + gOR
-		total += Exp(nom - denom)
+		total += math.Exp(nom - denom)
 		r++
 		o--
 	}

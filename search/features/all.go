@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/utils"
 )
 
@@ -34,7 +34,7 @@ func Get(name string) (CreateFunc, bool) {
 	return nil, false
 }
 
-func CallCreateWithArgs(function CreateFunc, args []interface{}) (Feature, error) {
+func CallCreateWithArgs(function CreateFunc, args []interface{}) (search.Feature, error) {
 	fn, fnType, ok := functionAndType(function)
 	if !ok {
 		return nil, fmt.Errorf("argument is not a function")
@@ -50,7 +50,7 @@ func CallCreateWithArgs(function CreateFunc, args []interface{}) (Feature, error
 	}
 	result := fn.Call(arguments)
 	inter := result[0].Interface()
-	return inter.(Feature), nil
+	return inter.(search.Feature), nil
 }
 
 var Help = `

@@ -1,8 +1,8 @@
 package extenders
 
-import . "github.com/egonelbre/spexs2/search"
+import "github.com/egonelbre/spexs2/search"
 
-func starGreedyExtend(base *Query, db *Database, querys queryMap) {
+func starGreedyExtend(base *search.Query, db *search.Database, querys queryMap) {
 	positions := base.Loc.Iter()
 	if len(positions) == 0 {
 		return
@@ -31,7 +31,7 @@ func starGreedyExtend(base *Query, db *Database, querys queryMap) {
 	starExtendPosition(base, db, querys, prevpos)
 }
 
-func StarGreedy(base *Query) Querys {
+func StarGreedy(base *search.Query) search.Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
 	stars := make(queryMap)
@@ -39,12 +39,12 @@ func StarGreedy(base *Query) Querys {
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 
-func RegexGreedy(base *Query) Querys {
+func RegexGreedy(base *search.Query) search.Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
-	combine(base, base.Db, patterns, IsSingle)
+	combine(base, base.Db, patterns, search.IsSingle)
 	stars := make(queryMap)
 	starGreedyExtend(base, base.Db, stars)
-	combine(base, base.Db, stars, IsStar)
+	combine(base, base.Db, stars, search.IsStar)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }

@@ -8,25 +8,25 @@ import (
 
 	"github.com/rogpeppe/rjson"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/search/extenders"
 	"github.com/egonelbre/spexs2/search/filters"
 	"github.com/egonelbre/spexs2/search/pool"
 )
 
-type Printer func(io.Writer, Pooler)
+type Printer func(io.Writer, search.Pooler)
 
 type AppSetup struct {
-	Setup
+	search.Setup
 
 	conf *Conf
 
-	Order []Feature
+	Order []search.Feature
 
 	Printer    Printer
-	printQuery func(io.Writer, *Query)
+	printQuery func(io.Writer, *search.Query)
 
-	Features map[string]Feature
+	Features map[string]search.Feature
 	Dataset  *Dataset
 }
 
@@ -36,8 +36,8 @@ func NewAppSetup(conf *Conf) *AppSetup {
 
 	s.Db, s.Dataset = CreateDatabase(conf)
 
-	s.Order = make([]Feature, 0)
-	s.Features = make(map[string]Feature)
+	s.Order = make([]search.Feature, 0)
+	s.Features = make(map[string]search.Feature)
 
 	s.initInput()
 	s.initOrder()
@@ -48,14 +48,14 @@ func NewAppSetup(conf *Conf) *AppSetup {
 	s.initPrinter()
 
 	features := s.Features
-	s.PreProcess = func(q *Query) error {
+	s.PreProcess = func(q *search.Query) error {
 		q.CacheValues()
 		for _, fn := range features {
 			fn(q)
 		}
 		return nil
 	}
-	s.PostProcess = func(q *Query) error {
+	s.PostProcess = func(q *search.Query) error {
 		return nil
 	}
 
@@ -96,7 +96,7 @@ func (s *AppSetup) initExtender() {
 	s.Extender = extender
 }
 
-func (s *AppSetup) makeFilter(name string, data rjson.RawMessage) (Filter, error) {
+func (s *AppSetup) makeFilter(name string, data rjson.RawMessage) (search.Filter, error) {
 	info("make filter " + name)
 	bytes, _ := data.MarshalJSON()
 
@@ -117,9 +117,9 @@ func (s *AppSetup) makeFilter(name string, data rjson.RawMessage) (Filter, error
 	return filter, nil
 }
 
-func (s *AppSetup) makeFilters(conf map[string]rjson.RawMessage) Filter {
+func (s *AppSetup) makeFilters(conf map[string]rjson.RawMessage) search.Filter {
 	info("make filters")
-	fns := make([]Filter, 0)
+	fns := make([]search.Filter, 0)
 	for name, data := range conf {
 		fn, err := s.makeFilter(name, data)
 		if err == nil {
@@ -135,7 +135,7 @@ func (s *AppSetup) initFilters() {
 	s.Outputtable = s.makeFilters(s.conf.Extension.Outputtable)
 }
 
-func lengthFitness(q *Query) float64 {
+func lengthFitness(q *search.Query) float64 {
 	return 1 / float64(q.Len())
 }
 

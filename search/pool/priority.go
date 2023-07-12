@@ -4,22 +4,22 @@ import (
 	"container/heap"
 	"sort"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 )
 
 type Priority struct {
-	items  []*Query
-	Order  []Feature
-	Worst  *Query
+	items  []*search.Query
+	Order  []search.Feature
+	Worst  *search.Query
 	length int
 	limit  int
 }
 
 type priorityIntf Priority
 
-func NewPriority(order []Feature, limit int) *Priority {
+func NewPriority(order []search.Feature, limit int) *Priority {
 	p := &Priority{}
-	p.items = make([]*Query, limit+100)
+	p.items = make([]*search.Query, limit+100)
 	p.length = 0
 	p.limit = limit
 	p.Order = order
@@ -32,15 +32,15 @@ func (p *Priority) Empty() bool {
 	return p.length == 0
 }
 
-func (p *Priority) Pop() (*Query, bool) {
+func (p *Priority) Pop() (*search.Query, bool) {
 	if p.Empty() {
 		return nil, false
 	}
 	v := heap.Pop((*priorityIntf)(p))
-	return v.(*Query), true
+	return v.(*search.Query), true
 }
 
-func (p *Priority) Push(pat *Query) {
+func (p *Priority) Push(pat *search.Query) {
 	worst := p.Worst
 	if worst != nil && p.less(pat, worst) {
 		return
@@ -48,11 +48,11 @@ func (p *Priority) Push(pat *Query) {
 
 	heap.Push((*priorityIntf)(p), pat)
 	if p.limit > 0 && p.Len() > p.limit {
-		p.Worst = heap.Pop((*priorityIntf)(p)).(*Query)
+		p.Worst = heap.Pop((*priorityIntf)(p)).(*search.Query)
 	}
 }
 
-func (p *Priority) Top(n int) []*Query {
+func (p *Priority) Top(n int) []*search.Query {
 	sort.Sort((*priorityIntf)(p))
 	last := n
 	if last > p.length {
@@ -61,7 +61,7 @@ func (p *Priority) Top(n int) []*Query {
 	return p.items[:last]
 }
 
-func (p *Priority) Bottom(n int) []*Query {
+func (p *Priority) Bottom(n int) []*search.Query {
 	sort.Sort((*priorityIntf)(p))
 	first := p.length - n
 	if first < 0 {
@@ -69,14 +69,14 @@ func (p *Priority) Bottom(n int) []*Query {
 	}
 	items := p.items[first:p.length]
 	n = len(items)
-	result := make([]*Query, n)
+	result := make([]*search.Query, n)
 	for i := 0; i < n; i++ {
 		result[i] = items[n-i-1]
 	}
 	return result
 }
 
-func (p *Priority) Values() []*Query {
+func (p *Priority) Values() []*search.Query {
 	return p.Bottom(p.limit)
 }
 
@@ -84,7 +84,7 @@ func (p *Priority) Heapify() {
 	heap.Init((*priorityIntf)(p))
 }
 
-func (p *Priority) less(a *Query, b *Query) bool {
+func (p *Priority) less(a *search.Query, b *search.Query) bool {
 	for _, fn := range p.Order {
 		aval, _ := fn(a)
 		bval, _ := fn(b)
@@ -116,12 +116,12 @@ func (p *priorityIntf) Less(i, j int) bool {
 // heap.Interface
 func (p *priorityIntf) Push(x interface{}) {
 	if p.length+1 > len(p.items) {
-		tmp := make([]*Query, len(p.items)+50000)
+		tmp := make([]*search.Query, len(p.items)+50000)
 		copy(tmp, p.items)
 		p.items = tmp
 	}
 
-	p.items[p.length] = x.(*Query)
+	p.items[p.length] = x.(*search.Query)
 	p.length++
 }
 

@@ -1,11 +1,11 @@
 package filters
 
 import (
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/utils"
 )
 
-type CreateFunc func(*Setup, []byte) Filter
+type CreateFunc func(*search.Setup, []byte) search.Filter
 
 var All = [...]CreateFunc{
 	NoStartingGroup,

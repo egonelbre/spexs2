@@ -7,7 +7,7 @@ import (
 
 	"github.com/rogpeppe/rjson"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/search/features"
 )
 
@@ -46,12 +46,12 @@ func (s *AppSetup) parseFeature(call string) (name string, args []interface{}, i
 	return
 }
 
-func (s *AppSetup) makeFeature(call string) Feature {
+func (s *AppSetup) makeFeature(call string) search.Feature {
 	feature, _ := s.makeFeatureEx(call)
 	return feature
 }
 
-func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
+func (s *AppSetup) makeFeatureEx(call string) (search.Feature, bool) {
 	info("  feature: parse " + call)
 	name, args, isInfo, positive := s.parseFeature(call)
 
@@ -78,7 +78,7 @@ func (s *AppSetup) makeFeatureEx(call string) (Feature, bool) {
 
 	feature := createdFn
 	if !positive {
-		feature = func(q *Query) (float64, string) {
+		feature = func(q *search.Query) (float64, string) {
 			v, info := createdFn(q)
 			return -v, info
 		}

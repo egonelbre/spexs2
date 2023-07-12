@@ -1,13 +1,13 @@
 package extenders
 
 import (
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/utils"
 )
 
-type CreateFunc func(Setup, []byte) Extender
+type CreateFunc func(search.Setup, []byte) search.Extender
 
-var All = [...]Extender{
+var All = [...]search.Extender{
 	Simple,
 	Group,
 	Star,
@@ -16,13 +16,13 @@ var All = [...]Extender{
 	RegexGreedy,
 }
 
-func wrap(f Extender) CreateFunc {
-	return func(s Setup, data []byte) Extender {
+func wrap(f search.Extender) CreateFunc {
+	return func(s search.Setup, data []byte) search.Extender {
 		return f
 	}
 }
 
-func Get(name string) (Extender, bool) {
+func Get(name string) (search.Extender, bool) {
 	for _, fn := range All {
 		if utils.FuncName(fn) == name {
 			return fn, true

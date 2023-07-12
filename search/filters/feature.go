@@ -5,12 +5,12 @@ import (
 	"log"
 	"math"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 )
 
 type minmax struct{ Min, Max float64 }
 
-func FromFeature(feature Feature, data []byte) Filter {
+func FromFeature(feature search.Feature, data []byte) search.Filter {
 	var conf struct{ Min, Max float64 }
 	conf.Min = math.NaN()
 	conf.Max = math.NaN()
@@ -24,21 +24,21 @@ func FromFeature(feature Feature, data []byte) Filter {
 	low, high := !math.IsNaN(conf.Min), !math.IsNaN(conf.Max)
 
 	if low && high {
-		return func(q *Query) bool {
+		return func(q *search.Query) bool {
 			val, _ := feature(q)
 			return (min <= val) && (val <= max)
 		}
 	} else if low {
-		return func(q *Query) bool {
+		return func(q *search.Query) bool {
 			val, _ := feature(q)
 			return min <= val
 		}
 	} else if high {
-		return func(q *Query) bool {
+		return func(q *search.Query) bool {
 			val, _ := feature(q)
 			return val <= max
 		}
 	}
 
-	return func(q *Query) bool { return true }
+	return func(q *search.Query) bool { return true }
 }

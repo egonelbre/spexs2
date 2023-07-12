@@ -4,30 +4,30 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 )
 
-func pat(s string) *Query {
-	r := NewQuery(nil, RegToken{})
-	r.Db = NewDatabase()
+func pat(s string) *search.Query {
+	r := search.NewQuery(nil, search.RegToken{})
+	r.Db = search.NewDatabase()
 	return add(r, s)
 }
 
-func add(base *Query, s string) *Query {
+func add(base *search.Query, s string) *search.Query {
 	if len(s) <= 0 {
 		return base
 	}
 	rune, size := utf8.DecodeRuneInString(s)
 
-	token := RegToken{Token: Token(rune), Flags: IsSingle}
+	token := search.RegToken{Token: search.Token(rune), Flags: search.IsSingle}
 	if rune == 'X' {
-		token.Flags = IsStar
+		token.Flags = search.IsStar
 	}
-	n := NewQuery(base, token)
+	n := search.NewQuery(base, token)
 	return add(n, s[size:])
 }
 
-func testPop(t *testing.T, p Pooler, expected string, expectedOk bool) {
+func testPop(t *testing.T, p search.Pooler, expected string, expectedOk bool) {
 	val, ok := p.Pop()
 	if ok != expectedOk {
 		t.Errorf("didn't get correct ok value, got='%v', expected='%v', str='%s'", ok, expectedOk, expected)
@@ -56,11 +56,11 @@ func TestFifo(t *testing.T) {
 }
 
 func TestPriority(t *testing.T) {
-	lenFeature := func(q *Query) (float64, string) {
+	lenFeature := func(q *search.Query) (float64, string) {
 		return float64(q.Len()), ""
 	}
 
-	p := NewPriority([]Feature{lenFeature}, 0)
+	p := NewPriority([]search.Feature{lenFeature}, 0)
 
 	p.Push(pat("bc"))
 	p.Push(pat("defg"))

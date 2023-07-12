@@ -7,10 +7,10 @@ import (
 	"regexp"
 	"text/template"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 )
 
-type strFeature func(*Query) string
+type strFeature func(*search.Query) string
 
 func (s *AppSetup) initPrinter() {
 	format := s.conf.Printer.Format
@@ -32,12 +32,12 @@ func (s *AppSetup) initPrinter() {
 
 			var feat strFeature
 			if !info {
-				feat = func(q *Query) string {
+				feat = func(q *search.Query) string {
 					val, _ := feature(q)
 					return fmt.Sprintf("%v", val)
 				}
 			} else {
-				feat = func(q *Query) string {
+				feat = func(q *search.Query) string {
 					_, info := feature(q)
 					return info
 				}
@@ -56,7 +56,7 @@ func (s *AppSetup) initPrinter() {
 		log.Fatal(err)
 	}
 
-	printQuery := func(out io.Writer, q *Query) {
+	printQuery := func(out io.Writer, q *search.Query) {
 		values := make(map[string]string)
 		for name, fn := range features {
 			values[name] = fn(q)
@@ -71,7 +71,7 @@ func (s *AppSetup) initPrinter() {
 
 	s.printQuery = printQuery
 
-	s.Printer = func(out io.Writer, pool Pooler) {
+	s.Printer = func(out io.Writer, pool search.Pooler) {
 		values := pool.Values()
 
 		if showHeader {

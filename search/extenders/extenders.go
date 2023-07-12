@@ -1,16 +1,16 @@
 package extenders
 
 import (
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/set/multi"
 )
 
-type queryMap map[Token]*Query
+type queryMap map[search.Token]*search.Query
 
 // TODO: method queryMap.toQuerys
 // TODO: method queryMap.addLoc(token, pos)
-func toQuerys(queryMap queryMap) Querys {
-	querys := make(Querys, len(queryMap))
+func toQuerys(queryMap queryMap) search.Querys {
+	querys := make(search.Querys, len(queryMap))
 	i := 0
 	for _, q := range queryMap {
 		querys[i] = q
@@ -19,16 +19,16 @@ func toQuerys(queryMap queryMap) Querys {
 	return querys
 }
 
-func extend(base *Query, db *Database, querys queryMap) {
+func extend(base *search.Query, db *search.Database, querys queryMap) {
 	for _, p := range base.Loc.Iter() {
 		token := db.FullSequence[p]
-		if token == ZeroToken {
+		if token == search.ZeroToken {
 			continue
 		}
 
 		q, ok := querys[token]
 		if !ok {
-			q = NewQuery(base, RegToken{Token: token, Flags: IsSingle})
+			q = search.NewQuery(base, search.RegToken{Token: token, Flags: search.IsSingle})
 			querys[token] = q
 		}
 
@@ -36,15 +36,15 @@ func extend(base *Query, db *Database, querys queryMap) {
 	}
 }
 
-func Simple(base *Query) Querys {
+func Simple(base *search.Query) search.Querys {
 	querys := make(queryMap)
 	extend(base, base.Db, querys)
 	return toQuerys(querys)
 }
 
-func combine(base *Query, db *Database, querys queryMap, flags RegFlags) {
+func combine(base *search.Query, db *search.Database, querys queryMap, flags search.RegFlags) {
 	for _, group := range db.Groups {
-		q := NewQuery(base, RegToken{Token: group.Token, Flags: IsGroup | flags})
+		q := search.NewQuery(base, search.RegToken{Token: group.Token, Flags: search.IsGroup | flags})
 		querys[group.Token] = q
 		sets := multi.New()
 		for _, token := range group.Elems {
@@ -56,23 +56,23 @@ func combine(base *Query, db *Database, querys queryMap, flags RegFlags) {
 	}
 }
 
-func Group(base *Query) Querys {
+func Group(base *search.Query) search.Querys {
 	querys := make(queryMap)
 	extend(base, base.Db, querys)
-	combine(base, base.Db, querys, IsSingle)
+	combine(base, base.Db, querys, search.IsSingle)
 	return toQuerys(querys)
 }
 
-func starExtendPosition(base *Query, db *Database, querys queryMap, start int) {
+func starExtendPosition(base *search.Query, db *search.Database, querys queryMap, start int) {
 	for i, token := range db.FullSequence[start:] {
 		p := start + i
-		if token == ZeroToken {
+		if token == search.ZeroToken {
 			break
 		}
 
 		q, ok := querys[token]
 		if !ok {
-			q = NewQuery(base, RegToken{Token: token, Flags: IsStar})
+			q = search.NewQuery(base, search.RegToken{Token: token, Flags: search.IsStar})
 			querys[token] = q
 		}
 
@@ -80,7 +80,7 @@ func starExtendPosition(base *Query, db *Database, querys queryMap, start int) {
 	}
 }
 
-func starExtend(base *Query, db *Database, querys queryMap) {
+func starExtend(base *search.Query, db *search.Database, querys queryMap) {
 	prevseq := -1
 	for _, p := range base.Loc.Iter() {
 		seq := db.PosToSequence[p]
@@ -92,7 +92,7 @@ func starExtend(base *Query, db *Database, querys queryMap) {
 	}
 }
 
-func Star(base *Query) Querys {
+func Star(base *search.Query) search.Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
 	stars := make(queryMap)
@@ -100,12 +100,12 @@ func Star(base *Query) Querys {
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }
 
-func Regex(base *Query) Querys {
+func Regex(base *search.Query) search.Querys {
 	patterns := make(queryMap)
 	extend(base, base.Db, patterns)
-	combine(base, base.Db, patterns, IsSingle)
+	combine(base, base.Db, patterns, search.IsSingle)
 	stars := make(queryMap)
 	starExtend(base, base.Db, stars)
-	combine(base, base.Db, stars, IsStar)
+	combine(base, base.Db, stars, search.IsStar)
 	return append(toQuerys(patterns), toQuerys(stars)...)
 }

@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 )
 
 var (
@@ -93,9 +93,9 @@ func main() {
 	starttime := time.Now()
 
 	if *procs == 1 {
-		Run(&setup.Setup)
+		search.Run(&setup.Setup)
 	} else {
-		RunParallel(&setup.Setup, *procs)
+		search.RunParallel(&setup.Setup, *procs)
 	}
 
 	finishtime := time.Now()

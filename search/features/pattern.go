@@ -1,28 +1,28 @@
 package features
 
-import . "github.com/egonelbre/spexs2/search"
+import "github.com/egonelbre/spexs2/search"
 
 // pattern as a string
-func Pat() Feature {
-	return func(q *Query) (float64, string) {
+func Pat() search.Feature {
+	return func(q *search.Query) (float64, string) {
 		return 0.0, q.String()
 	}
 }
 
 // pattern as regular expression
-func PatRegex() Feature {
-	return func(q *Query) (float64, string) {
+func PatRegex() search.Feature {
+	return func(q *search.Query) (float64, string) {
 		return 0.0, q.StringLong()
 	}
 }
 
 // length of the pattern
-func PatLength() Feature {
-	return func(q *Query) (float64, string) {
+func PatLength() search.Feature {
+	return func(q *search.Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
 			t++
-			if e.Flags&IsStar != 0 {
+			if e.Flags&search.IsStar != 0 {
 				t++
 			}
 		}
@@ -31,11 +31,11 @@ func PatLength() Feature {
 }
 
 // count of characters
-func PatChars() Feature {
-	return func(q *Query) (float64, string) {
+func PatChars() search.Feature {
+	return func(q *search.Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
-			if e.Flags&IsGroup == 0 {
+			if e.Flags&search.IsGroup == 0 {
 				t++
 			}
 		}
@@ -44,11 +44,11 @@ func PatChars() Feature {
 }
 
 // count of groups
-func PatGroups() Feature {
-	return func(q *Query) (float64, string) {
+func PatGroups() search.Feature {
+	return func(q *search.Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
-			if e.Flags&IsGroup != 0 {
+			if e.Flags&search.IsGroup != 0 {
 				t++
 			}
 		}
@@ -57,11 +57,11 @@ func PatGroups() Feature {
 }
 
 // count of stars
-func PatStars() Feature {
-	return func(q *Query) (float64, string) {
+func PatStars() search.Feature {
+	return func(q *search.Query) (float64, string) {
 		t := 0
 		for _, e := range q.Pat {
-			if e.Flags&IsStar != 0 {
+			if e.Flags&search.IsStar != 0 {
 				t++
 			}
 		}

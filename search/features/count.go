@@ -1,6 +1,6 @@
 package features
 
-import . "github.com/egonelbre/spexs2/search"
+import "github.com/egonelbre/spexs2/search"
 
 // function to sum elements in arr by group
 func count(arr []int, group []int) int {
@@ -16,16 +16,16 @@ func countf(arr []int, group []int) float64 {
 }
 
 // the total count of sequences
-func Total(group []int) Feature {
-	return func(q *Query) (float64, string) {
+func Total(group []int) search.Feature {
+	return func(q *search.Query) (float64, string) {
 		total := countf(q.Db.Total, group)
 		return total, ""
 	}
 }
 
 // the count of matching sequences
-func Matches(group []int) Feature {
-	return func(q *Query) (float64, string) {
+func Matches(group []int) search.Feature {
+	return func(q *search.Query) (float64, string) {
 		matches := q.Matches()
 		return countf(matches, group), ""
 	}
@@ -34,8 +34,8 @@ func Matches(group []int) Feature {
 const minSeqsCountTable = 30
 
 // the count of matching unique sequences
-func Seqs(group []int) Feature {
-	return func(q *Query) (float64, string) {
+func Seqs(group []int) search.Feature {
+	return func(q *search.Query) (float64, string) {
 		db := q.Db
 
 		prevseq := -1
@@ -54,16 +54,16 @@ func Seqs(group []int) Feature {
 }
 
 // the count of occurences
-func Occs(group []int) Feature {
-	return func(q *Query) (float64, string) {
+func Occs(group []int) search.Feature {
+	return func(q *search.Query) (float64, string) {
 		occs := q.Occs()
 		return countf(occs, group), ""
 	}
 }
 
 // the ratio of matching sequences to total count
-func MatchesProp(group []int) Feature {
-	return func(q *Query) (float64, string) {
+func MatchesProp(group []int) search.Feature {
+	return func(q *search.Query) (float64, string) {
 		total := countf(q.Db.Total, group)
 		matches := q.Matches()
 		return countf(matches, group) / total, ""
@@ -71,8 +71,8 @@ func MatchesProp(group []int) Feature {
 }
 
 // the ratio between matching sequences (adjusted)
-func MatchesRatio(nom []int, denom []int) Feature {
-	return func(q *Query) (float64, string) {
+func MatchesRatio(nom []int, denom []int) search.Feature {
+	return func(q *search.Query) (float64, string) {
 		matches := q.Matches()
 		countNom := countf(matches, nom) + 1.0
 		countDenom := countf(matches, denom) + 1.0
@@ -81,8 +81,8 @@ func MatchesRatio(nom []int, denom []int) Feature {
 }
 
 // the ratio between occurences (adjusted)
-func OccsRatio(nom []int, denom []int) Feature {
-	return func(q *Query) (float64, string) {
+func OccsRatio(nom []int, denom []int) search.Feature {
+	return func(q *search.Query) (float64, string) {
 		occs := q.Occs()
 		countNom := countf(occs, nom) + 1.0
 		countDenom := countf(occs, denom) + 1.0
@@ -91,8 +91,8 @@ func OccsRatio(nom []int, denom []int) Feature {
 }
 
 // the ratio of proptions between matches (adjusted)
-func MatchesPropRatio(nom []int, denom []int) Feature {
-	return func(q *Query) (float64, string) {
+func MatchesPropRatio(nom []int, denom []int) search.Feature {
+	return func(q *search.Query) (float64, string) {
 		totalNom := countf(q.Db.Total, nom) + 1.0
 		totalDenom := countf(q.Db.Total, denom) + 1.0
 

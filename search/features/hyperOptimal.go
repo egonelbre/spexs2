@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"math"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 	"github.com/egonelbre/spexs2/stats/hyper"
 )
 
 // the count of matching unique sequences
-func countseqs(q *Query, group []int, iter []int) int {
+func countseqs(q *search.Query, group []int, iter []int) int {
 	db := q.Db
 
 	prevseq := -1
@@ -28,8 +28,8 @@ func countseqs(q *Query, group []int, iter []int) int {
 	return count(seqs, group)
 }
 
-func HyperOptimal(fore []int) Feature {
-	return func(q *Query) (float64, string) {
+func HyperOptimal(fore []int) search.Feature {
+	return func(q *search.Query) (float64, string) {
 		db := q.Db
 
 		iter := q.Loc.Iter()

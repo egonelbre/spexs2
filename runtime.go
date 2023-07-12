@@ -7,7 +7,7 @@ import (
 	"runtime/pprof"
 	"time"
 
-	. "github.com/egonelbre/spexs2/search"
+	"github.com/egonelbre/spexs2/search"
 )
 
 const mb = 1024 * 1024
@@ -40,7 +40,7 @@ func setMemLimit(setup *AppSetup) {
 	ext := setup.Extender
 	m := new(runtime.MemStats)
 
-	setup.Extender = func(q *Query) Querys {
+	setup.Extender = func(q *search.Query) search.Querys {
 		runtime.ReadMemStats(m)
 		if m.Alloc/mb > memLimit {
 			panic("memory limit exceeded!")
@@ -57,7 +57,7 @@ func attachMemProfiler(setup *AppSetup) {
 
 	ext := setup.Extender
 
-	setup.Extender = func(q *Query) Querys {
+	setup.Extender = func(q *search.Query) search.Querys {
 		if count >= limit {
 			f, err := os.Create(filename)
 			if err != nil {
@@ -109,7 +109,7 @@ func runStats(setup *AppSetup) {
 	}()
 
 	ext := setup.Extender
-	setup.Extender = func(q *Query) Querys {
+	setup.Extender = func(q *search.Query) search.Querys {
 		seq = q.String()
 		counter++
 		return ext(q)
@@ -124,7 +124,7 @@ func endStats() {
 
 func setupLiveView(setup *AppSetup) {
 	out := setup.Outputtable
-	setup.Outputtable = func(q *Query) bool {
+	setup.Outputtable = func(q *search.Query) bool {
 		result := out(q)
 		if result {
 			setup.printQuery(os.Stderr, q)
