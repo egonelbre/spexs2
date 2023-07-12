@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	version = flag.Bool("version", false, "print version")
+	printVersion = flag.Bool("version", false, "print version")
 
 	details = flag.Bool("details", false, "detailed help")
 	verbose = flag.Bool("verbose", false, "print extended info")
@@ -48,7 +48,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *version {
+	if *printVersion {
 		PrintVersion()
 		os.Exit(0)
 	}
