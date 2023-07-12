@@ -7,14 +7,14 @@ import (
 
 type queryMap map[Token]*Query
 
-//TODO: method queryMap.toQuerys
-//TODO: method queryMap.addLoc(token, pos)
+// TODO: method queryMap.toQuerys
+// TODO: method queryMap.addLoc(token, pos)
 func toQuerys(queryMap queryMap) Querys {
 	querys := make(Querys, len(queryMap))
 	i := 0
 	for _, q := range queryMap {
 		querys[i] = q
-		i ++
+		i++
 	}
 	return querys
 }
@@ -28,7 +28,7 @@ func extend(base *Query, db *Database, querys queryMap) {
 
 		q, ok := querys[token]
 		if !ok {
-			q = NewQuery(base, RegToken{token, IsSingle})
+			q = NewQuery(base, RegToken{Token: token, Flags: IsSingle})
 			querys[token] = q
 		}
 
@@ -44,7 +44,7 @@ func Simple(base *Query) Querys {
 
 func combine(base *Query, db *Database, querys queryMap, flags RegFlags) {
 	for _, group := range db.Groups {
-		q := NewQuery(base, RegToken{group.Token, IsGroup | flags})
+		q := NewQuery(base, RegToken{Token: group.Token, Flags: IsGroup | flags})
 		querys[group.Token] = q
 		sets := multi.New()
 		for _, token := range group.Elems {
@@ -72,7 +72,7 @@ func starExtendPosition(base *Query, db *Database, querys queryMap, start int) {
 
 		q, ok := querys[token]
 		if !ok {
-			q = NewQuery(base, RegToken{token, IsStar})
+			q = NewQuery(base, RegToken{Token: token, Flags: IsStar})
 			querys[token] = q
 		}
 

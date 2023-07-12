@@ -41,7 +41,7 @@ func (s Skip) Exec(d *Debugger) {
 	if count > 100 {
 		count = 100
 	}
-	for i := 0; i < count; i ++ {
+	for i := 0; i < count; i++ {
 		d.control <- cBreak
 	}
 }

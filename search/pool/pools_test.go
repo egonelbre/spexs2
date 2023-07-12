@@ -19,7 +19,7 @@ func add(base *Query, s string) *Query {
 	}
 	rune, size := utf8.DecodeRuneInString(s)
 
-	token := RegToken{Token(rune), IsSingle}
+	token := RegToken{Token: Token(rune), Flags: IsSingle}
 	if rune == 'X' {
 		token.Flags = IsStar
 	}

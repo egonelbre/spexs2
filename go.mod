@@ -1,6 +1,6 @@
 module github.com/egonelbre/spexs2
 
-go 1.13
+go 1.20
 
 require (
 	github.com/ematvey/go-fn v0.0.0-20130403065544-37331e464987

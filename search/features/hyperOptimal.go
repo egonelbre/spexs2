@@ -23,7 +23,7 @@ func countseqs(q *Query, group []int, iter []int) int {
 			continue
 		}
 		prevseq = seq.Index
-		seqs[seq.Section] ++
+		seqs[seq.Section]++
 	}
 	return count(seqs, group)
 }
