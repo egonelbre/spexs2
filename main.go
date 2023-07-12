@@ -11,11 +11,6 @@ import (
 )
 
 var (
-	buildversion string
-	buildtime    string
-)
-
-var (
 	version = flag.Bool("version", false, "print version")
 
 	details = flag.Bool("details", false, "detailed help")

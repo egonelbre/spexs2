@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"runtime/debug"
 
 	"github.com/egonelbre/spexs2/search/extenders"
 	"github.com/egonelbre/spexs2/search/features"
@@ -34,6 +35,11 @@ func PrintHelp() {
 }
 
 func PrintVersion() {
-	lgh.Printf("%v\n", buildversion)
-	lgh.Printf("%v\n", buildtime)
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		lgh.Printf("build does not contain version info\n")
+		return
+	}
+
+	lgh.Printf("%v\n", info.Main.Version)
 }
