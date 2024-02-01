@@ -28,8 +28,8 @@ func PrintHelp() {
 	lgh.Printf("\n")
 	lgh.Printf(features.Help())
 
-	//lgh.Printf("\n### Examples\n")
-	//lgh.Printf("  spexs2 -conf=conf.json inp=data.dna ref=random.dna\n")
+	// lgh.Printf("\n### Examples\n")
+	// lgh.Printf("  spexs2 -conf=conf.json inp=data.dna ref=random.dna\n")
 
 	lgh.Printf("\n")
 }

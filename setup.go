@@ -104,7 +104,7 @@ func (s *AppSetup) makeFilter(name string, data rjson.RawMessage) (search.Filter
 		return nil, fmt.Errorf("filter is disabled")
 	}
 
-	regRemoveParens, _ := regexp.Compile(`\(.*\)`)
+	regRemoveParens := regexp.MustCompile(`\(.*\)`)
 	filterName := regRemoveParens.ReplaceAllString(name, "")
 	createFilter, ok := filters.Get(filterName)
 	if ok {

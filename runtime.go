@@ -27,7 +27,9 @@ func startProfiler(outputFile string) bool {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pprof.StartCPUProfile(f)
+	if err := pprof.StartCPUProfile(f); err != nil {
+		log.Fatal(err)
+	}
 	return true
 }
 
@@ -63,8 +65,8 @@ func attachMemProfiler(setup *AppSetup) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			pprof.WriteHeapProfile(f)
-			f.Close()
+			_ = pprof.WriteHeapProfile(f)
+			_ = f.Close()
 			log.Fatal("Wrote memory profile!")
 		}
 		count++

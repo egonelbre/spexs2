@@ -18,14 +18,14 @@ func (s *AppSetup) initPrinter() {
 	showHeader := s.conf.Printer.ShowHeader
 
 	if header == "" {
-		regHdr, _ := regexp.Compile(`[\{\}]`)
+		regHdr := regexp.MustCompile(`[\{\}]`)
 		header = regHdr.ReplaceAllString(format, "")
 	}
 
 	features := make(map[string]strFeature)
 	featureIdx := 0
 
-	regFeature, _ := regexp.Compile(`[a-zA-Z?() @~,]+`)
+	regFeature := regexp.MustCompile(`[a-zA-Z?() @~,]+`)
 	format = regFeature.ReplaceAllStringFunc(format,
 		func(call string) string {
 			feature, info := s.makeFeatureEx(call)

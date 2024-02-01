@@ -218,7 +218,7 @@ There are important features "Binom" and "Hyper" that allow us to find interesti
 
 The filters specify how to limit our search space - or more trivially, how to skip looking at the patterns.
 
-The "Extendable" filter specifies our search space, for example here we can add a limit to the pattern length or skip patterns with low number of occurences.
+The "Extendable" filter specifies our search space, for example here we can add a limit to the pattern length or skip patterns with low number of occurrences.
 
 The "Outputtable" filter specifies the patterns that we allow to be printed. For example we probably do not want very small patterns.
 

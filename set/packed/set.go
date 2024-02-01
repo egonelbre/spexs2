@@ -60,7 +60,7 @@ func (s *Set) Add(v int) {
 			bucket(df>>(bits*4)),
 		)
 	default:
-		for ; df >= cbit; df = df >> bits {
+		for ; df >= cbit; df >>= bits {
 			s.data = append(s.data, bucket(cbit|(df&mask)))
 		}
 		s.data = append(s.data, bucket(df))
@@ -75,7 +75,7 @@ func (s *Set) Iter() []int {
 	df := 0
 	k := uint(0)
 	for _, b := range s.data {
-		df = df | (int(b&mask) << k)
+		df |= int(b&mask) << k
 		k += bits
 		if b < cbit {
 			base += df

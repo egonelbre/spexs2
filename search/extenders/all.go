@@ -65,6 +65,6 @@ func Help() string {
 	for _, fn := range All {
 		fmt.Fprintf(w, "  %v\t%v\n", fn.Name, fn.Desc)
 	}
-	w.Flush()
+	_ = w.Flush()
 	return b.String()
 }

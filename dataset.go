@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -74,7 +75,7 @@ func loadFileList(filename string) []string {
 
 	reader := bufio.NewReader(file)
 	for err == nil {
-		if line, err = reader.ReadString('\n'); err != nil && err != io.EOF {
+		if line, err = reader.ReadString('\n'); err != nil && !errors.Is(err, io.EOF) {
 			log.Fatal(err)
 		}
 
@@ -89,7 +90,6 @@ func loadFileList(filename string) []string {
 
 func (ds *Dataset) AddFileGroups(db *search.Database, groups map[string]FileGroup, countSeparator string, skip map[string]bool) {
 	for group, filegroup := range groups {
-
 		files := make([]string, 0)
 		if filegroup.File != "" {
 			files = append(files, filegroup.File)
@@ -147,7 +147,7 @@ func (ds *Dataset) AddFile(db *search.Database, filename string, countSeparator 
 		count := 1
 
 		if isCounted {
-			if line, err = reader.ReadString(countSeparator[0]); err != nil && err != io.EOF {
+			if line, err = reader.ReadString(countSeparator[0]); err != nil && !errors.Is(err, io.EOF) {
 				log.Fatal(err)
 			}
 			line = strings.TrimSpace(line)
@@ -158,7 +158,7 @@ func (ds *Dataset) AddFile(db *search.Database, filename string, countSeparator 
 			}
 		}
 
-		if line, err = reader.ReadString('\n'); err != nil && err != io.EOF {
+		if line, err = reader.ReadString('\n'); err != nil && !errors.Is(err, io.EOF) {
 			log.Fatal(err)
 		}
 
@@ -166,7 +166,7 @@ func (ds *Dataset) AddFile(db *search.Database, filename string, countSeparator 
 		tokenNames := strings.Split(line, db.Separator)
 		tokenNames = removeInvalid(tokenNames, skip)
 
-		if len(tokenNames) <= 0 {
+		if len(tokenNames) == 0 {
 			continue
 		}
 

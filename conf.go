@@ -103,20 +103,20 @@ func NewConf(configFile string) *Conf {
 		log.Fatal(err)
 	}
 
-	regArg, _ := regexp.Compile(`^\s*(.*)=(.*)$`)
+	regArg := regexp.MustCompile(`^\s*(.*)=(.*)$`)
 	for _, arg := range flag.Args() {
 		if !regArg.MatchString(arg) {
 			log.Fatal("Argument was not in correct form: ", arg)
 		}
 		tokens := regArg.FindStringSubmatch(arg)
 
-		replace, _ := regexp.Compile(`\$` + tokens[1] + `(=[^$]*)?\$`)
+		replace := regexp.MustCompile(`\$` + tokens[1] + `(=[^$]*)?\$`)
 		replacement := ([]byte)(tokens[2])
 		data = replace.ReplaceAll(data, replacement)
 	}
 
-	regDefaults, _ := regexp.Compile(`\$[^\$]+\$`)
-	regDefault, _ := regexp.Compile(`\$[^=]+=(.*)\$`)
+	regDefaults := regexp.MustCompile(`\$[^\$]+\$`)
+	regDefault := regexp.MustCompile(`\$[^=]+=(.*)\$`)
 	data = regDefaults.ReplaceAllFunc(data, func(repl []byte) []byte {
 		defaults := regDefault.FindSubmatch(repl)
 		if defaults != nil {

@@ -84,7 +84,7 @@ var All = [...]Desc{
 	{
 		Category: "Count",
 		Name:     "Occs",
-		Desc:     "Occs(A)\tcount of occurences in the sequences",
+		Desc:     "Occs(A)\tcount of occurrences in the sequences",
 		Create:   Occs,
 	},
 
@@ -189,7 +189,7 @@ func Help() string {
 		}
 		fmt.Fprintf(w, "  %v\n", fn.Desc)
 	}
-	w.Flush()
+	_ = w.Flush()
 	return b.String()
 }
 

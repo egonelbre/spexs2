@@ -98,7 +98,7 @@ func DefaultHandler(d *Debugger, cmd string, params []string) Action {
 			if err == nil {
 				return Skip{timeout}
 			}
-			return Err{string(err.Error())}
+			return Err{err.Error()}
 		}
 		return Err{"Requires skip count parameter."}
 	case "watch", "w":

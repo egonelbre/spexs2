@@ -61,6 +61,6 @@ func Help() string {
 	}
 	fmt.Fprintf(w, "\n  > Feature\n")
 	fmt.Fprintf(w, "  Any feature can be used as a filter.\n")
-	w.Flush()
+	_ = w.Flush()
 	return b.String()
 }

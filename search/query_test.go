@@ -12,7 +12,7 @@ func pat(s string) *Query {
 }
 
 func add(base *Query, s string) *Query {
-	if len(s) <= 0 {
+	if len(s) == 0 {
 		return base
 	}
 	rune, size := utf8.DecodeRuneInString(s)

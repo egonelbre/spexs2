@@ -12,8 +12,8 @@ import (
 )
 
 func parseCall(call string) (name string, groups []string, info bool, positive bool) {
-	regNameArgs, _ := regexp.Compile(`([-+]?)([a-zA-Z0-9]+)(\??)\((.*)\)`)
-	regArgs, _ := regexp.Compile("~?[@a-zA-Z0-9]+")
+	regNameArgs := regexp.MustCompile(`([-+]?)([a-zA-Z0-9]+)(\??)\((.*)\)`)
+	regArgs := regexp.MustCompile("~?[@a-zA-Z0-9]+")
 	tokens := regNameArgs.FindStringSubmatch(call)
 	if tokens == nil {
 		log.Fatalf("Invalid name: %v", call)

@@ -58,6 +58,7 @@ func Run(s *Setup) {
 		}
 
 		if s.PostProcess(p) != nil {
+			// TODO: should the error be logged somewhere?
 			break
 		}
 	}
@@ -101,7 +102,10 @@ func RunParallel(s *Setup, routines int) {
 				extensions := s.Extender(p)
 				for _, extended := range extensions {
 					if s.Extendable(extended) {
-						s.PreProcess(extended)
+						if s.PreProcess(extended) != nil {
+							// TODO: should the error be logged somewhere?
+							continue
+						}
 
 						m.Lock()
 						s.In.Push(extended)

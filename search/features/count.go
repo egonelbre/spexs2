@@ -51,7 +51,7 @@ func Seqs(group []int) search.Feature {
 	}
 }
 
-// the count of occurences
+// the count of occurrences
 func Occs(group []int) search.Feature {
 	return func(q *search.Query) (float64, string) {
 		occs := q.Occs()
@@ -78,7 +78,7 @@ func MatchesRatio(nom []int, denom []int) search.Feature {
 	}
 }
 
-// the ratio between occurences (adjusted)
+// the ratio between occurrences (adjusted)
 func OccsRatio(nom []int, denom []int) search.Feature {
 	return func(q *search.Query) (float64, string) {
 		occs := q.Occs()

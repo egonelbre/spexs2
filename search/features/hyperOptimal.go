@@ -72,7 +72,7 @@ func HyperOptimal(fore []int) search.Feature {
 			}
 		}
 
-		//fmt.Printf("<%v/%v> <%v/%v>\t%v\t%v\n", best.matches, best.seqs, allMatches, totalSeqs, best.p, q)
+		// fmt.Printf("<%v/%v> <%v/%v>\t%v\t%v\n", best.matches, best.seqs, allMatches, totalSeqs, best.p, q)
 
 		return best.p, fmt.Sprintf("<%v/%v>", best.matches, best.seqs)
 	}
