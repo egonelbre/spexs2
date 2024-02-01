@@ -3,32 +3,156 @@ package features
 import (
 	"fmt"
 	"reflect"
+	"slices"
+	"strings"
+	"text/tabwriter"
 
 	"github.com/egonelbre/spexs2/search"
-	"github.com/egonelbre/spexs2/utils"
 )
 
 type CreateFunc interface{}
 
-var All = [...]CreateFunc{
-	// simple counting
-	Total, Matches, Seqs, Occs,
-	// ratios and proportions
-	MatchesProp, MatchesRatio, OccsRatio, MatchesPropRatio,
-	// binomial
-	Binom,
-	// hypergeometrics
-	Hyper, HyperApprox, HyperDown, HyperOptimal,
-	// pattern length related
-	PatLength, PatChars, PatGroups, PatStars,
+type Desc struct {
+	Category string
+	Name     string
+	Alias    []string
+	Desc     string
+	Create   CreateFunc
+}
+
+var All = [...]Desc{
 	// only strings
-	Pat, PatRegex,
+	{
+		Category: "Pattern",
+		Name:     "Pat",
+		Desc:     "Pat?()\tpattern as string",
+		Create:   Pat,
+	},
+	{
+		Category: "Pattern",
+		Name:     "PatRegex",
+		Alias:    []string{"Regex"},
+		Desc:     "Regex?()\tpattern where groups have been expanded",
+		Create:   PatRegex,
+	},
+
+	// pattern length related
+	{
+		Category: "Pattern",
+		Name:     "PatLength",
+		Desc:     "PatLength()\tpattern length",
+		Create:   PatLength,
+	},
+	{
+		Category: "Pattern",
+		Name:     "PatChars",
+		Desc:     "PatChars()\tcount of simple tokens in pattern",
+		Create:   PatChars,
+	},
+	{
+		Category: "Pattern",
+		Name:     "PatGroups",
+		Desc:     "PatGroups()\tcount of grouping tokens in pattern",
+		Create:   PatGroups,
+	},
+	{
+		Category: "Pattern",
+		Name:     "PatStars",
+		Desc:     "PatStars()\tcount of star tokens in pattern",
+		Create:   PatStars,
+	},
+
+	// simple counting
+	{
+		Category: "Count",
+		Name:     "Total",
+		Desc:     "Total(A)\ttotal count of sequences",
+		Create:   Total,
+	},
+	{
+		Category: "Count",
+		Name:     "Matches",
+		Desc:     "Matches(A)\tcount of matching sequences",
+		Create:   Matches,
+	},
+	{
+		Category: "Count",
+		Name:     "Seqs",
+		Desc:     "Seqs(A)\tcount of unique sequences in matches",
+		Create:   Seqs,
+	},
+	{
+		Category: "Count",
+		Name:     "Occs",
+		Desc:     "Occs(A)\tcount of occurences in the sequences",
+		Create:   Occs,
+	},
+
+	// ratios and proportions
+	{
+		Category: "Ratio",
+		Name:     "MatchesProp",
+		Desc:     "MatchesProp(A)\t:= Matches(A)/Total(A)",
+		Create:   MatchesProp,
+	},
+	{
+		Category: "Ratio",
+		Name:     "MatchesRatio",
+		Desc:     "MatchesRatio(A, B)\t:= (Matches(A)+1)/(Matches(B)+1)",
+		Create:   MatchesRatio,
+	},
+	{
+		Category: "Ratio",
+		Name:     "OccsRatio",
+		Desc:     "OccsRatio(A, B)\t:= (Occs(A)+1)/(Occs(B)+1)",
+		Create:   OccsRatio,
+	},
+	{
+		Category: "Ratio",
+		Name:     "MatchesPropRatio",
+		Desc:     "MatchesPropRatio(A, B)\t:= ((Matches(A)+1)/(Total(A)+1))/((Matches(B)+1)/(Total(B)+1))",
+		Create:   MatchesPropRatio,
+	},
+
+	// binomial
+	{
+		Category: "Statistics",
+		Name:     "Binom",
+		Desc:     "Binom(fore, back)\tbinomial p-value between fore and back datasets",
+		Create:   Binom,
+	},
+
+	// hypergeometrics
+	{
+		Category: "Statistics",
+		Name:     "Hyper",
+		Desc:     "Hyper(fore, back)\thypergeometric p-value between for and back datsets",
+		Create:   Hyper,
+	},
+	{
+		Category: "Statistics",
+		Name:     "HyperApprox",
+		Desc:     "HyperApprox(fore, back)\tapprox. hypergeometric p-value (~5 sig. digits) between for and back datsets",
+		Create:   HyperApprox,
+	},
+	{
+		Category: "Statistics",
+		Name:     "HyperDown",
+		Desc:     "HyperDown(fore, back)\thypergeometric split down between for and back datsets",
+		Create:   HyperDown,
+	},
+	{
+		Category: "Statistics",
+		Name:     "HyperOptimal",
+		Desc:     "HyperOptimal(fore...)\tbest hypergeometric p-value across fore datasets",
+		Create:   HyperOptimal,
+	},
 }
 
 func Get(name string) (CreateFunc, bool) {
 	for _, fn := range All {
-		if utils.FuncName(fn) == name {
-			return fn, true
+		if fn.Name == name || slices.Contains(fn.Alias, name) {
+			return fn.Create, true
 		}
 	}
 	return nil, false
@@ -53,38 +177,21 @@ func CallCreateWithArgs(function CreateFunc, args []interface{}) (search.Feature
 	return inter.(search.Feature), nil
 }
 
-var Help = `
-:Pattern:
-  Pat?()   : pattern as string
-  Regex?() : pattern where groups have been expanded
-
-  PatLength() : pattern length
-  PatChars()  : count of simple tokens in pattern
-  PatGroups() : count of grouping tokens in pattern
-  PatStars()  : count of star tokens in pattern
-
-:Counting:
-  // A and B refers to dataset
-  Total(A)   : total count of sequences
-  Matches(A) : count of matching sequences
-  Seqs(A)    : count of unique sequences in matches
-  Occs(A)    : count of occurences in the sequences
-
-:Ratios:
-  // A and B refer to datasets
-  MatchesProp(A)     = Matches(A)/Total(A)
-  MatchesRatio(A, B) = (Matches(A)+1)/(Matches(B)+1)
-  OccsRatio(A, B)    = (Occs(A)+1)/(Occs(B)+1)
-  MatchesPropRatio(A, B) = 
-    ((Matches(A)+1)/(Total(A)+1))/((Matches(B)+1)/(Total(B)+1))
-
-:Statistics:
-  // fore and back refer to datasets
-  Binom(fore, back)       : binomial p-value
-  Hyper(fore, back)       : hypergeometric p-value
-  HyperApprox(fore, back) : approx. hypergeometric p-value (~5 sig. digits)
-  HyperDown(fore, back)   : hypergeometric split down
-`
+func Help() string {
+	var b strings.Builder
+	w := tabwriter.NewWriter(&b, 0, 0, 1, ' ', 0)
+	fmt.Fprintf(w, "### Features\n")
+	lastCategory := ""
+	for _, fn := range All {
+		if fn.Category != lastCategory {
+			fmt.Fprintf(w, "\n  > %v\n", fn.Category)
+			lastCategory = fn.Category
+		}
+		fmt.Fprintf(w, "  %v\n", fn.Desc)
+	}
+	w.Flush()
+	return b.String()
+}
 
 func functionAndType(fn interface{}) (v reflect.Value, t reflect.Type, ok bool) {
 	v = reflect.ValueOf(fn)
