@@ -31,8 +31,6 @@ func Matches(group []int) search.Feature {
 	}
 }
 
-const minSeqsCountTable = 30
-
 // the count of matching unique sequences
 func Seqs(group []int) search.Feature {
 	return func(q *search.Query) (float64, string) {

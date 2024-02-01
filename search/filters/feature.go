@@ -8,8 +8,6 @@ import (
 	"github.com/egonelbre/spexs2/search"
 )
 
-type minmax struct{ Min, Max float64 }
-
 func FromFeature(feature search.Feature, data []byte) search.Filter {
 	var conf struct{ Min, Max float64 }
 	conf.Min = math.NaN()

@@ -49,12 +49,6 @@ var All = [...]Desc{
 	},
 }
 
-func wrap(f search.Extender) CreateFunc {
-	return func(s search.Setup, data []byte) search.Extender {
-		return f
-	}
-}
-
 func Get(name string) (search.Extender, bool) {
 	for _, fn := range All {
 		if fn.Name == name {

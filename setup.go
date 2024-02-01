@@ -135,10 +135,6 @@ func (s *AppSetup) initFilters() {
 	s.Outputtable = s.makeFilters(s.conf.Extension.Outputtable)
 }
 
-func lengthFitness(q *search.Query) float64 {
-	return 1 / float64(q.Len())
-}
-
 func (s *AppSetup) initOrder() {
 	for _, order := range s.conf.Output.SortBy {
 		fn := s.makeFeature(order)
