@@ -20,3 +20,6 @@ spexs2.exe
 *.prof
 *.sublime-project
 *.sublime-workspace
+
+# Added by goreleaser init:
+dist/
