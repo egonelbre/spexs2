@@ -29,7 +29,7 @@ func main() {
 	adder := AttachDebugger(d, Adder)
 	done := make(chan int, 100)
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(a int) {
 			fmt.Printf(".")
 			adder(a, a*3)
@@ -38,7 +38,7 @@ func main() {
 		}(i)
 	}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		<-done
 	}
 

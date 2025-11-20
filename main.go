@@ -33,7 +33,7 @@ var (
 	lg = log.New(os.Stderr, "", log.Ltime)
 )
 
-func info(v ...interface{}) {
+func info(v ...any) {
 	if *verbose {
 		fmt.Fprintf(os.Stderr, "%+v: ", time.Now())
 		fmt.Fprintln(os.Stderr, v...)

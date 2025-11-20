@@ -37,9 +37,9 @@ func (s *AppSetup) groupToIDs(group string) []int {
 	return s.Dataset.Groups[group]
 }
 
-func (s *AppSetup) parseFeature(call string) (name string, args []interface{}, info bool, positive bool) {
+func (s *AppSetup) parseFeature(call string) (name string, args []any, info bool, positive bool) {
 	name, groups, info, positive := parseCall(call)
-	args = make([]interface{}, len(groups))
+	args = make([]any, len(groups))
 	for i, group := range groups {
 		args[i] = s.groupToIDs(group)
 	}

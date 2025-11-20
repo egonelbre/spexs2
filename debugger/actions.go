@@ -37,10 +37,7 @@ func (c Continue) Exec(d *Debugger) {
 
 func (s Skip) Exec(d *Debugger) {
 	d.control <- cBreak
-	count := s.Count
-	if count > 100 {
-		count = 100
-	}
+	count := min(s.Count, 100)
 	for i := 0; i < count; i++ {
 		d.control <- cBreak
 	}

@@ -33,8 +33,8 @@ func CreateDatabase(conf *Conf) (*search.Database, *Dataset) {
 	db.Separator = conf.Reader.Separator
 
 	skip := make(map[string]bool)
-	tokenNames := strings.Split(conf.Reader.Skip, db.Separator)
-	for _, name := range tokenNames {
+	tokenNames := strings.SplitSeq(conf.Reader.Skip, db.Separator)
+	for name := range tokenNames {
 		skip[name] = true
 	}
 

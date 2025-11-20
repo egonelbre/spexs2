@@ -12,7 +12,7 @@ type test struct {
 }
 
 func BenchmarkBinom(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for v := 0; v < 1000; v += 13 {
 			for r := 0; r < 1000; r += 15 {
 				ComplementCdf(v, 13000, float64(r)/float64(13000))

@@ -78,9 +78,8 @@ func RunParallel(s *Setup, routines int) {
 	added <- signal{}
 	workers := 0
 
-	for i := 0; i < routines; i++ {
-		wg.Add(1)
-		go func() {
+	for range routines {
+		wg.Go(func() {
 			runtime.LockOSThread()
 			for {
 				<-added
@@ -134,8 +133,7 @@ func RunParallel(s *Setup, routines int) {
 				m.Unlock()
 			}
 
-			wg.Done()
-		}()
+		})
 	}
 
 	wg.Wait()

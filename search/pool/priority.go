@@ -54,19 +54,13 @@ func (p *Priority) Push(pat *search.Query) {
 
 func (p *Priority) Top(n int) []*search.Query {
 	sort.Sort((*priorityIntf)(p))
-	last := n
-	if last > p.length {
-		last = p.length
-	}
+	last := min(n, p.length)
 	return p.items[:last]
 }
 
 func (p *Priority) Bottom(n int) []*search.Query {
 	sort.Sort((*priorityIntf)(p))
-	first := p.length - n
-	if first < 0 {
-		first = 0
-	}
+	first := max(p.length-n, 0)
 	items := p.items[first:p.length]
 	n = len(items)
 	result := make([]*search.Query, n)
@@ -114,7 +108,7 @@ func (p *priorityIntf) Less(i, j int) bool {
 }
 
 // heap.Interface
-func (p *priorityIntf) Push(x interface{}) {
+func (p *priorityIntf) Push(x any) {
 	if p.length+1 > len(p.items) {
 		tmp := make([]*search.Query, len(p.items)+50000)
 		copy(tmp, p.items)
@@ -125,7 +119,7 @@ func (p *priorityIntf) Push(x interface{}) {
 	p.length++
 }
 
-func (p *priorityIntf) Pop() interface{} {
+func (p *priorityIntf) Pop() any {
 	r := p.items[p.length-1]
 	p.length--
 	return r

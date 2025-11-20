@@ -10,7 +10,7 @@ import (
 	"github.com/egonelbre/spexs2/search"
 )
 
-type CreateFunc interface{}
+type CreateFunc any
 
 type Desc struct {
 	Category string
@@ -158,7 +158,7 @@ func Get(name string) (CreateFunc, bool) {
 	return nil, false
 }
 
-func CallCreateWithArgs(function CreateFunc, args []interface{}) (search.Feature, error) {
+func CallCreateWithArgs(function CreateFunc, args []any) (search.Feature, error) {
 	fn, fnType, ok := functionAndType(function)
 	if !ok {
 		return nil, fmt.Errorf("argument is not a function")
@@ -193,7 +193,7 @@ func Help() string {
 	return b.String()
 }
 
-func functionAndType(fn interface{}) (v reflect.Value, t reflect.Type, ok bool) {
+func functionAndType(fn any) (v reflect.Value, t reflect.Type, ok bool) {
 	v = reflect.ValueOf(fn)
 	ok = v.Kind() == reflect.Func
 	if !ok {

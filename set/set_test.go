@@ -39,7 +39,7 @@ func testUse(set Set, t *testing.T) {
 }
 
 func addValues(set Set, n int) {
-	for i := 0; i < n; i++ {
+	for i := range n {
 		set.Add(i)
 	}
 }
@@ -60,7 +60,7 @@ func testMemoryUse(set Set, n int, t *testing.T) {
 	rng := rand.New(rand.NewSource(5))
 
 	last := 0
-	for i := 0; i < n; i++ {
+	for range n {
 		last += 10 + rng.Intn(20)
 		set.Add(last)
 	}
