@@ -20,13 +20,13 @@ func PrintHelp() {
 	flag.PrintDefaults()
 
 	lgh.Printf("\n")
-	lgh.Printf(extenders.Help())
+	lgh.Print(extenders.Help())
 
 	lgh.Printf("\n")
-	lgh.Printf(filters.Help())
+	lgh.Print(filters.Help())
 
 	lgh.Printf("\n")
-	lgh.Printf(features.Help())
+	lgh.Print(features.Help())
 
 	// lgh.Printf("\n### Examples\n")
 	// lgh.Printf("  spexs2 -conf=conf.json inp=data.dna ref=random.dna\n")
