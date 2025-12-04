@@ -1,4 +1,4 @@
-package set
+package multi
 
 import "sort"
 
@@ -35,7 +35,8 @@ func (s bylen) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s bylen) Len() int           { return len(s) }
 func (s bylen) Less(i, j int) bool { return len(s[i]) < len(s[j]) }
 
-func MergeSortedInts(sets ...[]int) []int {
+// mergeSortedInts merges sorted integer sets into a single sorted set.
+func mergeSortedInts(sets ...[]int) []int {
 	if len(sets) == 0 {
 		return nil
 	}

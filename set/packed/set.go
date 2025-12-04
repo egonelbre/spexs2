@@ -8,16 +8,31 @@ const (
 	mask = cbit - 1  // bits mask
 )
 
+// Set represents a set of integers.
+//
+// It's guaranteed that the elements are added in increasing order
+// and there are no duplicates.
 type Set struct {
 	cur   int
 	count int
 	data  []bucket
 }
 
+// New creates a new empty set.
 func New() *Set {
 	return &Set{}
 }
 
+// From creates a set with the provided values.
+func From(values ...int) *Set {
+	s := New()
+	for _, v := range values {
+		s.Add(v)
+	}
+	return s
+}
+
+// Add adds a new element to the set.
 func (s *Set) Add(v int) {
 	df := v - s.cur
 
@@ -68,6 +83,7 @@ func (s *Set) Add(v int) {
 
 }
 
+// All returns all elements in the set.
 func (s *Set) All() []int {
 	vals := make([]int, s.count)
 	j := 0
@@ -88,6 +104,7 @@ func (s *Set) All() []int {
 	return vals
 }
 
+// Len returns the number of elements in the set.
 func (s *Set) Len() int {
 	return s.count
 }
