@@ -2,13 +2,14 @@ package set
 
 import "sort"
 
-func merge(left, right, into []int) {
+// merge merges left and right integer sets into dst.
+func merge(left, right, dst []int) {
 	if len(left) == 0 {
-		copy(into, right)
+		copy(dst, right)
 		return
 	}
 	if len(right) == 0 {
-		copy(into, left)
+		copy(dst, left)
 		return
 	}
 
@@ -18,14 +19,14 @@ func merge(left, right, into []int) {
 			if lv < rv {
 				break
 			}
-			into[i] = rv
+			dst[i] = rv
 			i++
 			rlast++
 		}
-		into[i] = lv
+		dst[i] = lv
 		i++
 	}
-	copy(into[i:], right[rlast:])
+	copy(dst[i:], right[rlast:])
 }
 
 type bylen [][]int

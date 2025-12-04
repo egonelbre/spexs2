@@ -26,11 +26,11 @@ func (multi *Set) Len() int {
 	return c
 }
 
-func (multi *Set) Iter() []int {
+func (multi *Set) All() []int {
 	sets := make([][]int, 0, len(multi.sets))
 
 	for _, s := range multi.sets {
-		sets = append(sets, s.Iter())
+		sets = append(sets, s.All())
 	}
 
 	return set.MergeSortedInts(sets...)

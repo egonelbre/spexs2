@@ -68,7 +68,7 @@ func (s *Set) Add(v int) {
 
 }
 
-func (s *Set) Iter() []int {
+func (s *Set) All() []int {
 	vals := make([]int, s.count)
 	j := 0
 	base := 0

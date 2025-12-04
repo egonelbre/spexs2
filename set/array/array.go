@@ -15,6 +15,6 @@ func (s *Set) Len() int {
 	return len(*s)
 }
 
-func (s *Set) Iter() []int {
+func (s *Set) All() []int {
 	return []int(*s)
 }

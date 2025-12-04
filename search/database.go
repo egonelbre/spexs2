@@ -77,7 +77,7 @@ func (db *Database) MatchesOccs(s set.Set) (matches []int, occs []int) {
 	occs = make([]int, len(db.Total))
 
 	prevseq := -1
-	for _, p := range s.Iter() {
+	for _, p := range s.All() {
 		seq := db.PosToSequence[p]
 		occs[seq.Section] += int(seq.Count)
 		if seq.Index == prevseq {

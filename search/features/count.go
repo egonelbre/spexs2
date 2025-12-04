@@ -39,7 +39,7 @@ func Seqs(group []int) search.Feature {
 		prevseq := -1
 
 		count := make([]int, len(db.Total))
-		for _, p := range q.Loc.Iter() {
+		for _, p := range q.Loc.All() {
 			seq := db.PosToSequence[p]
 			if seq.Index == prevseq {
 				continue
