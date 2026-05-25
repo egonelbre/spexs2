@@ -2,7 +2,7 @@
 
 ### Quick introduction
 
-What's **spexs**? It's easier to show what it actually does. To start you need a set of sequences - it can be a sequence of letters or words. For let's imagine we have a data set of events some of them lead to errors and some of them ended normally:
+What's **spexs**? It's easier to show what it actually does. To start you need a set of sequences - it can be a sequence of letters or words. Let's imagine we have a data set of events, some of them lead to errors and some of them ended normally:
 
 ```
 # without errors
@@ -19,7 +19,7 @@ AHAFFFGABIXBCAYCBBHBDCDDXZE
 ... snip ...
 ```
 
-The events `A`, `B`, `C`, `D`, `F`, `G`, `H`, `I`, `X`, `Y`, `Z` are normal events and `E` is the problematic "error" event. So we need to figure out which event pattern causes the problem?
+The events `A`, `B`, `C`, `D`, `F`, `G`, `H`, `I`, `X`, `Y`, `Z` are normal events and `E` is the problematic "error" event. So how do we figure out which event pattern causes the problem?
 
 After we prepare the configuration file (explained later) and plug in the data **spexs** gives the result:
 
@@ -44,7 +44,7 @@ Remember that **spexs** isn't a magical tool that knows which kinds of patterns 
 
 ### Overview
 
-The easiest way to get started is to download an example that is most similar with your problem. Then adjust the configuration and finally tweak until it fits.
+The easiest way to get started is to download an example that is most similar to your problem. Then adjust the configuration and finally tweak until it fits.
 
 The simplest approach to running the tool is:
 
@@ -97,7 +97,7 @@ We need to give it a configuration file to specify how to find patterns. Let's e
 }
 ```
 
-First the configuration looks a lot like *json* format, but it can also deal with small user errors, like missing trailing commas. As we can see the configuration is divided into 5 parts: Dataset, Reader, Extension, Output and Printer. Each specifies a particular part of the tool.
+First the configuration looks a lot like *JSON* format, but it can also deal with small user errors, like missing trailing commas. As we can see the configuration is divided into 5 parts: Dataset, Reader, Extension, Output and Printer. Each specifies a particular part of the tool.
 
 #### Dataset
 
@@ -126,7 +126,7 @@ Then the `$inp$` in the configuration file will be replaced with `data.txt`. You
 
 #### Reader
 
-Reader specifies how to read in the input. "Method" specifies how to read in the sequences and the rest are arguments to the reader. There are currently to ways of reading the input: "Delimited" and "Counted".
+Reader specifies how to read in the input. "Method" specifies how to read in the sequences and the rest are arguments to the reader. There are currently two ways of reading the input: "Delimited" and "Counted".
 
 ```
 "Reader" : {
@@ -206,13 +206,13 @@ The "Regex" method will find patterns that can contain either groups or gaps. Fo
 
 ##### Features
 
-Features are the properties of the patterns. For example, how many times the pattern occurs in a dataset, or how long it is, or the probablity of finding such pattern.
+Features are the properties of the patterns. For example, how many times the pattern occurs in a dataset, or how long it is, or the probability of finding such pattern.
 
 Features allow to define filters (explained in the next section) and they can be used for printing the result. To specify a feature we use the name of the filter and use data set names as argument. For example, to find the number of matching sequences in the data set "alpha" we can specify `Matches(alpha)`.
 
 The full list of features can be seen on the command line with `./spexs2 --details`.
 
-There are important features "Binom" and "Hyper" that allow us to find interesting patterns. To determine whether a pattern happens by chance or is, indeed, characteristic to the data we need to use some statistics. We can calculate how probable some pattern is when we compare the number of matches in the data to the number of matches in some random data. If a pattern is found in the input and random data the same number of times, it probably occured by chance. If a pattern is only found in the input data, then it probably is very interesting.
+There are important features "Binom" and "Hyper" that allow us to find interesting patterns. To determine whether a pattern happens by chance or is, indeed, characteristic to the data we need to use some statistics. We can calculate how probable some pattern is when we compare the number of matches in the data to the number of matches in some random data. If a pattern is found in the input and random data the same number of times, it probably occurred by chance. If a pattern is only found in the input data, then it probably is very interesting.
 
 ##### Filters
 
@@ -222,7 +222,7 @@ The "Extendable" filter specifies our search space, for example here we can add 
 
 The "Outputtable" filter specifies the patterns that we allow to be printed. For example we probably do not want very small patterns.
 
-The feature filter defintion looks like:
+The feature filter definition looks like:
 
 ```
 "Feature(dataset)" : { "min" : 0, "max" : $max:13$ }
@@ -243,7 +243,7 @@ We can use output to specify how many of the "best" patterns will be remembered 
 
 "SortBy" defines how to decide which are the top results. It takes an array of features as the sorting, if the first feature value is same for two patterns it will use the second etc.
 
-"Count" simply specifies the how many top results to keep.
+"Count" simply specifies how many top results to keep.
 
 #### Printer
 
@@ -258,7 +258,7 @@ Printer specifies how to show the results in the command line:
 }
 ```
 
-"ShowHeader" specifies whether to add an header to the output. "Reverse" allows to reverse the ordering of the output patterns, this is especially useful when testing the tool, since the best results will be printed to the console last.
+"ShowHeader" specifies whether to add a header to the output. "Reverse" allows to reverse the ordering of the output patterns, this is especially useful when testing the tool, since the best results will be printed to the console last.
 
 "Header" is an optional argument for giving nice looking column headers. If the value is empty the "Format" string will be used instead.
 
